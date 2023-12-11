@@ -6,6 +6,7 @@
 #include <boost/format.hpp>
 #include <iostream>
 #include <boost/timer/timer.hpp>
+#include <chrono>
 
 namespace FDU {
 namespace NLF {
@@ -20,7 +21,7 @@ void NLFApp::parse_command(int argc, char *argv[]) {
 }
 
 void NLFApp::try_process() {
-  boost::timer::auto_cpu_timer t;
+  auto start = chrono::high_resolution_clock::now();
 
 #ifdef EXCEPTION_HANDLE
   try {
@@ -29,7 +30,9 @@ void NLFApp::try_process() {
     refine_netlist();
     save_files();
 
-    FDU_LOG(INFO) << (finish_fmt % (t.elapsed().system / 1e9)).str();
+    auto end = chrono::high_resolution_clock::now();
+
+    FDU_LOG(INFO) << (finish_fmt % chrono::duration_cast<chrono::milliseconds>(end - start).count()).str();
 
 #ifdef EXCEPTION_HANDLE
   } catch (exception &e) {

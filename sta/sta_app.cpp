@@ -4,6 +4,7 @@
 #include <boost/timer/timer.hpp>
 // #include "report.h"
 // #include "reportmanager.hpp"
+#include <chrono>
 
 // #define NO_EXCEPTION_HANDLE
 
@@ -18,7 +19,7 @@ void STAApp::try_process(int argc, char *argv[]) {
   try {
 #endif
 
-    boost::timer::auto_cpu_timer t;
+     auto start = chrono::high_resolution_clock::now();
 
     arg_ = &STAArg::instance();
     design_ = new COS::TDesign;
@@ -34,7 +35,9 @@ void STAApp::try_process(int argc, char *argv[]) {
     //! 4. save files
     save_files();
 
-    FDU_LOG(INFO) << "success running STA in " << (t.elapsed().system / 1e9) << " sec";
+    auto end = chrono::high_resolution_clock::now();
+
+    FDU_LOG(INFO) << "success running STA in " << (chrono::duration_cast<chrono::milliseconds>(end - start).count()) << " ms";
 
 #ifndef NO_EXCEPTION_HANDLE
   } catch (exception &e) {

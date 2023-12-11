@@ -1,8 +1,7 @@
 #include "sta_app.hpp"
 #include "sta_report.hpp"
 #include "sta_utils.hpp"
-#define BOOST_TIMER_ENABLE_DEPRECATED
-#include <boost/timer.hpp>
+#include <boost/timer/timer.hpp>
 // #include "report.h"
 // #include "reportmanager.hpp"
 
@@ -19,7 +18,7 @@ void STAApp::try_process(int argc, char *argv[]) {
   try {
 #endif
 
-    boost::timer t;
+    boost::timer::auto_cpu_timer t;
 
     arg_ = &STAArg::instance();
     design_ = new COS::TDesign;
@@ -35,7 +34,7 @@ void STAApp::try_process(int argc, char *argv[]) {
     //! 4. save files
     save_files();
 
-    FDU_LOG(INFO) << "success running STA in " << t.elapsed() << " sec";
+    FDU_LOG(INFO) << "success running STA in " << (t.elapsed().system / 1e9) << " sec";
 
 #ifndef NO_EXCEPTION_HANDLE
   } catch (exception &e) {

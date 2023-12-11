@@ -5,8 +5,7 @@
 
 #include <boost/format.hpp>
 #include <iostream>
-#define BOOST_TIMER_ENABLE_DEPRECATED
-#include <boost/timer.hpp>
+#include <boost/timer/timer.hpp>
 
 namespace FDU {
 namespace NLF {
@@ -21,7 +20,7 @@ void NLFApp::parse_command(int argc, char *argv[]) {
 }
 
 void NLFApp::try_process() {
-  boost::timer t;
+  boost::timer::auto_cpu_timer t;
 
 #ifdef EXCEPTION_HANDLE
   try {
@@ -30,7 +29,7 @@ void NLFApp::try_process() {
     refine_netlist();
     save_files();
 
-    FDU_LOG(INFO) << (finish_fmt % t.elapsed()).str();
+    FDU_LOG(INFO) << (finish_fmt % (t.elapsed().system / 1e9)).str();
 
 #ifdef EXCEPTION_HANDLE
   } catch (exception &e) {

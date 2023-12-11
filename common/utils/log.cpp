@@ -13,6 +13,9 @@ namespace LOG {
 
 using namespace std;
 using namespace boost;
+namespace keywords = boost::log::keywords;
+namespace expr = boost::log::expressions;
+namespace attrs = boost::log::attributes;
 
 static const char *sev_levels[] = {"DEBUG", "VERBOSE", "INFO ", "WARN ",
                                    "ERROR"};

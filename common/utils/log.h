@@ -22,9 +22,6 @@ namespace LOG {
 namespace logging = boost::log;
 namespace sinks = boost::log::sinks;
 namespace src = boost::log::sources;
-namespace keywords = boost::log::keywords;
-namespace expr = boost::log::expressions;
-namespace attrs = boost::log::attributes;
 
 enum severity_level { DEBUG, VERBOSE, INFO, WARN, ERR };
 std::ostream &operator<<(std::ostream &s, severity_level level);

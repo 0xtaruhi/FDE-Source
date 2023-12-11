@@ -10,7 +10,6 @@
 // #define _BUILD_CELLLIBRARY2_0
 
 namespace VL2XML_PARSER {
-using std::exception;
 // using namespace DebugHelper;
 
 VerilogDesign::~VerilogDesign() {

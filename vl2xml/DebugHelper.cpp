@@ -4,7 +4,6 @@ using std::cin;
 using std::cout;
 using std::endl;
 using std::string;
-using std::vector;
 
 string NotFindExp(string type, string name) {
   return "There is no [" + type + "] named \"" + name + "\"";

@@ -23,7 +23,6 @@ ChangeLog:
 namespace VL2XML_PARSER {
 
 using std::list;
-using std::map;
 using std::string;
 using std::vector;
 using namespace COS;

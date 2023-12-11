@@ -26,7 +26,6 @@ using namespace COS;
 using std::list;
 using std::map;
 using std::string;
-using std::vector;
 
 class VerilogModule {
 

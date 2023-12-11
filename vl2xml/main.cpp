@@ -1,6 +1,5 @@
 #include "DebugHelper.hpp"
 #include "Vl2xmlApp.h"
-#include "netlist.hpp"
 
 using namespace VL2XML_PARSER;
 

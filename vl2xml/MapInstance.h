@@ -6,7 +6,7 @@
 
 namespace VL2XML_PARSER {
 
-using namespace std;
+// using namespace std;
 
 class MapInstance {
 public:
@@ -14,24 +14,24 @@ public:
   ~MapInstance();
 
   // about instance name mapping
-  string get_real_name() { return RealName; }
-  string get_mapped_name() { return MappedName; }
-  void set_real_name(string name) { RealName = name; }
-  void set_mapped_name(string name) { MappedName = name; }
+  std::string get_real_name() { return RealName; }
+  std::string get_mapped_name() { return MappedName; }
+  void set_real_name(std::string name) { RealName = name; }
+  void set_mapped_name(std::string name) { MappedName = name; }
 
   // about port name mapping
-  string get_mapped_port_through_real_port(string name) {
+  std::string get_mapped_port_through_real_port(std::string name) {
     return PortsMap[name];
   }
-  void insert_port_pair(string real, string mapped) {
+  void insert_port_pair(std::string real, std::string mapped) {
     PortsMap.insert(make_pair(real, mapped));
   }
 
 private:
-  string RealName;
-  string MappedName;
+  std::string RealName;
+  std::string MappedName;
 
-  map<string, string> PortsMap;
+  std::map<std::string, std::string> PortsMap;
 };
 } // namespace VL2XML_PARSER
 

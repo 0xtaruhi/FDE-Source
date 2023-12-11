@@ -356,7 +356,7 @@ void add_gsb(FPGADesign *fpgadesign, RTCell *rtmod, string cil_fname,
       ++to_node_it;
 
       p_sw = (*from_node_it)->find_switch(*to_node_it);
-      ASSERT(p_sw != NULL, ErrMsg(ErrMsg::RTERR_UFND_SWH) %
+      ASSERT(p_sw != nullptr, ErrMsg(ErrMsg::RTERR_UFND_SWH) %
                                (*from_node_it)->full_name() %
                                (*to_node_it)->full_name());
 

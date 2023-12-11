@@ -111,7 +111,7 @@ void Transformer::remove_dangling() {
                                 has_output_pin = true; // assume it only has
    input/output pin
 
-                        if (pin.net() != NULL) {
+                        if (pin.net() != nullptr) {
                                 poss_dangling_nets.push_back(pin.net());
                                 if (pin.dir() == COS::OUTPUT)
                                         has_output_net = true;
@@ -143,7 +143,7 @@ bool Transformer::is_inst_dangling(Instance *inst,
     else if (pin->dir() == COS::INOUT)
       has_inout_pin = true;
 
-    if (pin->net() != NULL) {
+    if (pin->net() != nullptr) {
       poss_dangling_nets.push_back(pin->net());
       if (pin->dir() == COS::INPUT)
         has_input_net = true;
@@ -207,7 +207,7 @@ void Transformer::transform(Match *match) {
     reset_internal_struct();
   }
 
-  cur_match_ = NULL;
+  cur_match_ = nullptr;
 }
 
 void Transformer::transform(VCell *vcell) {
@@ -223,7 +223,7 @@ void Transformer::transform(VCell *vcell) {
   for (Match::InstPair &ipair : vcell->inst_pairs())
     definit_dangling_insts_.insert(ipair.image_inst);
 
-  cur_vcell_ = NULL;
+  cur_vcell_ = nullptr;
 }
 
 bool Transformer::is_feasible(VCell *vcell) {
@@ -239,8 +239,8 @@ bool Transformer::is_feasible(VCell *vcell) {
       &create_config(CFG_NAME::SLICE, PROP_NV::CEMUX),
       &create_config(CFG_NAME::SLICE, PROP_NV::SRMUX)};
 
-  ASSERTD(slice_cell_, "slice cell is null when check feasible");
-  ASSERTD(slice_inst_, "slice instance is null when check feasible");
+  ASSERTD(slice_cell_, "slice cell is nullptr when check feasible");
+  ASSERTD(slice_inst_, "slice instance is nullptr when check feasible");
 
   // check for slice size constraint
   if (num_lut_in_cur_slice_ + vcell->rule()->rule_cell()->num_lut() >
@@ -251,7 +251,7 @@ bool Transformer::is_feasible(VCell *vcell) {
     return false;
 
   // check for ff constraint
-  PKInstance *ff_inst = NULL;
+  PKInstance *ff_inst = nullptr;
   for (Match::InstPair &ipair : vcell->inst_pairs()) {
     if (ipair.rule_inst->down_module()->name() == CELL_NAME::FF) {
       ff_inst = ipair.image_inst;
@@ -259,7 +259,7 @@ bool Transformer::is_feasible(VCell *vcell) {
     }
   }
 
-  if (ff_inst != NULL) {
+  if (ff_inst != nullptr) {
     string slice_value = "";
     string ff_value = "";
 
@@ -267,8 +267,8 @@ bool Transformer::is_feasible(VCell *vcell) {
     for (int i = 0; i < NUM_TEST; ++i) {
       Pin *slice_pin = slice_inst_->find_pin(*(pname_test[i]));
       VPort *vcell_port = vcell->find_port(*(pname_test[i]));
-      if (vcell_port != NULL && slice_pin != NULL) {
-        if (slice_pin->net() != NULL &&
+      if (vcell_port != nullptr && slice_pin != nullptr) {
+        if (slice_pin->net() != nullptr &&
             vcell_port->vpin()->net() != slice_pin->net())
           return false;
 
@@ -345,7 +345,7 @@ Module *Transformer::find_cell(const NameInfo &cname_i) {
     return slice_cell_;
 
   NameCellMap::iterator fit = created_cell_lktb_.find(cname_i.name);
-  return fit == created_cell_lktb_.end() ? NULL : fit->second;
+  return fit == created_cell_lktb_.end() ? nullptr : fit->second;
 }
 
 Instance *Transformer::find_instance(const NameInfo &iname_i) {
@@ -356,7 +356,7 @@ Instance *Transformer::find_instance(const NameInfo &iname_i) {
   // branch 1: name is a fake name
   if (iname_i.is_fake) {
     NameInstMap::iterator fit = created_inst_lktb_.find(iname_i.name);
-    return fit == created_inst_lktb_.end() ? NULL : fit->second;
+    return fit == created_inst_lktb_.end() ? nullptr : fit->second;
   }
 
   // branch 2: name is not fake and the target is SLICE_CELL
@@ -366,7 +366,7 @@ Instance *Transformer::find_instance(const NameInfo &iname_i) {
     {
             NameCellMap::iterator fit =
     created_cell_lktb_.find(cur_op_->target()->name()); Module* cell = fit ==
-    created_cell_lktb_.end() ? NULL : fit->second; return
+    created_cell_lktb_.end() ? nullptr : fit->second; return
     cell->find_instance(iname_i.name);
     }
     else*/
@@ -375,15 +375,15 @@ Instance *Transformer::find_instance(const NameInfo &iname_i) {
 
   // branch 3: name is not fake, the target is TopCell, like reconnect
   // and we are transform Match currently
-  if (cur_match_ != NULL) {
+  if (cur_match_ != nullptr) {
     RuleCell *rcell = cur_match_->rule()->rule_cell();
     RuleInstance *rinst = rcell->find_instance(iname_i.name);
-    return rinst == NULL ? NULL : rinst->image();
+    return rinst == nullptr ? nullptr : rinst->image();
   }
 
   // branch 4: name is not fake, the target is TopCell
   // and we are transform VCell currently
-  if (cur_vcell_ != NULL)
+  if (cur_vcell_ != nullptr)
     return cur_vcell_->find_image_inst(iname_i.name);
 
   // should never happen

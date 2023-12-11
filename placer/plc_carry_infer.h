@@ -20,35 +20,35 @@ struct ChainNode;
 struct ChainEdge;
 
 /************************************************************************/
-/* carry chainÖÐµÄ½ÚµãÖ®¼äµÄ±ß£¬¿ÉÒÔ¿¼ÂÇÈ¥µô                            */
+/* carry chainï¿½ÐµÄ½Úµï¿½Ö®ï¿½ï¿½Ä±ß£ï¿½ï¿½ï¿½ï¿½Ô¿ï¿½ï¿½ï¿½È¥ï¿½ï¿½                            */
 /************************************************************************/
 struct ChainEdge {
   ChainNode *_from_node;
   ChainNode *_to_node;
 
-  ChainEdge(ChainNode *f = NULL, ChainNode *t = NULL)
+  ChainEdge(ChainNode *f = nullptr, ChainNode *t = nullptr)
       : _from_node(f), _to_node(t) {}
 };
 
 /************************************************************************/
-/* carry chainÖÐµÄ½Úµã¶¨Òå                                              */
+/* carry chainï¿½ÐµÄ½Úµã¶¨ï¿½ï¿½                                              */
 /************************************************************************/
 struct ChainNode {
-  PLCInstance *_owner;   // Ö¸Ïò¸ÃsliceµÄÖ¸Õë
-  ChainEdge *_from_edge; // ¸ÃsliceµÄfrom±ß
-  ChainEdge *_to_edge;   // ¸ÃsliceµÄto±ß
+  PLCInstance *_owner;   // Ö¸ï¿½ï¿½ï¿½sliceï¿½ï¿½Ö¸ï¿½ï¿½
+  ChainEdge *_from_edge; // ï¿½ï¿½sliceï¿½ï¿½fromï¿½ï¿½
+  ChainEdge *_to_edge;   // ï¿½ï¿½sliceï¿½ï¿½toï¿½ï¿½
 
   explicit ChainNode(PLCInstance *owner)
-      : _owner(owner), _from_edge(NULL), _to_edge(NULL) {}
+      : _owner(owner), _from_edge(nullptr), _to_edge(nullptr) {}
   ~ChainNode() { delete _to_edge; }
-  // ´´½¨¸Ã½ÚµãµÄto edge£¬²¢½«Á½¸ö½ÚµãÁ¬½ÓºÃ
+  // ï¿½ï¿½ï¿½ï¿½ï¿½Ã½Úµï¿½ï¿½to edgeï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Úµï¿½ï¿½ï¿½ï¿½Óºï¿½
   void create_to_edge(ChainNode *t) {
     t->_from_edge = _to_edge = new ChainEdge(this, t);
   }
 };
 
 /************************************************************************/
-/* ÓÃÀ´´¦Àícarry chain                                                  */
+/* ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½carry chain                                                  */
 /************************************************************************/
 class CarryChainInference {
 public:
@@ -58,15 +58,15 @@ public:
   }
   // map<name, insts>
   typedef std::map<std::string, std::vector<PLCInstance *>> CarryChains;
-  // ÕÒµ½designÍø±íÖÐµÄ¸÷¸öcarry chain,²¢ÇÒ´æ´¢ÔÚchains
+  // ï¿½Òµï¿½designï¿½ï¿½ï¿½ï¿½ï¿½ÐµÄ¸ï¿½ï¿½ï¿½carry chain,ï¿½ï¿½ï¿½Ò´æ´¢ï¿½ï¿½chains
   void inference(TDesign *design, CarryChains &chains);
 
 protected:
-  // ´´½¨carry chainÖÐµÄÒ»¸ö½Úµã
+  // ï¿½ï¿½ï¿½ï¿½carry chainï¿½Ðµï¿½Ò»ï¿½ï¿½ï¿½Úµï¿½
   ChainNode *create_node(PLCInstance *owner);
-  // ÕÒµ½designÍø±íÖÐµÄcarry chainµÄ¸÷¸ö½Úµã£¬µ«ÊÇÃ»ÓÐÉèÖÃ³Écarry chain
+  // ï¿½Òµï¿½designï¿½ï¿½ï¿½ï¿½ï¿½Ðµï¿½carry chainï¿½Ä¸ï¿½ï¿½ï¿½ï¿½Úµã£¬ï¿½ï¿½ï¿½ï¿½Ã»ï¿½ï¿½ï¿½ï¿½ï¿½Ã³ï¿½carry chain
   void find_chains(PLCModule *top_cell);
-  // ½«·ÖÁ¢½Úµã×éÖ¯³É¸÷¸öcarry chainÈ»ºó´æ´¢£¬²¢ÉèÖÃºÃÊôÐÔ
+  // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Úµï¿½ï¿½ï¿½Ö¯ï¿½É¸ï¿½ï¿½ï¿½carry chainÈ»ï¿½ï¿½æ´¢ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ãºï¿½ï¿½ï¿½ï¿½ï¿½
   void store_chains(CarryChains &chains);
 
 private:

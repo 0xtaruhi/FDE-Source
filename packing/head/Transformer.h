@@ -80,8 +80,8 @@ class Transformer {
 public:
   // constructor
   Transformer()
-      : cur_match_(NULL), cur_vcell_(NULL), cur_op_(NULL), top_cell_(NULL),
-        slice_cell_(NULL), slice_inst_(NULL), slice_full_flag_(false),
+      : cur_match_(nullptr), cur_vcell_(nullptr), cur_op_(nullptr), top_cell_(nullptr),
+        slice_cell_(nullptr), slice_inst_(nullptr), slice_full_flag_(false),
         num_lut_in_cur_slice_(0), num_ff_in_cur_slice_(0) {}
 
   void transform(Match *);

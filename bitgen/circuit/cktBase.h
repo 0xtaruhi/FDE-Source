@@ -23,10 +23,10 @@ protected:
 public:
   // for XDL
   cktBase(const std::string &name, xdlMatch *matchResults = 0)
-      : _name(name), _matchResults(matchResults), _nlBase(NULL) {}
+      : _name(name), _matchResults(matchResults), _nlBase(nullptr) {}
   // for XML
   cktBase(COS::Object *nlBase = 0)
-      : _name(""), _nlBase(nlBase), _matchResults(NULL) {}
+      : _name(""), _nlBase(nlBase), _matchResults(nullptr) {}
 
   std::string getName() const { return _name; }
   std::string name() const { return _name; }

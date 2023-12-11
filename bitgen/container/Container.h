@@ -34,7 +34,7 @@ boost::iterator_range<IT> > struct iter_pair : Rng { iter_pair(IT begin, IT end)
 name) const { IT it = boost::find_if(*this, matchName<R>(name)); if(it ==
 end()){
 //				std::cout << Warning("container: no such member
-... " + name) << std::endl; return NULL;
+... " + name) << std::endl; return nullptr;
                         }
                         else
                                 return &*it;

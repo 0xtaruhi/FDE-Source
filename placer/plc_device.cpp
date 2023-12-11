@@ -38,7 +38,7 @@ std::ostream &operator<<(std::ostream &s, Site::SiteType type) {
 // Site
 
 /************************************************************************/
-/* ÅÐ¶Ï¸ÃsiteÀïÃæÕ¼ÓÃµÄinstÀïÊÇ·ñÓÐmacroµ¥Ôª*/
+/* ï¿½Ð¶Ï¸ï¿½siteï¿½ï¿½ï¿½ï¿½Õ¼ï¿½Ãµï¿½instï¿½ï¿½ï¿½Ç·ï¿½ï¿½ï¿½macroï¿½ï¿½Ôª*/
 /************************************************************************/
 bool Site::has_macro() const {
   bool has = false;
@@ -52,7 +52,7 @@ bool Site::has_macro() const {
 }
 
 /************************************************************************/
-/* ÅÐ¶Ï¸ÃsiteÀïÃæÕ¼ÓÃµÄinstÀïÊÇ·ñÓÐfixµ¥Ôª*/
+/* ï¿½Ð¶Ï¸ï¿½siteï¿½ï¿½ï¿½ï¿½Õ¼ï¿½Ãµï¿½instï¿½ï¿½ï¿½Ç·ï¿½ï¿½ï¿½fixï¿½ï¿½Ôª*/
 /************************************************************************/
 bool Site::has_fixed_insts() const {
   bool has = false;
@@ -66,7 +66,7 @@ bool Site::has_fixed_insts() const {
 }
 
 /************************************************************************/
-/* µÃµ½¸ÃsiteµÄmacro ÀàÐÍ */
+/* ï¿½Ãµï¿½ï¿½ï¿½siteï¿½ï¿½macro ï¿½ï¿½ï¿½ï¿½ */
 /************************************************************************/
 FLOORPLAN::SwapableType Site::macro_type() const {
   FLOORPLAN::SwapableType type = FLOORPLAN::SITE;
@@ -100,12 +100,12 @@ PLCInstance *Site::get_occ_inst(int idx) const {
       if (idx != 0)
         --idx;
       else if (idx == 0 && _occ_insts[i]->is_fixed())
-        return NULL;
+        return nullptr;
       else
         return _occ_insts[i];
     }
   }
-  return NULL;
+  return nullptr;
 }
 
 //////////////////////////////////////////////////////////////////////////

@@ -30,7 +30,7 @@ void CarryChainInference::inference(TDesign *design, CarryChains &chains) {
  *
  */
 ChainNode *CarryChainInference::create_node(PLCInstance *owner) {
-  ChainNode *node = NULL;
+  ChainNode *node = nullptr;
   // ���������_nodes���棬��ô���ظýڵ�
   // ��������ڣ�����һ�������뵽_nodes��
   if (_nodes.count(owner))

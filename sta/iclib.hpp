@@ -114,7 +114,7 @@ public:
 
   ICModule *get_model(const std::string &name) {
     module_map::iterator it = modules_.find(name);
-    return it != modules_.end() ? it->second : NULL;
+    return it != modules_.end() ? it->second : nullptr;
   }
 
   static ICLib *instance() { return instance_.get(); }

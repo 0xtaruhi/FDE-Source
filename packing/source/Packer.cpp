@@ -9,8 +9,8 @@ using namespace CHIP_TYPE_NAME;
 void Packer::try_pack(Design *design, bool fEncry_) {
   // initialize target objects
   top_cell_ =
-      static_cast<PKCell *>(design->top_module()); // PKCellÒÔmoduleÎª»ùÀà
-  tf_.set_top_cell(top_cell_);                     // tfÎªtransformerÀà¶ÔÏó
+      static_cast<PKCell *>(design->top_module()); // PKCellï¿½ï¿½moduleÎªï¿½ï¿½ï¿½ï¿½
+  tf_.set_top_cell(top_cell_);                     // tfÎªtransformerï¿½ï¿½ï¿½ï¿½ï¿½
 
   // first remove all dangling elements, need to confirm
   tf_.remove_dangling();
@@ -18,15 +18,15 @@ void Packer::try_pack(Design *design, bool fEncry_) {
   // two steps for csp packing
   // cout <<InfoMsg(InfoMsg::INFO_MAP2HW) << endl;
   FDU_LOG(INFO) << InfoMsg(InfoMsg::INFO_MAP2HW);
-  map_to_hw_lib(); // Ó³Éäµ½device_lib
+  map_to_hw_lib(); // Ó³ï¿½äµ½device_lib
 
   // cout <<InfoMsg(InfoMsg::INFO_PREMACRO) << endl;
   FDU_LOG(INFO) << InfoMsg(InfoMsg::INFO_PREMACRO);
-  preprocess_macro(); // Ó³Éäµ½macro_lib
+  preprocess_macro(); // Ó³ï¿½äµ½macro_lib
 
   // cout <<InfoMsg(InfoMsg::INFO_MAP2MACRO) << endl;
   FDU_LOG(INFO) << InfoMsg(InfoMsg::INFO_MAP2MACRO);
-  map_to_vcell(); // Ó³Éäµ½normal_lib
+  map_to_vcell(); // Ó³ï¿½äµ½normal_lib
   map_to_macro();
 
   // cout <<InfoMsg(InfoMsg::INFO_MAP2CLUSTER) << endl;
@@ -48,22 +48,22 @@ void Packer::try_pack(Design *design, bool fEncry_) {
 
 void Packer::map_to_hw_lib() {
   top_cell_
-      ->enable_update_graph(); // top_cell_ÎªPKCellÀà£¬Ö¸ÏòÉè¼ÆµÄ¶¥²ãµÄÄ£¿éModuleÀà
+      ->enable_update_graph(); // top_cell_ÎªPKCellï¿½à£¬Ö¸ï¿½ï¿½ï¿½ï¿½ÆµÄ¶ï¿½ï¿½ï¿½ï¿½Ä£ï¿½ï¿½Moduleï¿½ï¿½
 
   RuleLibaray *hw_rule_lib = prule_lib_.hw_rule_lib();
   ASSERT(hw_rule_lib, "hardware rule library not found");
 
-  for (RuleLibaray::Layer *layer : hw_rule_lib->layers()) { // ±éÀúÃ¿¸ölayer
+  for (RuleLibaray::Layer *layer : hw_rule_lib->layers()) { // ï¿½ï¿½ï¿½ï¿½Ã¿ï¿½ï¿½layer
     if (layer->empty())
       continue;
     PtrVector<Match> layer_matches;
-    for (Rule *rule : *layer) { // ÒÔÃ¿¸öruleºÍ¶¥²ãÄ£¿é¹¹³ÉÒ»¸ömatch
+    for (Rule *rule : *layer) { // ï¿½ï¿½Ã¿ï¿½ï¿½ruleï¿½Í¶ï¿½ï¿½ï¿½Ä£ï¿½é¹¹ï¿½ï¿½Ò»ï¿½ï¿½match
       Match *amatch =
           layer_matches.add(new Match(rule, top_cell_)); // Match(Rule*,PKCell)
-      ncsp.solve(amatch); // °´Éú³ÉµÄmatch½øÐÐCSPÆ¥Åä
+      ncsp.solve(amatch); // ï¿½ï¿½ï¿½ï¿½ï¿½Éµï¿½matchï¿½ï¿½ï¿½ï¿½CSPÆ¥ï¿½ï¿½
 #ifdef _DEBUG
       if (amatch->num_matches() != 0)
-        amatch->write(); // debugÄ£Ê½ÏÂÊä³öÆ¥Åä½á¹û£¨ÒÔxml¸ñÊ½£©
+        amatch->write(); // debugÄ£Ê½ï¿½ï¿½ï¿½ï¿½ï¿½Æ¥ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½xmlï¿½ï¿½Ê½ï¿½ï¿½
 #endif
     }
     // add to transform here!
@@ -259,7 +259,7 @@ void Packer::map_to_cluster() {
 
     VCell *next_vcell = get_next_vcell();
     ////////////////////////sophie/////////////////////////////////
-    while (next_vcell != NULL && !next_vcell->is_clustered()) {
+    while (next_vcell != nullptr && !next_vcell->is_clustered()) {
       add_to_cluster(next_vcell);
       next_vcell = get_next_vcell();
     }
@@ -283,7 +283,7 @@ void Packer::add_to_cluster(VCell *vcell) {
 
 void Packer::update_partial_gain(VPort *vport) {
   PKNet *net = vport->vpin()->net();
-  if (net == NULL)
+  if (net == nullptr)
     return;
 
   // update share gain
@@ -325,7 +325,7 @@ VCell *Packer::get_next_vcell() {
     if (tf_.is_feasible(cddt_vcell))
       return cddt_vcell;
   }
-  return NULL;
+  return nullptr;
 }
 
 void Packer::reset_clustering_structs() {

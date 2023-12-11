@@ -77,7 +77,7 @@ class ICreateInst : public Instruct {
   friend class InstructParser;
 
 public:
-  ICreateInst(TranTestCase *c) : Instruct(c), model_(NULL) {}
+  ICreateInst(TranTestCase *c) : Instruct(c), model_(nullptr) {}
 
   c_str_ptr name() const { return INSTR_NAME; }
   COS::Object *execute() const;
@@ -102,7 +102,7 @@ class ICreateIob : public Instruct {
   friend class InstructParser;
 
 public:
-  ICreateIob(TranTestCase *c) : Instruct(c), model_(NULL) {}
+  ICreateIob(TranTestCase *c) : Instruct(c), model_(nullptr) {}
 
   c_str_ptr name() const { return INSTR_NAME; }
   COS::Object *execute() const;
@@ -151,7 +151,7 @@ class ICloneCell : public Instruct {
   friend class InstructParser;
 
 public:
-  ICloneCell(TranTestCase *c) : Instruct(c), model_(NULL) {}
+  ICloneCell(TranTestCase *c) : Instruct(c), model_(nullptr) {}
 
   c_str_ptr name() const { return INSTR_NAME; }
   COS::Object *execute() const;
@@ -361,7 +361,7 @@ class ICreateSlice : public Instruct {
   friend class InstructParser;
 
 public:
-  ICreateSlice(TranTestCase *c) : Instruct(c), model_(NULL) {}
+  ICreateSlice(TranTestCase *c) : Instruct(c), model_(nullptr) {}
 
   c_str_ptr name() const { return INSTR_NAME; }
   COS::Object *execute() const;

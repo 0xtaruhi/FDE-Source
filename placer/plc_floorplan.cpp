@@ -95,7 +95,7 @@ void Floorplan::build_fpga() {
             site._capacity = 0;
         } else
           site._capacity = rsc.second;
-        site._occ_insts.resize(rsc.second, NULL);
+        site._occ_insts.resize(rsc.second, nullptr);
         site._logic_pos = Point(row, col);
         if (site._capacity)
           _dev_info.add_rsc_ava_pos(site._type, Point(row, col));
@@ -217,7 +217,7 @@ void Floorplan::init_place_lut6(LUT6Inference::LUT6s &lut6s) {
 
   for (LUT6 &lut6 : lut6s) {
     int rand_idx;
-    Site *slice_site = NULL;
+    Site *slice_site = nullptr;
     do {
       rand_idx = rand() % ava_pos.size();
       slice_site = &_fpga.at(ava_pos[rand_idx]).site(Site::SLICE);
@@ -400,7 +400,7 @@ Floorplan::Result Floorplan::satisfy_cst_rules_for_site(SwapObject *from_obj,
     int num_fixed_insts = 0, num_carrychain_insts = 0;
     // ��ÿһ��to obj�����fix��carry chainռ�õ���Ŀ
     for (PLCInstance *inst : site_to._occ_insts) {
-      if (inst == NULL)
+      if (inst == nullptr)
         continue;
       // �����fix
       if (inst->is_fixed())
@@ -669,7 +669,7 @@ void Floorplan::update_qualified_pos_for_carrychain(SwapInsts &from_insts,
   typedef set<pair<int, int>> AffectedZCols;
   AffectedZCols affected_z_cols;
 
-  PLCInstance *inst = NULL;
+  PLCInstance *inst = nullptr;
   Point pos;
   int index;
   int carry_size = DEVICE::carry_chain[0].size(); // ÿ����λ����ռ��slice����
@@ -725,7 +725,7 @@ void Floorplan::swap_insts_for_site(SwapObject *from_obj, Point &pos_to,
 
         from_obj->update_place_info(0, pos_to, site_to);
         from_insts.push_back(from_obj->plc_insts()[0]);
-        to_insts.push_back(NULL);
+        to_insts.push_back(nullptr);
       } else { // swap with
         PLCInstance *to_inst = site_to.get_occ_inst(rand_to_index);
         if (!to_inst)
@@ -914,7 +914,7 @@ FLOORPLAN::SwapableType Floorplan::find_to(SwapObject *from_obj, Point &pos_to,
 void Floorplan::swap_insts(SwapInsts &from_insts, SwapInsts &to_insts,
                            Point &pos_from, Point &pos_to, double rlim) {
   FLOORPLAN::SwapableType to_type;
-  SwapObject *from_obj = NULL;
+  SwapObject *from_obj = nullptr;
   // �������_nl_info.num_swap_objects()Ϊ0����ô�Ͳ�������ѭ���������Ժ���Ҫ�޸�
   do {
     // ����ҵ�һ�����Խ�����from obj������Ǵ�������Ϣ����Ѱ��
@@ -977,7 +977,7 @@ void Floorplan::maintain(bool keey_swap, SwapInsts &from_insts,
       pos_to = to_inst->past_logic_pos();
       site_type = to_inst->curr_loc_site()->_type;
     } else
-      throw(CONSOLE::PLC_ERROR % "both from_inst & to_inst are NULL.");
+      throw(CONSOLE::PLC_ERROR % "both from_inst & to_inst are nullptr.");
     // �õ�site from��site to
     Site &site_from = _fpga.at(pos_from).site(site_type);
     Site &site_to = _fpga.at(pos_to).site(site_type);
@@ -1103,7 +1103,7 @@ double Floorplan::compute_tcost(TEngine::WORK_MODE emode, double crit_exp) {
   PLCInstance *source_inst, *sink_inst;
   Property<COS::TData> &delays =
       create_temp_property<COS::TData>(COS::PIN, PIN::DELAY);
-  // if(dynamic_cast<TDesign*>(_nl_info.design()) != NULL )
+  // if(dynamic_cast<TDesign*>(_nl_info.design()) != nullptr )
   dmax = _nl_info.design()->timing_analyse(emode);
 
   for (PLCNet *net :

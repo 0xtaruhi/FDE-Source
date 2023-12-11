@@ -69,14 +69,14 @@ void TilePortValidation::vldtInstanceSide(const ArchInstance *inst,
   const Port *oppositePt =
       oppositeInst->down_module()->find_port(oppositeSideStr);
 
-  if (pt == NULL && oppositePt != NULL) {
+  if (pt == nullptr && oppositePt != nullptr) {
     PRINTLN(os, format("%s(%s) has no %s side port but its opposite tile "
                        "%s(%s) has %s port.") %
                     inst->name() % lexical_cast<string>(pos) % sideStr %
                     oppositeInst->name() % lexical_cast<string>(oppositePos) %
                     oppositeSideStr);
   }
-  if (oppositePt == NULL && pt != NULL) {
+  if (oppositePt == nullptr && pt != nullptr) {
     PRINTLN(os, format("%s(%s) has no %s side port but its opposite tile "
                        "%s(%s) has %s port.") %
                     oppositeInst->name() % lexical_cast<string>(oppositePos) %

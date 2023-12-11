@@ -13,8 +13,8 @@ using namespace COS;
 // RTNode
 
 TreeNode::TreeNode(RTNode *owner) : _owner(owner) {
-  _parent = NULL;
-  _parent_sw = NULL;
+  _parent = nullptr;
+  _parent_sw = nullptr;
   _re_expand = true;
   _Rupstream = _Cdownstream = _delay = RRGPara::ZERO_DOUBLE;
 
@@ -68,7 +68,7 @@ TreeNode *RouteTree::add_path_to_rout_tree(TDHeapNode *sink_hnode) {
 
   RTNode *current = sink_hnode->_prev_rt_node;
   RRGSwitch *child_sw = sink_hnode->_prev_sw;
-  TreeNode *tree_node = NULL;
+  TreeNode *tree_node = nullptr;
   while (current->prev_node()) {
     tree_node = new TreeNode(current);
     tree_node->_re_expand = true;

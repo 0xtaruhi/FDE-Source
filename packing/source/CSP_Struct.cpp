@@ -41,7 +41,7 @@ ConstraintComNet::ConstraintComNet(Variable *var1, Variable *var2)
     : BConstraint(var1, var2, 0, BConstraint::CONSTRAINT_COMNET) {}
 
 Query::Query(Variable *tar, int weight, BConstraint *c, QueryEnum e)
-    : source_(NULL), target_(tar), weight_(weight), correspond_(c), qtype_(e) {
+    : source_(nullptr), target_(tar), weight_(weight), correspond_(c), qtype_(e) {
   tar->add_incoming_query(this);
 }
 
@@ -75,7 +75,7 @@ QueryOutgoing::QueryOutgoing(Variable *src, Variable *arc, BConstraint *c)
 bool BConstraint::appliable() const {
   if (!active_)
     return false;
-  return var1_->instance() != NULL && var2_->instance() != NULL;
+  return var1_->instance() != nullptr && var2_->instance() != nullptr;
 }
 
 bool ConstraintType::execute() {
@@ -90,7 +90,7 @@ bool ConstraintType::execute() {
     GNode *inst_node = static_cast<GNode *>(inst_obj);
     for (cstr_ptr cpstr : rule_node->connect_pin()) {
       Pin *pin = inst_node->correspond()->find_pin(*cpstr);
-      if (pin == NULL || pin->net() == NULL)
+      if (pin == nullptr || pin->net() == nullptr)
         return false;
     }
   } else {
@@ -159,21 +159,21 @@ bool ConstraintComNet::execute() {
 
   for (const GNode::PinNamesPair &apair : com_net_pairs) {
     Pin *apin = src_inst->find_pin(*apair.first[0]);
-    if (apin == NULL)
+    if (apin == nullptr)
       return false;
 
     Net *com_net = apin->net();
     for (cstr_ptr cpstr : apair.first) {
       apin = src_inst->find_pin(*cpstr);
 
-      if (apin == NULL || apin->net() != com_net)
+      if (apin == nullptr || apin->net() != com_net)
         return false;
     }
 
     for (cstr_ptr cpstr : apair.second) {
       apin = tar_inst->find_pin(*cpstr);
 
-      if (apin == NULL || apin->net() != com_net)
+      if (apin == nullptr || apin->net() != com_net)
         return false;
     }
   }
@@ -186,16 +186,16 @@ bool ConstraintComNet::execute() {
 // the appliable conditions are: first the target var is not instantiated
 // second the source var must be instantiated
 bool Query::appliable() const {
-  if (target_->instance() != NULL)
+  if (target_->instance() != nullptr)
     return false;
-  if (source_ != NULL && source_->instance() == NULL)
+  if (source_ != nullptr && source_->instance() == nullptr)
     return false;
   return true;
 }
 
 void QueryType::query_gobjects(CellGraph::GObjList *type_domain) {
   query_result_.clear();
-  if (type_domain == NULL)
+  if (type_domain == nullptr)
     return;
 
   correspond_->activate();
@@ -205,7 +205,7 @@ void QueryType::query_gobjects(CellGraph::GObjList *type_domain) {
     if (!gobj->layer_lock() && correspond_->execute())
       query_result_.insert(gobj);
   }
-  target_->set_instance(NULL); //???
+  target_->set_instance(nullptr); //???
 }
 
 int QueryType::average_in_degree() {

@@ -12,7 +12,7 @@ namespace rt_cil_lib {
 using boost::lexical_cast;
 
 cilLibrary *CilLibHandler::loadCil(xml_node *node) {
-  ASSERT(_cilLib, "cilLib pointer is null");
+  ASSERT(_cilLib, "cilLib pointer is nullptr");
   foreach_child(eleLibNode, node, "element_library") loadEleLib(eleLibNode);
 
   return _cilLib;

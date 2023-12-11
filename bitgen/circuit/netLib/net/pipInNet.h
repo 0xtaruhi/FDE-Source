@@ -17,7 +17,7 @@ private:
   std::string _dir;
 
 public:
-  explicit pipNet(const std::string &info) : cktBase("", NULL) {
+  explicit pipNet(const std::string &info) : cktBase("", nullptr) {
     constructFromXDL(info);
   }
 

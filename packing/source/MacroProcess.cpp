@@ -30,7 +30,7 @@ struct ChainCell {
   bool addf_flag;
 
   ChainCell(VCell *vc)
-      : lut(NULL), cymux(NULL), xor_(NULL), addf(NULL), level(0),
+      : lut(nullptr), cymux(nullptr), xor_(nullptr), addf(nullptr), level(0),
         addf_flag(false) {
     for (const Match::InstPair &inst_pair : vc->inst_pairs()) {
       if (inst_pair.image_inst->down_module()->name() == LUT) {
@@ -87,14 +87,14 @@ static void find_singal_chain_from_cin(PKInstance *seed,
   PKInstance *cymux = cell->cymux;
 
   PKNet *cinet = cymux->find_pin(CYMUX_CI)->net();
-  if (cinet != NULL) {
+  if (cinet != nullptr) {
 
     PKInstance *ci_cymux;
     PKInstance *ci_seed;
     PKPin *muxcout_pin = cinet->find_pin(CYMUX_O);
 
     // the cell is in the middle of the chain
-    if (muxcout_pin != NULL &&
+    if (muxcout_pin != nullptr &&
         muxcout_pin->instance()->down_module()->name() == CYMUX) {
       ci_cymux = muxcout_pin->instance();
       ci_seed = ci_cymux->property_value(CHAIN_CELL)->lut;
@@ -103,8 +103,8 @@ static void find_singal_chain_from_cin(PKInstance *seed,
     // first chain cell, its input cell has 2 cases:
     // 1, the cell has no pin named with CYMUX_O
     // 2, the cell luckly has a pin named with CYMUX_O, but it is not CYMUX
-    else if (muxcout_pin == NULL ||
-             (muxcout_pin != NULL &&
+    else if (muxcout_pin == nullptr ||
+             (muxcout_pin != nullptr &&
               muxcout_pin->instance()->down_module()->name() != CYMUX)) {
       first_chain_cells.push_back(cell);
       return;
@@ -129,14 +129,14 @@ static void find_single_chain_from_addf_cin(PKInstance *seed,
   PKInstance *addf = cell->addf;
 
   PKNet *cinet = addf->find_pin(ADDF_CI)->net();
-  if (cinet != NULL) {
+  if (cinet != nullptr) {
 
     PKInstance *ci_addf;
     PKInstance *ci_seed;
     PKPin *addfcout_pin = cinet->find_pin(ADDF_CO);
 
     // the cell is in the middle of the chain
-    if (addfcout_pin != NULL &&
+    if (addfcout_pin != nullptr &&
         addfcout_pin->instance()->down_module()->name() == ADDF) {
       ci_addf = addfcout_pin->instance();
       ci_seed = ci_addf->property_value(CHAIN_CELL)->addf;
@@ -149,8 +149,8 @@ static void find_single_chain_from_addf_cin(PKInstance *seed,
     // first chain cell, its input cell has 2 cases:
     // 1, the cell has no pin named with CYMUX_O
     // 2, the cell luckly has a pin named with CYMUX_O, but it is not CYMUX
-    else if (addfcout_pin == NULL ||
-             (addfcout_pin != NULL &&
+    else if (addfcout_pin == nullptr ||
+             (addfcout_pin != nullptr &&
               addfcout_pin->instance()->down_module()->name() != ADDF)) {
       first_chain_cells.push_back(cell);
       return;
@@ -174,7 +174,7 @@ static void find_singal_chain_from_cout(PKInstance *seed,
   PKInstance *cymux = cell->cymux;
 
   PKNet *conet = cymux->find_pin(CYMUX_O)->net();
-  if (conet != NULL) {
+  if (conet != nullptr) {
 
     PKInstance *co_cymux;
     PKInstance *co_seed;
@@ -183,7 +183,7 @@ static void find_singal_chain_from_cout(PKInstance *seed,
     PKPin *xorcin_pin = conet->find_pin(XOR_CI);
 
     // the cell is in the middle of the chain
-    if (muxcin_pin != NULL &&
+    if (muxcin_pin != nullptr &&
         muxcin_pin->instance()->down_module()->name() == CYMUX) {
       co_cymux = muxcin_pin->instance();
       co_seed = co_cymux->property_value(CHAIN_CELL)->lut;
@@ -191,7 +191,7 @@ static void find_singal_chain_from_cout(PKInstance *seed,
     }
     // this is the second last carry chain cell
     // and the last chain cell has no cymux(only lut+xor)
-    else if (muxcin_pin == NULL && xorcin_pin != NULL &&
+    else if (muxcin_pin == nullptr && xorcin_pin != nullptr &&
              xorcin_pin->instance()->down_module()->name() == XOR) {
       co_xor = xorcin_pin->instance();
       co_seed = co_xor->property_value(CHAIN_CELL)->lut;
@@ -201,8 +201,8 @@ static void find_singal_chain_from_cout(PKInstance *seed,
       next_cell->level = chain_level++;
     }
     // this is the last carry chain cell with cymux
-    else if (muxcin_pin == NULL ||
-             (muxcin_pin != NULL &&
+    else if (muxcin_pin == nullptr ||
+             (muxcin_pin != nullptr &&
               muxcin_pin->instance()->down_module()->name() != CYMUX)) {
       ;
     }
@@ -226,7 +226,7 @@ static void find_single_chain_from_addf_cout(PKInstance *seed,
   PKInstance *addf = cell->addf;
 
   PKNet *conet = addf->find_pin(ADDF_CO)->net();
-  if (conet != NULL) {
+  if (conet != nullptr) {
 
     PKInstance *co_addf;
     PKInstance *co_seed;
@@ -235,7 +235,7 @@ static void find_single_chain_from_addf_cout(PKInstance *seed,
     // PKPin* xorcin_pin = conet->find_pin(XOR_CI);
 
     // the cell is in the middle of the chain
-    if (addfcin_pin != NULL &&
+    if (addfcin_pin != nullptr &&
         addfcin_pin->instance()->down_module()->name() == ADDF) {
       co_addf = addfcin_pin->instance();
       co_seed = co_addf->property_value(CHAIN_CELL)->addf;
@@ -245,7 +245,7 @@ static void find_single_chain_from_addf_cout(PKInstance *seed,
     }
     // this is the second last carry chain cell
     // and the last chain cell has no cymux(only lut+xor)
-    // else if(muxcin_pin == NULL && xorcin_pin != NULL &&
+    // else if(muxcin_pin == nullptr && xorcin_pin != nullptr &&
     // xorcin_pin->owner().instof().name() == XOR){ 	co_xor =
     //&xorcin_pin->owner(); 	co_seed =
     // co_xor->property_value<ChainCell*>(CHAIN_CELL)->lut;
@@ -255,8 +255,8 @@ static void find_single_chain_from_addf_cout(PKInstance *seed,
     //	next_cell->level = chain_level++;
     //}
     // this is the last carry chain cell with cymux
-    else if (addfcin_pin == NULL ||
-             (addfcin_pin != NULL &&
+    else if (addfcin_pin == nullptr ||
+             (addfcin_pin != nullptr &&
               addfcin_pin->instance()->down_module()->name() != ADDF)) {
       ;
     }
@@ -329,7 +329,7 @@ static void group_carry_chain(AllChainCells &chain_cells,
         chains.push_back(chain);
       }
     } else {
-      if (cell->cymux == NULL)
+      if (cell->cymux == nullptr)
         continue;
       if (!cell->lut->is_used()) {
         seed = cell->lut;
@@ -390,7 +390,7 @@ void Packer::pack_carry_chain() {
   typedef pair<VCell *, VCell *> CellPair;
   vector<vector<PKInstance *>> slice_chains; // slice chains
 
-  // ½«¸÷¸ö½øÎ»Á´´ò³Éslice
+  // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Î»ï¿½ï¿½ï¿½ï¿½ï¿½slice
   for (SingleChain chain : chains) {
 #ifdef _DEBUG
     cout << "=====================================================" << endl;
@@ -399,14 +399,14 @@ void Packer::pack_carry_chain() {
     vector<CellPair> cc_slices;
     for (size_t i = 0; i < chain.size(); i += 2) {
       VCell *f = ccell_to_vcell[chain[i]];
-      VCell *s = (i + 1 == chain.size()) ? NULL : ccell_to_vcell[chain[i + 1]];
+      VCell *s = (i + 1 == chain.size()) ? nullptr : ccell_to_vcell[chain[i + 1]];
       cc_slices.push_back(make_pair(f, s));
     }
 
     vector<PKInstance *> aslice_chain;
     for (CellPair &cp : cc_slices) {
       tf_.set_sfull_flag();
-      tf_.transform(cp.first); // ÏÈ´òÎ»ÓÚLUT FµÄ½øÎ»Á´
+      tf_.transform(cp.first); // ï¿½È´ï¿½Î»ï¿½ï¿½LUT Fï¿½Ä½ï¿½Î»ï¿½ï¿½
 
 #ifdef _DEBUG
       cout << "CARRY CHAIN INFO: [F] This level is packed into Slice F" << endl;
@@ -417,7 +417,7 @@ void Packer::pack_carry_chain() {
       PKPin *fcout = static_cast<PKPin *>(slice->find_pin(PIN_NAME::COUT));
       PKNet *fcout_net = fcout->net();
 
-      if (fcout_net != NULL) {
+      if (fcout_net != nullptr) {
         Net::pins_type f_sink_pin_range_ = fcout_net->sink_pins();
 
 #ifdef _DEBUG
@@ -427,12 +427,12 @@ void Packer::pack_carry_chain() {
                << endl;
 #endif
       }
-      // ´ò¿ªXBµÄÇé¿ö£º
-      // Çé¿ö1£º×îºóÒ»¼¶½øÎ»Á´µÄcout´ÓXB³öÈ¥£»
-      // Çé¿ö2£ºËäÈ»²»ÊÇ×îºóÒ»¼¶£¬µ«ÊÇ±ðµÄÆ÷¼þÐèÒªÓÃµ½½øÎ»Á´Êý¾Ý£¬Ò²´ÓXB³öÈ¥
+      // ï¿½ï¿½XBï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+      // ï¿½ï¿½ï¿½1ï¿½ï¿½ï¿½ï¿½ï¿½Ò»ï¿½ï¿½ï¿½ï¿½Î»ï¿½ï¿½ï¿½ï¿½coutï¿½ï¿½XBï¿½ï¿½È¥ï¿½ï¿½
+      // ï¿½ï¿½ï¿½2ï¿½ï¿½ï¿½ï¿½È»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ò»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ç±ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Òªï¿½Ãµï¿½ï¿½ï¿½Î»ï¿½ï¿½ï¿½ï¿½ï¿½Ý£ï¿½Ò²ï¿½ï¿½XBï¿½ï¿½È¥
 
-      // Çé¿ö1£º
-      if (fcout_net != NULL && cp.second == NULL) {
+      // ï¿½ï¿½ï¿½1ï¿½ï¿½
+      if (fcout_net != nullptr && cp.second == nullptr) {
 
         /*cout<<"--------------------------------------------"<<endl;
         cout<<"net name: "<<fcout_net->name()<<endl;
@@ -440,7 +440,7 @@ void Packer::pack_carry_chain() {
         cout<<"number of sink pins =\t"<<fcout_net->sink_pins().size()<<endl;*/
 
         PKPin *xb = static_cast<PKPin *>(slice->find_pin(PIN_NAME::XB));
-        ASSERT(xb->net() == NULL, "XB has been occupyied.-1");
+        ASSERT(xb->net() == nullptr, "XB has been occupyied.-1");
         xb->connect(fcout_net);
         xb->set_used();
         if (chip_type_ == CHIP_TYPE_NAME::FDP3)
@@ -458,11 +458,11 @@ void Packer::pack_carry_chain() {
 #endif
       }
 
-      // Çé¿ö2£º
+      // ï¿½ï¿½ï¿½2ï¿½ï¿½
 
-      else if (fcout_net != NULL && fcout_net->sink_pins().size() > 1) {
+      else if (fcout_net != nullptr && fcout_net->sink_pins().size() > 1) {
         PKPin *xb = static_cast<PKPin *>(slice->find_pin(PIN_NAME::XB));
-        ASSERT(xb->net() == NULL, "XB has been occupyied.-2");
+        ASSERT(xb->net() == nullptr, "XB has been occupyied.-2");
         xb->connect(fcout_net);
         xb->set_used();
         if (chip_type_ == CHIP_TYPE_NAME::FDP3)
@@ -480,9 +480,9 @@ void Packer::pack_carry_chain() {
 #endif
       }
 
-      // ÒòÎªÔÚÆ¥Åä¿âÀï´ò¿ªÁËcout£¬ÏÖÔÚÒª¹Ø±Õ£¬²¢ÇÒ½«cout¶ËÒÆ³ý±¾À´Á¬½ÓµÄÏßÍø
+      // ï¿½ï¿½Îªï¿½ï¿½Æ¥ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½coutï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Òªï¿½Ø±Õ£ï¿½ï¿½ï¿½ï¿½Ò½ï¿½coutï¿½ï¿½ï¿½Æ³ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Óµï¿½ï¿½ï¿½ï¿½ï¿½
       //
-      if (fcout_net != NULL) {
+      if (fcout_net != nullptr) {
         fcout->disconnect();
         fcout->clear_used();
         Config &COUTUSED = create_config("SLICE", "COUTUSED");
@@ -491,15 +491,15 @@ void Packer::pack_carry_chain() {
 
       set_vcell_clusterd(cp.first);
       tf_.clear_sfull_flag();
-      if (cp.second != NULL) {
+      if (cp.second != nullptr) {
 #ifdef _DEBUG
         cout << "CARRY CHAIN INFO: [G] This level is packed into Slice G"
              << endl;
 #endif
         tf_.transform(cp.second);
-        fcout_net = fcout->net(); // »ñµÃcout¶ËÁ¬½ÓµÄÏßÍø
+        fcout_net = fcout->net(); // ï¿½ï¿½ï¿½coutï¿½ï¿½ï¿½ï¿½ï¿½Óµï¿½ï¿½ï¿½ï¿½ï¿½
 
-        if (fcout_net != NULL) {
+        if (fcout_net != nullptr) {
           Net::pins_type g_sink_pin_range_ = fcout_net->sink_pins();
 
 #ifdef _DEBUG
@@ -510,17 +510,17 @@ void Packer::pack_carry_chain() {
           }
 #endif
         }
-        // ½øÎ»Á´×îºóÒ»¼¶µÄ½øÎ»Êä³öÈÔÓ¦¸Ã´Ócout³öÈ¥£¬iseºÍÎÒÃÇ×Ô¼ºµÄ²¼Ïß¶¼»á×Ô¶¯½«coutÏßÍøÖØÐÂÁ¬½Óµ½YBÏßÍøÈ¥£¬ÕâÒ»²½²»ÐèÒªpackingÀ´ÖØÁ¬ÏßÍø
-        // µ«ÎÒÃÇµÄ²¼¾Ö²¼ÏßÐèÒª°Ñ×îºóÒ»¼¶µÄYBMUX´ò¿ª
+        // ï¿½ï¿½Î»ï¿½ï¿½ï¿½ï¿½ï¿½Ò»ï¿½ï¿½ï¿½Ä½ï¿½Î»ï¿½ï¿½ï¿½ï¿½ï¿½Ó¦ï¿½Ã´ï¿½coutï¿½ï¿½È¥ï¿½ï¿½iseï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ô¼ï¿½ï¿½Ä²ï¿½ï¿½ß¶ï¿½ï¿½ï¿½ï¿½Ô¶ï¿½ï¿½ï¿½coutï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Óµï¿½YBï¿½ï¿½ï¿½ï¿½È¥ï¿½ï¿½ï¿½ï¿½Ò»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Òªpackingï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+        // ï¿½ï¿½ï¿½ï¿½ï¿½ÇµÄ²ï¿½ï¿½Ö²ï¿½ï¿½ï¿½ï¿½ï¿½Òªï¿½ï¿½ï¿½ï¿½ï¿½Ò»ï¿½ï¿½ï¿½ï¿½YBMUXï¿½ï¿½
 
-        // ÏÂÃæÕâ¸öifÈç¹ûÌõ¼þ³ÉÁ¢ÊÂÇé¾Í¸ã´óÁË
-        // ÕâÒ»¶Î´úÂë´¦Àícout¶ËÁ¬½ÓµÄÏßÍøÎÊÌâ
+        // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ifï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Í¸ï¿½ï¿½ï¿½ï¿½
+        // ï¿½ï¿½Ò»ï¿½Î´ï¿½ï¿½ë´¦ï¿½ï¿½coutï¿½ï¿½ï¿½ï¿½ï¿½Óµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
         //
-        // Âú×ãÌõ¼þµÄÏßÍøÁ¬½ÓÓÐÒÔÏÂ3ÖÖÇé¿ö
-        // 1-srcpinÓÐµÍ¼¶½øÎ»Á´µÄcout£¬sinkpinÓÐ¸ß¼¶½øÎ»Á´µÄcin£¬Ò»¸öÆäËûslice»òiobµÄÊäÈëpin
-        // 2-srcpinÓÐµÍ¼¶½øÎ»Á´µÄcout£¬sinkpinÓÐ¸ß¼¶½øÎ»Á´µÄcin£¬¶à¸öÆäËûslice»òiobµÄÊäÈëpin
-        // 3-srcpinÓÐµÍ¼¶½øÎ»Á´µÄcout£¬sinkpinÓÐ¶à¸öÆäËûslice»òiobµÄÊäÈëpin
-        if (fcout_net != NULL && fcout_net->sink_pins().size() > 1) {
+        // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½3ï¿½ï¿½ï¿½ï¿½ï¿½
+        // 1-srcpinï¿½ÐµÍ¼ï¿½ï¿½ï¿½Î»ï¿½ï¿½ï¿½ï¿½coutï¿½ï¿½sinkpinï¿½Ð¸ß¼ï¿½ï¿½ï¿½Î»ï¿½ï¿½ï¿½ï¿½cinï¿½ï¿½Ò»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½sliceï¿½ï¿½iobï¿½ï¿½ï¿½ï¿½ï¿½ï¿½pin
+        // 2-srcpinï¿½ÐµÍ¼ï¿½ï¿½ï¿½Î»ï¿½ï¿½ï¿½ï¿½coutï¿½ï¿½sinkpinï¿½Ð¸ß¼ï¿½ï¿½ï¿½Î»ï¿½ï¿½ï¿½ï¿½cinï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½sliceï¿½ï¿½iobï¿½ï¿½ï¿½ï¿½ï¿½ï¿½pin
+        // 3-srcpinï¿½ÐµÍ¼ï¿½ï¿½ï¿½Î»ï¿½ï¿½ï¿½ï¿½coutï¿½ï¿½sinkpinï¿½Ð¶ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½sliceï¿½ï¿½iobï¿½ï¿½ï¿½ï¿½ï¿½ï¿½pin
+        if (fcout_net != nullptr && fcout_net->sink_pins().size() > 1) {
 
 #ifdef _DEBUG
           cout << "CARRY CHAIN INFO: [G] Multi-sink pins in CARRYCHAIN" << endl;
@@ -551,7 +551,7 @@ void Packer::pack_carry_chain() {
           }*/
 
           if (has_cin) {
-// ÏÈ´´Ò»ÌõÐÂµÄnet£ºboy_net_name_
+// ï¿½È´ï¿½Ò»ï¿½ï¿½ï¿½Âµï¿½netï¿½ï¿½boy_net_name_
 #ifdef _DEBUG
             cout << "CARRY CHAIN INFO: [G] Divide carry chain net to two nets"
                  << endl;
@@ -569,13 +569,13 @@ void Packer::pack_carry_chain() {
               cout << "name=" << p_it->name() << endl;
               if (p_it->name() !=
                   CHAIN_NAME::
-                      ADDF_CI) { // °Ñ³ýÁË¸ß¼¶½øÎ»Á´µÄcin¶ËÒÔÍâµÄÈ«²¿pinÕÒ³öÀ´,·Å½øpin_ptr_vec
+                      ADDF_CI) { // ï¿½Ñ³ï¿½ï¿½Ë¸ß¼ï¿½ï¿½ï¿½Î»ï¿½ï¿½ï¿½ï¿½cinï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½È«ï¿½ï¿½pinï¿½Ò³ï¿½ï¿½ï¿½,ï¿½Å½ï¿½pin_ptr_vec
                 Pin *new_pin_ptr_ = (*p_it);
                 pin_ptr_vec.push_back(new_pin_ptr_);
               }
             }
 
-            // ½«·ÅÔÚpin_ptr_vecÀïµÄpinÈ«²¿ÖØÐÂÁ¬½Óµ½ÐÂµÄÏßÍøÉÏÈ¥
+            // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½pin_ptr_vecï¿½ï¿½ï¿½pinÈ«ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Óµï¿½ï¿½Âµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½È¥
             for (vector<Pin *>::iterator it = pin_ptr_vec.begin();
                  it != pin_ptr_vec.end(); ++it) {
               (*it)->reconnect(boy_net_);
@@ -583,8 +583,8 @@ void Packer::pack_carry_chain() {
             }
 
             PKPin *yb = static_cast<PKPin *>(slice->find_pin(PIN_NAME::YB));
-            ASSERT(yb->net() == NULL, "YB has been occupyied.");
-            yb->connect(boy_net_); // ½«ybÒ²hookupµ½ÐÂÏßÍøÉÏ
+            ASSERT(yb->net() == nullptr, "YB has been occupyied.");
+            yb->connect(boy_net_); // ï¿½ï¿½ybÒ²hookupï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
             yb->set_used();
             slice->set_property(YBMUX, "1");
             if (chip_type_ == CHIP_TYPE_NAME::FDP4)
@@ -609,7 +609,7 @@ void Packer::pack_carry_chain() {
           PKPin *fcin = static_cast<PKPin *>(slice->find_pin(PIN_NAME::CIN));
           PKPin *bx = static_cast<PKPin *>(slice->find_pin(PIN_NAME::BX));
           PKNet *fcin_net = fcin->net();
-          if (fcin_net != NULL && bx->net() == NULL) {
+          if (fcin_net != nullptr && bx->net() == nullptr) {
             fcin->disconnect();
             fcin->clear_used();
             bx->connect(fcin_net);

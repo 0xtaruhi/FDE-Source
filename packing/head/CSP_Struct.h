@@ -42,7 +42,7 @@ public:
    *  \param robj The corresponding rule GObject
    */
   Variable(GObject *robj)
-      : rule_gobj_(robj), type_query_(NULL), query_order_(-1), instance_(NULL) {
+      : rule_gobj_(robj), type_query_(nullptr), query_order_(-1), instance_(nullptr) {
   }
 
   /*! \brief query order getter

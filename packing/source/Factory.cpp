@@ -13,7 +13,7 @@ PKNet::PKNet(const string &name, NetType type, Module *owner, Bus *bus)
 PKCell::PKCell(const string &name, const string &type, Library *owner)
     : Module(name, type, owner), is_graph_update_(false) {}
 PKInstance::PKInstance(const string &name, Module *down_module, Module *owner)
-    : Instance(name, down_module, owner), gobj_(NULL), vcell_(NULL),
+    : Instance(name, down_module, owner), gobj_(nullptr), vcell_(nullptr),
       is_used_(false) {}
 PKPin::PKPin(const string &name, Port *port, Module *owner, int index,
              int mindex)
@@ -31,7 +31,7 @@ RulePort::RulePort(const string &name, int msb, int lsb, DirType dir,
 RuleInstance::RuleInstance(const string &name, Module *down_module,
                            Module *owner)
     : PKInstance(name, down_module, owner), rule_lock_(true),
-      image_inst_(NULL) {}
+      image_inst_(nullptr) {}
 RuleCell::RuleCell(const string &name, const string &type, Library *owner)
     : PKCell(name, type, owner), num_lut_(0), num_ff_(0) {}
 
@@ -138,32 +138,32 @@ void PKCell::parse_nets() {
 }
 
 void PKCell::after_inst_created(PKInstance *inst) {
-  if (is_graph_update_ && rela_graph_.get() != NULL)
+  if (is_graph_update_ && rela_graph_.get() != nullptr)
     rela_graph_->after_inst_created(inst);
 }
 
 void PKCell::before_pin_unhook(PKNet *net, PKPin *pin) {
-  if (is_graph_update_ && rela_graph_.get() != NULL)
+  if (is_graph_update_ && rela_graph_.get() != nullptr)
     rela_graph_->before_pin_unhooked(net, pin);
 }
 
 void PKCell::before_pin_hookup(PKNet *net, PKPin *pin) {
-  if (is_graph_update_ && rela_graph_.get() != NULL)
+  if (is_graph_update_ && rela_graph_.get() != nullptr)
     rela_graph_->before_pin_hookuped(net, pin);
 }
 
 void PKCell::before_pin_rehook(PKNet *old_net, PKNet *new_net, PKPin *pin) {
-  if (is_graph_update_ && rela_graph_.get() != NULL)
+  if (is_graph_update_ && rela_graph_.get() != nullptr)
     rela_graph_->before_pin_rehook(old_net, new_net, pin);
 }
 
 void PKCell::before_inst_remove(PKInstance *inst) {
-  if (is_graph_update_ && rela_graph_.get() != NULL)
+  if (is_graph_update_ && rela_graph_.get() != nullptr)
     rela_graph_->before_inst_remove(inst);
 }
 
 void PKCell::before_net_remove(PKNet *net) {
-  if (is_graph_update_ && rela_graph_.get() != NULL)
+  if (is_graph_update_ && rela_graph_.get() != nullptr)
     rela_graph_->before_net_remove(net);
 }
 

@@ -19,7 +19,7 @@ GArcType::GArcType(const string &src_type, const string &tar_type, PKNet *o)
 GNode::GNode(CellGraph *context, const string &type, PKInstance *o)
     : GObject(context, new GNodeType(type, o)),
       node_type_(static_cast<GNodeType *>(GObject::type_ptr())) {
-  if (o != NULL)
+  if (o != nullptr)
     o->set_gobj(this);
 }
 
@@ -49,7 +49,7 @@ GNode::PinNamesPair *GNode::create_pname_pair(GNode *node) {
 }
 
 void GNode::release() {
-  node_type_->ori_inst_->set_gobj(NULL);
+  node_type_->ori_inst_->set_gobj(nullptr);
 
   vector<GArc *> arc_vec(incoming_arcs_.begin(), incoming_arcs_.end());
   for (GArc *in_arc : arc_vec) {
@@ -170,8 +170,8 @@ void CellGraph::build_rule_cell() {
       for (GArc *arc : net->gobjects())
         arc->set_sink_num_type(sink_num_type);
     } else {
-      const SimpleNet *prev_snet = NULL;
-      GNode *prev_node = NULL;
+      const SimpleNet *prev_snet = nullptr;
+      GNode *prev_node = nullptr;
       for (const SimpleNet &snet : net->simple_nets()) {
         PKPin *src_pin = snet.src;
         //					PKPin* asink_pin =
@@ -183,8 +183,8 @@ void CellGraph::build_rule_cell() {
           continue;
 
         // add common net information of GNode
-        GNode::PinNamesPair *ppair_of_prev_node = NULL;
-        if (prev_node != NULL)
+        GNode::PinNamesPair *ppair_of_prev_node = nullptr;
+        if (prev_node != nullptr)
           ppair_of_prev_node = prev_node->create_pname_pair(node);
 
         // add connect pin for present node and add common net info for previous
@@ -192,12 +192,12 @@ void CellGraph::build_rule_cell() {
         for (PKPin *pin : snet.sinks) {
           if (port->is_connect())
             node->add_connect_pin(&pin->name());
-          if (ppair_of_prev_node != NULL)
+          if (ppair_of_prev_node != nullptr)
             ppair_of_prev_node->second.push_back(&pin->name());
         }
 
-        // if previous node is not NULL, add common net info for present node
-        if (prev_node != NULL) {
+        // if previous node is not nullptr, add common net info for present node
+        if (prev_node != nullptr) {
           for (PKPin *pin : prev_snet->sinks)
             ppair_of_prev_node->first.push_back(&pin->name());
         }
@@ -243,19 +243,19 @@ void CellGraph::fill_type_map() {
 CellGraph::GObjList *CellGraph::find_gobjs(const string &n) {
   TypeGObjMap::iterator it = type_map_.find(n);
   if (it == type_map_.end())
-    return NULL;
+    return nullptr;
   else
     return &(it->second);
 }
 
 // rebuild graph incrementally
 void CellGraph::after_inst_created(PKInstance *inst) {
-  ASSERTD(inst->gobject() == NULL, "gnode already created");
+  ASSERTD(inst->gobject() == nullptr, "gnode already created");
   create_gnode(this, inst->down_module()->name(), inst);
 }
 
 void CellGraph::before_pin_unhooked(PKNet *net, PKPin *pin) {
-  if (pin->is_mpin() || net == NULL)
+  if (pin->is_mpin() || net == nullptr)
     return;
 
   vector<GArc *> all_arcs;
@@ -283,7 +283,7 @@ void CellGraph::before_pin_unhooked(PKNet *net, PKPin *pin) {
 }
 
 void CellGraph::before_pin_hookuped(PKNet *net, PKPin *pin) {
-  if (pin->is_mpin() || net == NULL)
+  if (pin->is_mpin() || net == nullptr)
     return;
 
   if (pin->dir() == COS::OUTPUT && net->num_pure_sinks() != 0) {
@@ -333,7 +333,7 @@ void CellGraph::before_pin_rehook(PKNet *old_net, PKNet *new_net, PKPin *pin) {
 }
 
 void CellGraph::before_inst_remove(PKInstance *inst) {
-  if (inst->gobject() == NULL)
+  if (inst->gobject() == nullptr)
     return;
   inst->gobject()->release();
 }

@@ -407,7 +407,7 @@ int VerilogModule::ConvertInstances(Module &cell, Library &cell_lib,
 
       list<string> namelist;
 
-      // if expr is NULL then the port is empty.now just ignore it.
+      // if expr is nullptr then the port is empty.now just ignore it.
       if (!expr)
         continue;
       else
@@ -428,7 +428,7 @@ void VerilogModule::ConnectInstance(Module &cell, Instance &inst,
   Module *instof = inst.down_module();
   // If it belong to a port group, then treat it like it's a submodule
   // If not, treat it like it come from the cell lib
-  const Port *pg = NULL;
+  const Port *pg = nullptr;
   for (const Port *port : instof->ports()) {
     if (port->is_vector())
       if (port->name() == portname) {
@@ -733,8 +733,8 @@ void VerilogModule::ParsePrimaryNet(string name, Expression *start,
   /* while take different parameters because this is used in declaration*/
   /* while the one below handle the instance port connection	*/
   string netname;
-  // standard identifier the start will be NULL the same time
-  if (start == NULL || stop == NULL) {
+  // standard identifier the start will be nullptr the same time
+  if (start == nullptr || stop == nullptr) {
     namelist.push_back(name);
     rstart = -1;
     rstop = -1;
@@ -808,9 +808,9 @@ void VerilogModule::ParsePrimaryNet(string name, Expression *start,
 void VerilogModule::ParsePrimaryNet(Primary *prim, list<string> &namelist) {
   PUSH_STEP;
   string netname;
-  // standard identifier the start and stop will be NULL the same time but may
+  // standard identifier the start and stop will be nullptr the same time but may
   // still by multi bits like ADDR if so you need to consider that condition
-  if (prim->range.start == NULL || prim->range.stop == NULL) {
+  if (prim->range.start == nullptr || prim->range.stop == nullptr) {
     // use the STL algorithm find_if may perform better but i don't know it yet
     // ^_^
     bool singlebit = true;

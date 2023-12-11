@@ -12,7 +12,7 @@ void cktTileBstr::construct() {
   _used = false;
   if (_refDfotTile) {
     _refTile = _refDfotTile->getRefTile();
-    ASSERTD(_refTile, "cktTile: my _refTile is NULL");
+    ASSERTD(_refTile, "cktTile: my _refTile is nullptr");
     dfotTileBstr::construct();
   }
 }

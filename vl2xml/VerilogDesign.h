@@ -36,7 +36,7 @@ using namespace COS;
 class VerilogDesign {
 
 public:
-  VerilogDesign() : _topModule(NULL) {}
+  VerilogDesign() : _topModule(nullptr) {}
 
   int initializeGlobal();
   int clarifyDesign(Library *cell_lib);

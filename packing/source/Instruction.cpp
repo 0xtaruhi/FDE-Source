@@ -634,8 +634,8 @@ Object *ICreateInst::execute() const {
   const string temp_suffix_ = rinst->image()->name();
   /*sophie end:for maintaing image name*/
 
-  Instance *new_inst = NULL;
-  if (model_ != NULL) // model in the hw_lib
+  Instance *new_inst = nullptr;
+  if (model_ != nullptr) // model in the hw_lib
     new_inst = tar_cell->create_instance(
         tf->make_name(name_prefix_, temp_suffix_), model_);
   else {
@@ -667,8 +667,8 @@ Object *ICreateIob::execute() const {
       find_if(buf_net->pins(), [](const Pin *pin) { return pin->is_mpin(); });
   const string &port_name = iob_pin->name();
 
-  Instance *new_inst = NULL;
-  if (model_ != NULL) // model in the hw_lib
+  Instance *new_inst = nullptr;
+  if (model_ != nullptr) // model in the hw_lib
     new_inst = tar_cell->create_instance(port_name, model_);
   else {
     Module *model = tf->find_cell(cname_i_);
@@ -704,7 +704,7 @@ Object *ICloneCell::execute() const {
   Transformer *tf = co_case_->co_operation()->transformer();
 
   Module *model;
-  if (model_ != NULL)
+  if (model_ != nullptr)
     model = model_;
   else
     model = tf->find_cell(model_cname_i_);
@@ -746,12 +746,12 @@ Object *IReconnect::execute() const {
              "the same direction" % INSTR_NAME);
 
   if (new_pin->is_used())
-    return NULL;
+    return nullptr;
   new_pin->set_used();
 
   Net *net = old_pin->net();
-  if (net == NULL)
-    return NULL;
+  if (net == nullptr)
+    return nullptr;
 
   // ASSERT(net, TFErrMsg(TFErrMsg::USAT_PIN) % "unconnected" % old_pname_ %
   // INSTR_NAME);
@@ -768,7 +768,7 @@ Object *IReconnect::execute() const {
                               static_cast<PKPin *>(new_pin));
   new_pin->connect(net);
 
-  return NULL;
+  return nullptr;
 }
 
 // add by czh: begin 2009-9-17
@@ -776,8 +776,8 @@ Object *ICreateSlice::execute() const {
   Transformer *tf = co_case_->co_operation()->transformer();
   PKCell *tar_cell = co_case_->co_operation()->target();
 
-  Instance *new_inst = NULL;
-  if (model_ != NULL) // model in the hw_lib
+  Instance *new_inst = nullptr;
+  if (model_ != nullptr) // model in the hw_lib
     new_inst = tar_cell->create_instance(
         tf->make_name(name_prefix_, name_suffix_), model_);
   else {
@@ -839,7 +839,7 @@ Object *IConnect::execute() const {
   // static_cast<PKPin*>(new_pin));
   new_pin->connect(new_net);
 
-  return NULL;
+  return nullptr;
 }
 
 Object *IExconnect::execute() const {
@@ -889,7 +889,7 @@ Object *IExconnect::execute() const {
     new_inst->set_property(INIT, exchange_expr(table, old_pname_, new_pname_));
   }
 
-  return NULL;
+  return nullptr;
 }
 
 // add by czh: end
@@ -919,7 +919,7 @@ Object *IReconnectOpt::execute() const {
                                   opt_pnames_[i] % "unconnected" % INSTR_NAME);
 
       // emit signal here! but it always seems stop update graph here!
-      if (net != NULL) {
+      if (net != nullptr) {
         tar_cell->before_pin_unhook(static_cast<PKNet *>(net),
                                     static_cast<PKPin *>(old_pin));
         old_pin->disconnect();
@@ -937,7 +937,7 @@ Object *IReconnectOpt::execute() const {
     }
   }
 
-  return NULL;
+  return nullptr;
 }
 Object *IUnhook::execute() const {
   Transformer *tf = co_case_->co_operation()->transformer();
@@ -959,7 +959,7 @@ Object *IUnhook::execute() const {
                               static_cast<PKPin *>(pin));
   pin->disconnect();
 
-  return NULL;
+  return nullptr;
 }
 
 Object *IDupConnect::execute() const {
@@ -984,8 +984,8 @@ Object *IDupConnect::execute() const {
              "the same direction" % INSTR_NAME);
 
   Net *net = src_pin->net();
-  if (net == NULL)
-    return NULL;
+  if (net == nullptr)
+    return nullptr;
 
   // ASSERT(net, TFErrMsg(TFErrMsg::USAT_PIN) % "unconnected" % src_pname_ %
   // INSTR_NAME));
@@ -997,7 +997,7 @@ Object *IDupConnect::execute() const {
                               static_cast<PKPin *>(tar_pin));
   tar_pin->connect(net);
 
-  return NULL;
+  return nullptr;
 }
 
 Object *IUsePin::execute() const {
@@ -1022,7 +1022,7 @@ Object *IUsePin::execute() const {
   // maybe you should complain an exception when no usable pin found
   // for debugging if our algorithm work fine, but I just ignore it
   // for some special case
-  return NULL;
+  return nullptr;
 }
 
 static Property<string> &find_or_create_property(Instance *inst,
@@ -1055,7 +1055,7 @@ Object *ISetProperty::execute() const {
     }
     prop_it++;
   }
-  return NULL;
+  return nullptr;
 }
 
 Object *ICloneProperty::execute() const {
@@ -1081,7 +1081,7 @@ Object *ICloneProperty::execute() const {
   else
     tar_inst->set_property(p, default_value_);
 
-  return NULL;
+  return nullptr;
 }
 
 Object *ICopyProperty::execute() const {
@@ -1102,7 +1102,7 @@ Object *ICopyProperty::execute() const {
   else {
     Property<string> &sp = find_or_create_property(src_inst, src_prop_name_);
     if (!src_inst->property_exist(sp))
-      return NULL;
+      return nullptr;
     pval = src_inst->property_value(sp);
   }
 
@@ -1117,7 +1117,7 @@ Object *ICopyProperty::execute() const {
 
   tar_inst->set_property(tar_prop, pval);
 
-  return NULL;
+  return nullptr;
 }
 
 Object *ICopyProperty::copy_init(Instance *src_inst, Instance *tar_inst,
@@ -1131,7 +1131,7 @@ Object *ICopyProperty::copy_init(Instance *src_inst, Instance *tar_inst,
   }
   tar_inst->set_property(INIT, newinit);
   tar_inst->set_property(INIT_HEX, sinit);
-  return NULL;
+  return nullptr;
 }
 
 Property<deque<string>> INDEX;
@@ -1162,7 +1162,7 @@ Object *ISetIndex::execute() const {
     prop_it++;
   }
 
-  return NULL;
+  return nullptr;
 }
 
 Object *IShareNet::execute() const {
@@ -1191,7 +1191,7 @@ Object *IShareNet::execute() const {
         Instance *inst2 = tf->find_instance(sc.do_iname2_);
         PKPin *pin2 = static_cast<PKPin *>(inst2->find_pin(sc.do_pname2_));
         Net *net = pin2->net();
-        if (net == NULL)
+        if (net == nullptr)
           continue;
 
         Instance *inst1 = tf->find_instance(sc.do_iname1_);
@@ -1220,7 +1220,7 @@ Object *IShareNet::execute() const {
     }
   }
 
-  return NULL;
+  return nullptr;
 }
 
 Object *IReconnect2::execute() const {
@@ -1234,7 +1234,7 @@ Object *IReconnect2::execute() const {
   ASSERT(tar_pin,
          TFErrMsg(TFErrMsg::UFND_ELEM) % "pin" % old_pname_ % INSTR_NAME);
   if (tar_pin->is_used())
-    return NULL;
+    return nullptr;
   tar_pin->set_used();
 
   for (size_t i = 0; i < opt_inames_i_.size(); i++) {
@@ -1252,6 +1252,6 @@ Object *IReconnect2::execute() const {
     break;
   }
 
-  return NULL;
+  return nullptr;
 }
 } // namespace PACK

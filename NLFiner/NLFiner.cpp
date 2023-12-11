@@ -229,7 +229,7 @@ void NLFiner::op_remove(Module &cell, const vec_str &lib_names) {
   for (const string &prim : lib_names) {
     Module::inst_iter it = boost::find_if(cell.instances(), match_cell(prim));
     Instance *prim_pointer = (it == cell.instances().end()) ? 0 : *it;
-    if (prim_pointer == NULL) {
+    if (prim_pointer == nullptr) {
       ASSERT(0, "fail to find instance \"" + cell.name() + "::" + prim + "\"");
     }
     prim_pointer->release();
@@ -243,7 +243,7 @@ void NLFiner::op_mux(Module &cell, const vec_str &lib_names,
   for (const string &prim : lib_names) {
     Module::inst_iter it = boost::find_if(cell.instances(), match_cell(prim));
     Instance *prim_mux = (it == cell.instances().end()) ? 0 : *it;
-    if (prim_mux == NULL) {
+    if (prim_mux == nullptr) {
       ASSERT(0, "fail to find instance \"" + cell.name() + "::" + prim + "\"");
     }
 
@@ -267,9 +267,9 @@ void NLFiner::op_mux(Module &cell, const vec_str &lib_names,
     for (Pin *pin : prim_mux->pins()) {
       if (to_lower_copy(pin->port()->name()) == to_lower_copy(actual_bit) ||
           pin->is_source()) {
-        ASSERTS(pin->net() != NULL);
+        ASSERTS(pin->net() != nullptr);
       } else {
-        ASSERTS(pin->net() == NULL);
+        ASSERTS(pin->net() == nullptr);
       }
     }
 #endif
@@ -287,7 +287,7 @@ void NLFiner::op_vccgnd(Module &cell, const vec_str &lib_names,
   Module::inst_iter it =
       boost::find_if(cell.instances(), match_cell(prim_name));
   Instance *pmVccGnd = (it == cell.instances().end()) ? 0 : *it;
-  ASSERTS(pmVccGnd != NULL);
+  ASSERTS(pmVccGnd != nullptr);
 
   Net *net;
   if (to_lower_copy(prim_name) == "vcc") {
@@ -297,7 +297,7 @@ void NLFiner::op_vccgnd(Module &cell, const vec_str &lib_names,
   } else {
     ASSERTS(0);
   }
-  ASSERTS(net != NULL);
+  ASSERTS(net != nullptr);
 
   Pin *portPin = cell.find_port(port_name)->mpin();
   portPin->reconnect(net);
@@ -310,7 +310,7 @@ void NLFiner::op_attr(Module &cell, const vec_str &lib_names, const string &bit,
     Module::inst_iter it = boost::find_if(cell.instances(), match_cell(prim));
     Instance *prim_attr =
         (it == cell.instances().end()) ? 0 : *it; // such as LUT, init0
-    if (prim_attr == NULL)
+    if (prim_attr == nullptr)
       continue;
 
     Property<string> &prop = create_temp_property<string>(INSTANCE, prop_name);
@@ -394,10 +394,10 @@ void NLFiner::op_sweep(Module &cell) {
     size_t num_conn_ipin = 0;
     size_t num_conn_outpin = 0;
     for (Pin *pin : inst_it->pins()) {
-      if (pin->is_sink() && pin->net() != NULL) { // input pin of the instance
+      if (pin->is_sink() && pin->net() != nullptr) { // input pin of the instance
         num_conn_ipin++;
       } else if (pin->is_source() &&
-                 pin->net() != NULL) { // output pin of the cell
+                 pin->net() != nullptr) { // output pin of the cell
         num_conn_outpin++;
       }
     }
@@ -418,9 +418,9 @@ void NLFiner::op_sweep(Module &cell) {
     string cell_type;
     Property<string> &type = create_temp_property<string>(INSTANCE, "type");
     Property<string> &TYPE = create_temp_property<string>(INSTANCE, "TYPE");
-    if (inst_it->property_ptr(type) != NULL)
+    if (inst_it->property_ptr(type) != nullptr)
       cell_type = *(inst_it->property_ptr(type));
-    if (inst_it->property_ptr<string>(TYPE) != NULL)
+    if (inst_it->property_ptr<string>(TYPE) != nullptr)
       cell_type = *(inst_it->property_ptr(TYPE));
     if (cell_type == "RAM") {
       ++inst_it;

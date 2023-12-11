@@ -79,7 +79,7 @@ public:
   parse_error(const char *what, void *where) : m_what(what), m_where(where) {}
 
   //! Gets human readable description of error.
-  //! \return Pointer to null terminated description of the error.
+  //! \return Pointer to nullptr terminated description of the error.
   virtual const char *what() const throw() { return m_what; }
 
   //! Gets pointer to character data where error happened.
@@ -398,7 +398,7 @@ public:
   //! \param name_size Size of name to assign, or 0 to automatically calculate
   //! size from name string. \param value_size Size of value to assign, or 0 to
   //! automatically calculate size from value string. \return Pointer to
-  //! allocated node. This pointer will never be NULL.
+  //! allocated node. This pointer will never be nullptr.
   xml_node<Ch> *allocate_node(node_type type, const Ch *name = 0,
                               const Ch *value = 0, std::size_t name_size = 0,
                               std::size_t value_size = 0) {
@@ -429,7 +429,7 @@ public:
   //! assign, or 0 to automatically calculate size from name string. \param
   //! value_size Size of value to assign, or 0 to automatically calculate size
   //! from value string. \return Pointer to allocated attribute. This pointer
-  //! will never be NULL.
+  //! will never be nullptr.
   xml_attribute<Ch> *allocate_attribute(const Ch *name = 0, const Ch *value = 0,
                                         std::size_t name_size = 0,
                                         std::size_t value_size = 0) {
@@ -458,8 +458,8 @@ public:
   //! initialize the allocated memory with, or 0 to not initialize it. \param
   //! size Number of characters to allocate, or zero to calculate it
   //! automatically from source string length; if size is 0, source string must
-  //! be specified and null terminated. \return Pointer to allocated char array.
-  //! This pointer will never be NULL.
+  //! be specified and nullptr terminated. \return Pointer to allocated char array.
+  //! This pointer will never be nullptr.
   Ch *allocate_string(const Ch *source = 0, std::size_t size = 0) {
     assert(source || size); // Either source or size (or both) must be specified
     if (size == 0)
@@ -479,7 +479,7 @@ public:
   //! useful when you want to clone entire document. \param source Node to
   //! clone. \param result Node to put results in, or 0 to automatically
   //! allocate result node \return Pointer to cloned node. This pointer will
-  //! never be NULL.
+  //! never be nullptr.
   xml_node<Ch> *clone_node(const xml_node<Ch> *source,
                            xml_node<Ch> *result = 0) {
     // Prepare result node

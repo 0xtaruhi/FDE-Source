@@ -53,7 +53,7 @@ struct pContainer : public C {
       if (it == (*this).end()) {
         //				std::cout << Warning("container: no such
         // member ... " + name) << std::endl;
-        return NULL;
+        return nullptr;
       } else
         return &*it;
       //			ASSERT(it != end(), FDU::Exception("container:

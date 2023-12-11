@@ -126,7 +126,7 @@ void RTNet::load_src_sink_nodes(RTGraph *rrg) {
   // load source node
   src_node_ = static_cast<RTNode *>(
       rrg->find_logic_pin_node(src_pin->instance(), *src_pin, pos));
-  ASSERT(src_node_ != NULL,
+  ASSERT(src_node_ != nullptr,
          ErrMsg(ErrMsg::RTERR_UFND_NODE) % "source" % src_pin->name() % name());
   src_node_->set_src();
 
@@ -137,7 +137,7 @@ void RTNet::load_src_sink_nodes(RTGraph *rrg) {
            ErrMsg(ErrMsg::RTERR_POS) % "sink pin" % sink_pin->name());
     RTNode *sink_node = static_cast<RTNode *>(
         rrg->find_logic_pin_node(sink_pin->instance(), *sink_pin, pos));
-    ASSERT(sink_node != NULL, ErrMsg(ErrMsg::RTERR_UFND_NODE) % "sink" %
+    ASSERT(sink_node != nullptr, ErrMsg(ErrMsg::RTERR_UFND_NODE) % "sink" %
                                   sink_pin->name() % name());
     sink_node->set_sink();
     sink_nodes_.push_back(sink_node);
@@ -244,9 +244,9 @@ RTNet::path_node_iter RTNet::update_trace_back(RTNode *sink_node) {
 
   RTNode *node_ptr = sink_node;
   RTNode *prev_node_ptr;
-  while (node_ptr != NULL) {
+  while (node_ptr != nullptr) {
     prev_node_ptr = node_ptr->prev_node();
-    if (prev_node_ptr != NULL) {
+    if (prev_node_ptr != nullptr) {
       prev_node_ptr->set_pathnode(true);
       temptail = path_.insert(temptail, prev_node_ptr);
     }
@@ -299,7 +299,7 @@ void RTNet::save_path() {
     ++to_node_it;
 
     p_sw = (*from_node_it)->find_switch(*to_node_it);
-    ASSERT(p_sw != NULL, ErrMsg(ErrMsg::RTERR_UFND_SWH) %
+    ASSERT(p_sw != nullptr, ErrMsg(ErrMsg::RTERR_UFND_SWH) %
                              (*from_node_it)->full_name() %
                              (*to_node_it)->full_name());
     create_pip(p_sw->from_net()->name(), p_sw->to_net()->name(), p_sw->pos());

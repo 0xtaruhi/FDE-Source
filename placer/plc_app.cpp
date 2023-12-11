@@ -17,9 +17,9 @@ using namespace ARCH;
 using namespace COS;
 
 /************************************************************************/
-/*	¹¦ÄÜ£º·ÖÎöÓÃ»§´«µÝ½øÀ´²ÎÊý
- *	²ÎÊý£ºargc£º ²ÎÊý¸öÊý£¬ argv £º ²ÎÊýÁÐ±í
- *	·µ»ØÖµ£º void
+/*	ï¿½ï¿½ï¿½Ü£ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ã»ï¿½ï¿½ï¿½ï¿½Ý½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+ *	ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½argcï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ argv ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ð±ï¿½
+ *	ï¿½ï¿½ï¿½ï¿½Öµï¿½ï¿½ void
  */
 /************************************************************************/
 void PlaceApp::parse_command(int argc, char *argv[]) {
@@ -30,13 +30,13 @@ void PlaceApp::parse_command(int argc, char *argv[]) {
 }
 
 /************************************************************************/
-/*	¹¦ÄÜ£º¶ÁÈë²¼¾ÖÏà¹ØÎÄ¼þ
- *	²ÎÊý£º	void
- *	·µ»ØÖµ£ºvoid
+/*	ï¿½ï¿½ï¿½Ü£ï¿½ï¿½ï¿½ï¿½ë²¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä¼ï¿½
+ *	ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½	void
+ *	ï¿½ï¿½ï¿½ï¿½Öµï¿½ï¿½void
  */
 /************************************************************************/
 void PlaceApp::load_files() {
-  // ¶ÁÈëarchÎÄ¼þ
+  // ï¿½ï¿½ï¿½ï¿½archï¿½Ä¼ï¿½
   INFO(CONSOLE::PROGRESS % "10" %
        ("loading arch library \"" + _args._arch_lib + "\""));
   try {
@@ -45,7 +45,7 @@ void PlaceApp::load_files() {
     ERR(CONSOLE::FILE_ERROR % "can NOT load arch library.");
     exit(EXIT_FAILURE);
   }
-  // ¶ÁÈëÍø±íÎÄ¼þ
+  // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä¼ï¿½
   INFO(CONSOLE::PROGRESS % "20" %
        ("loading netlist \"" + _args._input_nl + "\""));
   try {
@@ -55,7 +55,7 @@ void PlaceApp::load_files() {
     ERR(CONSOLE::FILE_ERROR % "can NOT load netlist.");
     exit(EXIT_FAILURE);
   }
-  // ¶ÁÈëÔ¼ÊøÎÄ¼þ
+  // ï¿½ï¿½ï¿½ï¿½Ô¼ï¿½ï¿½ï¿½Ä¼ï¿½
   if (!_args._plc_csts.empty()) {
     INFO(CONSOLE::PROGRESS % "30" %
          ("loading constraint \"" + _args._plc_csts + "\""));
@@ -68,7 +68,7 @@ void PlaceApp::load_files() {
   } else {
     INFO(CONSOLE::PROGRESS % "30" % "no constraint loaded");
   }
-// ¶ÁÈëtemplate cell library£¨½ÓISEÁ÷³ÌÓÃ£©
+// ï¿½ï¿½ï¿½ï¿½template cell libraryï¿½ï¿½ï¿½ï¿½ISEï¿½ï¿½ï¿½ï¿½ï¿½Ã£ï¿½
 #ifdef CONST_GENERATE
   if (!_args._library.empty()) {
     INFO(CONSOLE::PROGRESS % "35" %
@@ -84,9 +84,9 @@ void PlaceApp::load_files() {
   }
 #endif
 
-  // ÌáÊ¾Effort Level
+  // ï¿½ï¿½Ê¾Effort Level
   INFO(CONSOLE::EFFORT_LEVEL % _args._effort_level);
-  // ÅÐ¶ÏÊÇ·ñÊÇÊ±ÐòÇý¶¯£¬²¢¶ÁÈëÑÓÊ±ÐÅÏ¢
+  // ï¿½Ð¶ï¿½ï¿½Ç·ï¿½ï¿½ï¿½Ê±ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê±ï¿½ï¿½Ï¢
   if (_args._mode == PLACER::TIMING_DRIVEN) {
     INFO(CONSOLE::PLC_MODE % "Timing Driven");
     INFO(CONSOLE::PROGRESS % "40" %
@@ -130,7 +130,7 @@ void PlaceApp::export_jtag_csts() {
     string cell_type = inst->module_type();
     if (cell_type == CELL::IO) {
       echo = true;
-      const Pin *pin = NULL;
+      const Pin *pin = nullptr;
       if ((pin = inst->pins().find(IPIN)) && pin->net())
         dir = INPUTS;
       else if ((pin = inst->pins().find(OPIN)) && pin->net() ||
@@ -164,9 +164,9 @@ void PlaceApp::export_jtag_csts() {
 }
 
 /************************************************************************/
-/*	¹¦ÄÜ£º ²¼¾Ö£¬µ÷ÓÃ_placer:SAPlacer½øÐÐ²¼¾Ö
- *	²ÎÊý£ºvoid
- *	·µ»ØÖµ£º void
+/*	ï¿½ï¿½ï¿½Ü£ï¿½ ï¿½ï¿½ï¿½Ö£ï¿½ï¿½ï¿½ï¿½ï¿½_placer:SAPlacerï¿½ï¿½ï¿½Ð²ï¿½ï¿½ï¿½
+ *	ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½void
+ *	ï¿½ï¿½ï¿½ï¿½Öµï¿½ï¿½ void
  */
 /************************************************************************/
 void PlaceApp::try_process() {
@@ -179,14 +179,14 @@ void PlaceApp::try_process() {
     if (_args._update_rand_seed)
       srand(t_start);
 
-    // ¶ÁÈëÏà¹ØÎÄ¼þ
+    // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä¼ï¿½
     load_files();
-    // ÉèÖÃ²¼¾ÖÄ£Ê½
+    // ï¿½ï¿½ï¿½Ã²ï¿½ï¿½ï¿½Ä£Ê½
     _placer.set_place_mode(_args._mode);
     _placer.set_effort_level(_args._effort_level);
-    // ¿ªÊ¼²¼¾Ö
+    // ï¿½ï¿½Ê¼ï¿½ï¿½ï¿½ï¿½
     _placer.try_place(_args);
-    // Êä³ö²¼¾Ö½á¹û
+    // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö½ï¿½ï¿½
     INFO(CONSOLE::PROGRESS % "90" % "begin to write placed netlist");
     _design.save("xml", _args._output_nl, _args._encrypt);
     export_jtag_csts();

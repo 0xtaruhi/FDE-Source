@@ -68,7 +68,7 @@ void RDEngine::build_net_tree(COSRTNet *net) {
 
     string node_name = switch_node_name(sw, from);
     RDNode *driver = cur_tree_->find_node_by_name(node_name);
-    if (driver == NULL) {
+    if (driver == nullptr) {
       // FDU_LOG(WARN) << "cannot find driver" << " select one:";
       int i = 0;
       RDNode *root = cur_tree_->root();

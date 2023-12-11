@@ -11,7 +11,7 @@ using namespace COS;
 using namespace XML;
 typedef rapidxml::file<> xml_file;
 void RTCstLoadHandler::load() {
-  ASSERTD(_pCstNets, "_pCstNets is NULL.");
+  ASSERTD(_pCstNets, "_pCstNets is nullptr.");
   std::ifstream cstFile(_cstFileName.c_str());
   xml_file xfile(cstFile);
   xml_document doc;

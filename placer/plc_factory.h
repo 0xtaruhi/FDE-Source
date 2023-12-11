@@ -19,74 +19,74 @@ using namespace COS;
 // using COS::NLFactory;
 
 /************************************************************************/
-/* 标示布局中所用instance的类                                           */
+/* 锟斤拷示锟斤拷锟斤拷锟斤拷锟斤拷锟斤拷instance锟斤拷锟斤拷                                           */
 /************************************************************************/
 class PLCInstance : public Instance {
 public:
   PLCInstance(const std::string &name, Module &instof, Module &owner)
-      : Instance(name, &instof, &owner), _curr_loc_site(NULL),
+      : Instance(name, &instof, &owner), _curr_loc_site(nullptr),
         _curr_logic_pos(), _is_fixed(false), _swapable_type(FLOORPLAN::SITE) {}
-  // 设定该instance的从属site，这里保存了两个指针，一个是原来的，一个是当前的
+  // 锟借定锟斤拷instance锟侥达拷锟斤拷site锟斤拷锟斤拷锟斤保锟斤拷锟斤拷锟斤拷锟斤拷指锟诫，一锟斤拷锟斤拷原锟斤拷锟侥ｏ拷一锟斤拷锟角碉拷前锟斤拷
   void set_curr_loc_site(Site *site) {
     _past_loc_site = _curr_loc_site;
     _curr_loc_site = site;
   }
-  // 得到当前的site
+  // 锟矫碉拷锟斤拷前锟斤拷site
   Site *curr_loc_site() const { return _curr_loc_site; }
-  // 得到以前的site
+  // 锟矫碉拷锟斤拷前锟斤拷site
   Site *past_loc_site() const { return _past_loc_site; }
-  // 复位site
+  // 锟斤拷位site
   void reset_loc_site() { _curr_loc_site = _past_loc_site; }
 
-  // 设置当前逻辑地址
+  // 锟斤拷锟矫碉拷前锟竭硷拷锟斤拷址
   void set_curr_logic_pos(const Point &pos) {
     _past_logic_pos = _curr_logic_pos;
     _curr_logic_pos = pos;
   }
-  // 得到当前/以前逻辑地址
+  // 锟矫碉拷锟斤拷前/锟斤拷前锟竭硷拷锟斤拷址
   Point curr_logic_pos() const { return _curr_logic_pos; }
   Point past_logic_pos() const { return _past_logic_pos; }
-  // 复位逻辑地址
+  // 锟斤拷位锟竭硷拷锟斤拷址
   void reset_logic_pos() { _curr_logic_pos = _past_logic_pos; }
 
-  // fix代表约束文件中固定的Instance
+  // fix锟斤拷锟斤拷约锟斤拷锟侥硷拷锟叫固讹拷锟斤拷Instance
   void fix_inst() { _is_fixed = true; }
   void loose_inst() { _is_fixed = false; }
   bool is_fixed() const { return _is_fixed; }
 
   Site::SiteType site_type() const { return _curr_loc_site->_type; }
-  // 设置/得到该isntance的可交换类型
+  // 锟斤拷锟斤拷/锟矫碉拷锟斤拷isntance锟侥可斤拷锟斤拷锟斤拷锟斤拷
   void set_swapable_type(FLOORPLAN::SwapableType t) { _swapable_type = t; }
   FLOORPLAN::SwapableType swapable_type() const { return _swapable_type; }
-  // 判断是否是macro type
+  // 锟叫讹拷锟角凤拷锟斤拷macro type
   bool is_macro() const {
     return _swapable_type == FLOORPLAN::LUT6 ||
            _swapable_type == FLOORPLAN::CARRY_CHAIN;
   }
 
 private:
-  // 存储上一个和当前从属的site
+  // 锟芥储锟斤拷一锟斤拷锟酵碉拷前锟斤拷锟斤拷锟斤拷site
   Site *_curr_loc_site, *_past_loc_site;
-  // 存储当前和上一个的逻辑地址
+  // 锟芥储锟斤拷前锟斤拷锟斤拷一锟斤拷锟斤拷锟竭硷拷锟斤拷址
   Point _curr_logic_pos, _past_logic_pos;
-  // 是否是fix
+  // 锟角凤拷锟斤拷fix
   bool _is_fixed;
-  // 该instance的可交换类型
+  // 锟斤拷instance锟侥可斤拷锟斤拷锟斤拷锟斤拷
   FLOORPLAN::SwapableType _swapable_type;
 };
 
 /************************************************************************/
-/* 标示布局中所用net的类                                                */
+/* 锟斤拷示锟斤拷锟斤拷锟斤拷锟斤拷锟斤拷net锟斤拷锟斤拷                                                */
 /************************************************************************/
 class PLCNet : public Net {
 public:
   enum AffectedType { NONE = 0, FROM = 1, TO = 2 };
 
   PLCNet(const std::string &name, COS::NetType type, Module &owner)
-      : Net(name, type, &owner, NULL), _is_ignored(false), _affected_type(NONE),
+      : Net(name, type, &owner, nullptr), _is_ignored(false), _affected_type(NONE),
         _bounding_box(new BoundingBox(this)), _total_tcost(0.) {}
   ~PLCNet() { delete _bounding_box; }
-  // 设置/得到net为ignored
+  // 锟斤拷锟斤拷/锟矫碉拷net为ignored
   void set_ignored() { _is_ignored = true; }
   bool is_ignored() const { return _is_ignored; }
 
@@ -111,7 +111,7 @@ public:
                            const Point &device_scale) {
     _bounding_box->update_bounding_box(device_scale, pos_from, pos_to);
   }
-  // 设置受影响线网的类型
+  // 锟斤拷锟斤拷锟斤拷影锟斤拷锟斤拷锟斤拷锟斤拷锟斤拷锟斤拷
   void set_affected_type(AffectedType type) { _affected_type |= type; }
   void reset_affected_type() { _affected_type = 0; }
   int affected_type() const { return _affected_type; }
@@ -162,7 +162,7 @@ public:
 };
 
 /************************************************************************/
-/* 产生布局所需元素的工厂 */
+/* 锟斤拷锟斤拷锟斤拷锟斤拷锟斤拷锟斤拷元锟截的癸拷锟斤拷 */
 /************************************************************************/
 class PLCFactory : public TimingFactory {
 public:

@@ -740,7 +740,7 @@ public:
   /*! \brief type find routine
    *
    *  \param[in] gt Type name of GObject
-   *  \return List of GObjects found, NULL returned when find nothing
+   *  \return List of GObjects found, nullptr returned when find nothing
    */
   GObjList *find_gobjs(const string &gt);
 

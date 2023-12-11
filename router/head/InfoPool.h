@@ -12,7 +12,7 @@ class RTGraph;
 
 class InfoPool {
 public:
-  InfoPool() : p_rrg_(NULL), p_design_(NULL) {}
+  InfoPool() : p_rrg_(nullptr), p_design_(nullptr) {}
 
   void set_rrg(const RTGraph *p_rrg) { p_rrg_ = p_rrg; }
   void set_design(const TDesign *p_design) { p_design_ = p_design; }

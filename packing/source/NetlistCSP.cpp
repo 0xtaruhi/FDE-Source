@@ -10,7 +10,7 @@ using namespace boost::assign;
 //////////////////////////////////////////////////////////////////////////
 //  NetlistCSP
 NetlistCSP::NetlistCSP()
-    : cur_match_(NULL), rule_graph_(NULL), image_graph_(NULL), solver_(this) {}
+    : cur_match_(nullptr), rule_graph_(nullptr), image_graph_(nullptr), solver_(this) {}
 
 NetlistCSP::~NetlistCSP() { clear(); }
 
@@ -18,25 +18,25 @@ void NetlistCSP::solve(Match *match) {
   cur_match_ = match;
   set_rule_graph(cur_match_->rule()
                      ->rule_cell()
-                     ->relative_graph()); // ½«µ±Ç°ruleÏÂµÄcellÉèÎªµ±Ç°Í¼
+                     ->relative_graph()); // ï¿½ï¿½ï¿½ï¿½Ç°ruleï¿½Âµï¿½cellï¿½ï¿½Îªï¿½ï¿½Ç°Í¼
   set_domain(cur_match_->image_cell()->relative_graph());
   solver_.solve();
 }
 
 void NetlistCSP::set_rule_graph(CellGraph *rg) {
   if (rg == rule_graph_)
-    return; // ÈôÒÑ¾­»ñµÃ¸ÃruleµÄcellÍ¼£¬Ôò·µ»Ø
+    return; // ï¿½ï¿½ï¿½Ñ¾ï¿½ï¿½ï¿½Ã¸ï¿½ruleï¿½ï¿½cellÍ¼ï¿½ï¿½ï¿½ò·µ»ï¿½
 
   clear();
 
   rule_graph_ = rg;
-  build_constraint_graph(); // ½¨Á¢º¬Ô¼ÊøµÄÍ¼
+  build_constraint_graph(); // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ô¼ï¿½ï¿½ï¿½ï¿½Í¼
 }
 
 void NetlistCSP::clear() {
   if (rule_graph_)
     for (GObject *gobj : rule_graph_->gobjects())
-      delete obj_var_map_[gobj]; // É¾³ýÍ¼µÄÏà¹Ø½áµãÔªËØ£¬¼´É¾³ý¸ÃÍ¼
+      delete obj_var_map_[gobj]; // É¾ï¿½ï¿½Í¼ï¿½ï¿½ï¿½ï¿½Ø½ï¿½ï¿½Ôªï¿½Ø£ï¿½ï¿½ï¿½É¾ï¿½ï¿½ï¿½ï¿½Í¼
   obj_var_map_.clear();
   type_set_.clear();
 }
@@ -95,7 +95,7 @@ void NetlistCSP::set_domain(CellGraph *ig) {
 }
 
 Variable *NetlistCSP::save_amatch() {
-  Variable *top_var_locked = NULL;
+  Variable *top_var_locked = nullptr;
   Match::InstMatch *amatch = cur_match_->create_amatch();
   for (GObject *rule_obj : rule_graph_->gobjects()) {
     //		for (GObjVarMap::value_type& mt: obj_var_map_) {
@@ -111,7 +111,7 @@ Variable *NetlistCSP::save_amatch() {
         rela_var->instance()
             ->set_rule_lock(); // current result instance can be matched in the
                                // current rule only once
-        if (top_var_locked == NULL)
+        if (top_var_locked == nullptr)
           top_var_locked = rela_var;
         else if (top_var_locked->query_order() > rela_var->query_order())
           top_var_locked = rela_var;
@@ -213,7 +213,7 @@ void SolutionBackjump::solve() {
       if (cur_query_idx == 0) {
         if (cur_var->dom_enumer().has_more_elem()) {
           remove_injection(cur_var);
-          cur_var->set_instance(NULL);
+          cur_var->set_instance(nullptr);
           status = INSTANTIATE;
           direction = 2;
         } else {
@@ -222,10 +222,10 @@ void SolutionBackjump::solve() {
         }
       } else if (cur_query_idx > 0) {
         remove_injection(cur_var);
-        cur_var->set_instance(NULL);
+        cur_var->set_instance(nullptr);
         cur_var = sorted_queries_[--cur_query_idx]->tar_var();
         remove_injection(cur_var);
-        cur_var->set_instance(NULL);
+        cur_var->set_instance(nullptr);
         status = INSTANTIATE;
         direction = 4;
       } else {
@@ -240,11 +240,11 @@ void SolutionBackjump::solve() {
         Variable *back_var = *(backjump_vars.rbegin());
         while (cur_query_idx > back_var->query_order()) {
           remove_injection(cur_var);
-          cur_var->set_instance(NULL);
+          cur_var->set_instance(nullptr);
           cur_var = sorted_queries_[--cur_query_idx]->tar_var();
         }
         remove_injection(cur_var);
-        cur_var->set_instance(NULL);
+        cur_var->set_instance(nullptr);
         cur_query = sorted_queries_[cur_query_idx];
         status = INSTANTIATE;
       }
@@ -253,14 +253,14 @@ void SolutionBackjump::solve() {
 
     case SUCCESS:
       top_var_locked = ncsp_->save_amatch(); //???
-      if (top_var_locked != NULL)
+      if (top_var_locked != nullptr)
         while (cur_query_idx > top_var_locked->query_order()) {
           remove_injection(cur_var);
-          cur_var->set_instance(NULL);
+          cur_var->set_instance(nullptr);
           cur_var = sorted_queries_[--cur_query_idx]->tar_var();
         }
       remove_injection(cur_var);
-      cur_var->set_instance(NULL);
+      cur_var->set_instance(nullptr);
       cur_query = sorted_queries_[cur_query_idx];
       status = INSTANTIATE;
       direction = 4;
@@ -284,7 +284,7 @@ Variable *SolutionBackjump::get_top_conflict_var(
 
 void SolutionBackjump::add_backjump_target(Query *q,
                                            QOrderVarSet &backjump_var) {
-  if (q->src_var() != NULL)
+  if (q->src_var() != nullptr)
     backjump_var.insert(q->src_var());
 }
 
@@ -296,12 +296,12 @@ void SolutionBackjump::build_search_strategy() {
     vars_left.insert(
         ncsp_->obj_var_map_[rule_obj]); // set of vars to be instantiated
 
-  GNode dummy(NULL, "DUMMY", NULL);
-  search_breadth_first(breadth_vars, vars_left, &dummy); // Éî¶ÈÓÅÏÈËÑË÷
+  GNode dummy(nullptr, "DUMMY", nullptr);
+  search_breadth_first(breadth_vars, vars_left, &dummy); // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 
   int query_order = 0;
   for (Query *q : sorted_queries_) {
-    q->tar_var()->set_instance(NULL); // thus is appliable
+    q->tar_var()->set_instance(nullptr); // thus is appliable
     q->tar_var()->set_query_order(query_order++);
   }
 }
@@ -314,7 +314,7 @@ void SolutionBackjump::search_breadth_first(SizeOrderVarSet &breadth_vars,
         reached_var; // breadth searched vars related to the current var
     for (Variable *var : breadth_vars) {
       Query *best_query = get_best_query(var);
-      if (best_query != NULL)
+      if (best_query != nullptr)
         sorted_queries_.push_back(best_query);
       vars_left.erase(vars_left.find(var));
       var->set_instance(
@@ -338,7 +338,7 @@ void SolutionBackjump::search_breadth_first(SizeOrderVarSet &breadth_vars,
 
 Query *SolutionBackjump::get_best_query(Variable *var) {
   int best_size = -1;
-  Query *best_query = NULL;
+  Query *best_query = nullptr;
   bool found = false;
 
   for (Query *q : var->incoming_queries()) {

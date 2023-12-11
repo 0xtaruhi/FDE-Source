@@ -8,7 +8,7 @@ namespace PACK {
 
 class Packer {
 public:
-  Packer() : top_cell_(NULL) {}
+  Packer() : top_cell_(nullptr) {}
 
   void load_rule_lib(const string &fn, Design *d) { prule_lib_.load(fn, d); }
   void load_config_lib(const string &fg) // added by hz

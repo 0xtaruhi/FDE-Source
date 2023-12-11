@@ -29,7 +29,7 @@ public:
     double total_cost;
 
     RTInfo()
-        : prev_node(NULL), pres_cost(1.), hist_cost(1.), path_cost(HUGE_FLOAT),
+        : prev_node(nullptr), pres_cost(1.), hist_cost(1.), path_cost(HUGE_FLOAT),
           total_cost(HUGE_FLOAT), tarflg(0) {}
   };
 
@@ -37,7 +37,7 @@ public:
   RTNode(RRGArchNet *owner, int capacity = 1)
       : RRGNode(owner), capacity_(capacity), occ_(0),
         base_cost_idx_(INVALID_INDEX), is_sink_(false), is_src_(false),
-        tree_node_(NULL), base_cost(1.0), is_pathnode_(false),
+        tree_node_(nullptr), base_cost(1.0), is_pathnode_(false),
         has_found_(false) {}
 
   int capacity() const { return capacity_; }
@@ -77,7 +77,7 @@ public:
   }
   void mod_pres_cost() { rt_info_.pres_cost = 1. + rt_info_.pres_cost; }
   void update_prev_info(RTNode *prev_node, double path_cost,
-                        RRGSwitch *prev_sw = NULL, double total_cost = 0.) {
+                        RRGSwitch *prev_sw = nullptr, double total_cost = 0.) {
     rt_info_.prev_node = prev_node;
     rt_info_.path_cost = path_cost;
     rt_info_.prev_sw = prev_sw;

@@ -93,12 +93,12 @@ public:
   Statement() {
     lineno = 0;
     type = NOP;
-    ifc.condition = NULL;
-    ifc.ifTrue = ifc.ifFalse = NULL;
-    ifc.cases = NULL;
-    assign.lval = assign.rval = NULL;
-    begin_end.block = NULL;
-    begin_end.declarations = NULL;
+    ifc.condition = nullptr;
+    ifc.ifTrue = ifc.ifFalse = nullptr;
+    ifc.cases = nullptr;
+    assign.lval = assign.rval = nullptr;
+    begin_end.block = nullptr;
+    begin_end.declarations = nullptr;
   }
   // Destructor
   ~Statement();
@@ -119,7 +119,7 @@ public:
   int lineno; // line number
   PortConnection() {
     position = -1;
-    value = NULL;
+    value = nullptr;
     lineno = 0;
   }
   PortConnection(const string &n, int p, Expression *v) {
@@ -161,8 +161,8 @@ public:
   list<PortConnection *> *connections;
   int lineno; // line number
   Instantiation() {
-    parameters = NULL;
-    connections = NULL;
+    parameters = nullptr;
+    connections = nullptr;
     lineno = 0;
   }
   // Destructor
@@ -186,9 +186,9 @@ public:
   Statement *action;
   int lineno; // line number
   Function() {
-    start = stop = NULL;
-    declarations = NULL;
-    action = NULL;
+    start = stop = nullptr;
+    declarations = nullptr;
+    action = nullptr;
     lineno = 0;
   }
   // Destructor
@@ -238,28 +238,28 @@ public:
   Primary(const string &n) {
     // scalar net primary (of name n)
     name = n;
-    range.start = range.stop = NULL;
+    range.start = range.stop = nullptr;
     type = NET;
-    arguments = NULL;
+    arguments = nullptr;
     lineno = 0;
   }
   Primary(const string &str, int bitwidth) {
     strValue = str;
     number.bitWidth = bitwidth;
     type = CONST;
-    range.start = range.stop = NULL;
-    arguments = NULL;
+    range.start = range.stop = nullptr;
+    arguments = nullptr;
     number.negative = false;
     lineno = 0;
   }
   Primary(unsigned int v, unsigned int w) {
     // constant primary (of value v and bitwidth w)
-    range.start = range.stop = NULL;
+    range.start = range.stop = nullptr;
     number.intValue = v;
     number.bitWidth = w;
     type = CONST;
     number.negative = false;
-    arguments = NULL;
+    arguments = nullptr;
     lineno = 0;
   }
   Primary(const string &n, Expression *i) {
@@ -267,7 +267,7 @@ public:
     name = n;
     range.start = i = range.stop = i;
     type = NET;
-    arguments = NULL;
+    arguments = nullptr;
     lineno = 0;
   }
   Primary(const string &n, Expression *f, Expression *l) {
@@ -276,7 +276,7 @@ public:
     range.start = f;
     range.stop = l;
     type = NET;
-    arguments = NULL;
+    arguments = nullptr;
     lineno = 0;
   }
   Primary(const string &n, list<Expression *> *args) {
@@ -284,7 +284,7 @@ public:
     name = n;
     arguments = args;
     type = FUNCTION_CALL;
-    range.start = range.stop = NULL;
+    range.start = range.stop = nullptr;
     lineno = 0;
   }
 
@@ -356,7 +356,7 @@ public:
   int lineno; // line number
   Expression *op2, *op3;
   Expression() {
-    op1 = op2 = op3 = NULL;
+    op1 = op2 = op3 = nullptr;
     type = UNKNOWN;
     lineno = 0;
   }
@@ -383,14 +383,14 @@ public:
 
   Expression(Expression *e1) {
     op1 = e1;
-    op2 = op3 = NULL;
+    op2 = op3 = nullptr;
     type = UNKNOWN;
     lineno = 0;
   }
   Expression(Expression *e1, Expression *e2) {
     op1 = e1;
     op2 = e2;
-    op3 = NULL;
+    op3 = nullptr;
     type = UNKNOWN;
     lineno = 0;
   }
@@ -447,7 +447,7 @@ public:
   Expression *value;
   int lineno; // line number
   Declaration() {
-    start = stop = start2D = stop2D = value = NULL;
+    start = stop = start2D = stop2D = value = nullptr;
     lineno = 0;
   }
   // Destructor
@@ -472,7 +472,7 @@ public:
   Type type;
   Expression *net;
 
-  Trigger() { net = NULL; }
+  Trigger() { net = nullptr; }
   // Destructor
   ~Trigger();
 };
@@ -490,8 +490,8 @@ public:
   Statement *action;
 
   AlwaysBlock() {
-    triggers = NULL;
-    action = NULL;
+    triggers = nullptr;
+    action = nullptr;
   }
   // Destructor
   ~AlwaysBlock();
@@ -510,8 +510,8 @@ public:
   bool isDefault;
 
   Case() {
-    conditions = NULL;
-    action = NULL;
+    conditions = nullptr;
+    action = nullptr;
   }
   // Destructor
   ~Case();
@@ -530,7 +530,7 @@ public:
   Expression *value;
 
   Assignment() {
-    lval = value = NULL;
+    lval = value = nullptr;
     lineno = 0;
   }
   // Destructor
@@ -545,7 +545,7 @@ public:
 
   Bundle(list<Expression *> *m) {
     members = m;
-    replication = NULL;
+    replication = nullptr;
     lineno = 0;
   }
   Bundle(list<Expression *> *m, class Expression *r) {

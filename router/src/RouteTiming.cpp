@@ -129,7 +129,7 @@ bool Router::timing_driven_route_net(RTNet &net, double Dmax, double pres_fac) {
 
     cur_heap_node = td_heap.heap_head();
 
-    if (cur_heap_node == NULL) {
+    if (cur_heap_node == nullptr) {
       reset_modify_nodes();
       return false;
     }
@@ -158,7 +158,7 @@ bool Router::timing_driven_route_net(RTNet &net, double Dmax, double pres_fac) {
       cur_heap_node->release();
       cur_heap_node = td_heap.heap_head();
 
-      if (cur_heap_node == NULL) {
+      if (cur_heap_node == nullptr) {
         reset_modify_nodes();
         return false;
       }
@@ -197,7 +197,7 @@ void Router::mark_timing_sinks(RTNet &net, std::vector<Pin *> &sink_pins) {
     Point pos = (*sink_pin_it)->instance()->property_value(postion);
     RTNode *sink_node = static_cast<RTNode *>(rrg_->find_logic_pin_node(
         (*sink_pin_it)->instance(), *(*sink_pin_it), pos));
-    ASSERT(sink_node != NULL, ErrMsg(ErrMsg::RTERR_UFND_NODE) % "sink" %
+    ASSERT(sink_node != nullptr, ErrMsg(ErrMsg::RTERR_UFND_NODE) % "sink" %
                                   (*sink_pin_it)->name() % net.name());
 
     sink_node->inc_tarflg();

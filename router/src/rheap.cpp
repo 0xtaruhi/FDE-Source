@@ -25,7 +25,7 @@ HeapNode *Heap::heap_head() {
     _heap.pop_back();
     return smallest;
   } else // empty
-    return NULL;
+    return nullptr;
 }
 
 template <typename T> class SimplePool {
@@ -110,7 +110,7 @@ void BFHeap::expand_neighbours(RTNode *src_node, RTNode *rt_node,
     }
 
     if (child_node->is_pathnode())
-      add_node_to_heap(child_node, NULL, NULL, total_cost);
+      add_node_to_heap(child_node, nullptr, nullptr, total_cost);
     else
       add_node_to_heap(child_node, rt_node, sw, total_cost);
   }
@@ -281,7 +281,7 @@ void TDHeap::add_rtree_to_heap(TreeNode *cur_root, const Pin &tar_pin,
     double total_cost =
         path_cost; // + astar_fac * get_expected_cost(cur_rt_node, tar_pin,
                    // cur_root->_Rupstream, TarCrit);
-    add_node_to_heap(cur_rt_node, NULL, NULL, total_cost, path_cost,
+    add_node_to_heap(cur_rt_node, nullptr, nullptr, total_cost, path_cost,
                      cur_root->_Rupstream);
 
     TreeNode::Children::iterator child_iter = cur_root->_children.begin();

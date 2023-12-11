@@ -25,7 +25,7 @@ public:
 public:
   RTNet(const string &name, NetType type, Module *owner, Bus *bus)
       : COSRTNet(name, type, owner, bus), is_ignore_(false),
-        is_partial_routed_(false), src_node_(NULL), seg_begin_(path_.end()),
+        is_partial_routed_(false), src_node_(nullptr), seg_begin_(path_.end()),
         seg_end_(path_.end()) {}
 
   void init_rt_info(RTGraph *, int, const CstNets *);

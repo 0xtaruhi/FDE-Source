@@ -67,12 +67,12 @@ bool Router::breadth_first_and_directed_search_route_net(RTNet &net) {
     BFHeap bf_heap;
     BFHeapNode *bf_heap_node;
 
-    bf_heap.add_node_to_heap(src_node, NULL, NULL, src_node->cong_cost());
+    bf_heap.add_node_to_heap(src_node, nullptr, nullptr, src_node->cong_cost());
     expand_trace_back(newiter, net, bf_heap);
 
     bf_heap_node = bf_heap.heap_head();
 
-    if (bf_heap_node == NULL) {
+    if (bf_heap_node == nullptr) {
       reset_modify_nodes();
       return false;
     }
@@ -96,7 +96,7 @@ bool Router::breadth_first_and_directed_search_route_net(RTNet &net) {
       bf_heap_node->release();
       bf_heap_node = bf_heap.heap_head();
 
-      if (bf_heap_node == NULL) {
+      if (bf_heap_node == nullptr) {
         reset_modify_nodes();
         return false;
       }
@@ -131,18 +131,18 @@ void Router::expand_trace_back(RTNet::path_node_iter node_it, RTNet &net,
                                BFHeap &bf_heap) {
   if (node_it != net.path_end()) {
     if (net.type() == CLOCK)
-      bf_heap.add_node_to_heap((*node_it), NULL, NULL, NO_PREVIOUS);
+      bf_heap.add_node_to_heap((*node_it), nullptr, nullptr, NO_PREVIOUS);
     else
-      (*node_it)->update_prev_info(NULL, HUGE_FLOAT);
+      (*node_it)->update_prev_info(nullptr, HUGE_FLOAT);
 
     ++node_it;
   }
 
   while (node_it != net.path_end()) {
     if (net.type() == CLOCK)
-      bf_heap.add_node_to_heap((*node_it), NULL, NULL, NO_PREVIOUS);
+      bf_heap.add_node_to_heap((*node_it), nullptr, nullptr, NO_PREVIOUS);
     else
-      (*node_it)->update_prev_info(NULL, HUGE_FLOAT);
+      (*node_it)->update_prev_info(nullptr, HUGE_FLOAT);
 
     if ((*node_it)->is_sink()) {
       ++node_it;

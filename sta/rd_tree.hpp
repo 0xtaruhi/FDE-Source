@@ -91,7 +91,7 @@ public:
     string icmod = arch_path->owner()->name();
     FDU_LOG(DEBUG) << "try find ic module: " << icmod;
     ICModule *module = ICLib::instance()->get_model(icmod);
-    if (module == NULL) {
+    if (module == nullptr) {
       int debug = 0;
     }
 

@@ -96,7 +96,7 @@ void STAEngine::find_seq_primitives(Instance &inst, int t_idx) {
 }
 
 void STAEngine::mark_sequentials() {
-  _clk_nets.push_back((Net *)NULL); // for assistance
+  _clk_nets.push_back((Net *)nullptr); // for assistance
 
   for (Instance *inst : target_design()->top_module()->instances())
     find_seq_primitives(*inst, find_clock_nets(*inst));

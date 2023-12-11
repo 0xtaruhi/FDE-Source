@@ -17,7 +17,7 @@ class VPort;
 
 class VPin {
 public:
-  VPin(VPort *vport) : vport_(vport), net_(NULL) {}
+  VPin(VPort *vport) : vport_(vport), net_(nullptr) {}
 
   VPort *vport() { return vport_; }
   const VPort *vport() const { return vport_; }
@@ -60,7 +60,7 @@ public:
     RuleInstance *rule_inst;
     PKInstance *image_inst;
 
-    InstPair(RuleInstance *r = NULL, PKInstance *i = NULL)
+    InstPair(RuleInstance *r = nullptr, PKInstance *i = nullptr)
         : rule_inst(r), image_inst(i) {}
   };
 

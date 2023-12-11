@@ -169,7 +169,7 @@ void write_edif_header(const string design_name, const string author,
                        ostream &os) {
   struct tm *local; // set the time
   time_t t;
-  t = time(NULL);
+  t = time(nullptr);
   local = localtime(&t);
   os << "(edif " << design_name << endl;
   os << "		(edifVersion 2 0 0)" << endl;

@@ -35,7 +35,7 @@ const char *cktMemLibBstr::_500KIP_FG256_MEMS[] = {
 // member functions
 
 void cktMemLibBstr::construct(const string &device, const string &package) {
-  ASSERTD(_refDfotMemLib, "cktMemLib: my _refDfotMemLib is NULL");
+  ASSERTD(_refDfotMemLib, "cktMemLib: my _refDfotMemLib is nullptr");
 
   dfotMemBstr *dfotMem = &_refDfotMemLib->getDfotMem();
   if (device == CHIPTYPE::FDP1000K && package == PACKAGE::PQ208) {

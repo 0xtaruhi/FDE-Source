@@ -191,7 +191,7 @@ bool TFaninType::execute() const {
   Pin *pin = inst->find_pin(pname_);
   ASSERT(pin, TFErrMsg(TFErrMsg::UFND_ELEM) % "pin" % pname_ % TEXPR_NAME);
 
-  if (pin->net() == NULL)
+  if (pin->net() == nullptr)
     return is_inverted_ ^ false;
 
   ASSERT(pin->net()->source_pins().size() == 1,

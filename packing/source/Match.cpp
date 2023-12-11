@@ -47,11 +47,11 @@ using namespace std;
 void VPin::unhook() {
   if (net_) {
     net_->remove_vpin(this);
-    net_ = NULL;
+    net_ = nullptr;
   }
 }
 void VPin::hookup(PKNet *net) {
-  ASSERT(net_ == NULL, "vpin already hooked");
+  ASSERT(net_ == nullptr, "vpin already hooked");
   net->add_vpin(this);
   net_ = net;
 }
@@ -65,7 +65,7 @@ VPort *VCell::find_port(const string &n) {
   for (VPort *p : ports_)
     if (p->name() == n)
       return p;
-  return NULL;
+  return nullptr;
 }
 
 PKInstance *VCell::find_image_inst(const string &rinst_name) const {
@@ -73,7 +73,7 @@ PKInstance *VCell::find_image_inst(const string &rinst_name) const {
     if (ipair.rule_inst->name() == rinst_name)
       return ipair.image_inst;
   }
-  return NULL;
+  return nullptr;
 }
 
 void VCell::compute_total_gain() {
@@ -88,7 +88,7 @@ void VCell::compute_seed_factor() {
   mark_net.clear();
   for (VPort *vport : ports_) {
     PKNet *net = vport->vpin()->net();
-    if (net != NULL && !net->is_touch()) {
+    if (net != nullptr && !net->is_touch()) {
       ++pk_fac_.degree;
       net->set_touch_flag();
       mark_net.push_back(net);
@@ -109,14 +109,14 @@ void VCell::compute_seed_factor() {
 // class Match
 Match::Match(Rule *rule, PKCell *image_cell)
     : rule_(rule), image_cell_(image_cell) {
-  if (rule_->rule_cell()->relative_graph() == NULL) {
+  if (rule_->rule_cell()->relative_graph() == nullptr) {
     rule_->rule_cell()->build_graph();
 #if defined(_DEBUG) && defined(_DRAW)
     rule_->rule_cell().relative_graph()->draw();
 #endif
   }
 
-  if (image_cell_->relative_graph() == NULL) {
+  if (image_cell_->relative_graph() == nullptr) {
     image_cell_->build_graph();
 #if defined(_DEBUG) && defined(_DRAW)
     image_cell_->relative_graph()->draw();
@@ -144,7 +144,7 @@ void Match::make_vcell() {
         //<< inner_net->name();
       }
       //				else
-      //					rport_pin_map[rport] = NULL;
+      //					rport_pin_map[rport] = nullptr;
     }
   }
 
@@ -156,11 +156,11 @@ void Match::make_vcell() {
       for (RulePort *rport : rule_->rule_cell()->ports()) {
         VPort *vport = vcell->create_port(rport);
         Pin *rpin = rport_pin_map[rport]; // port_pin_pair.second
-        if (rpin != NULL) {
+        if (rpin != nullptr) {
           PKInstance *image_inst =
               vcell->find_image_inst(rpin->instance()->name());
           Pin *real_pin = image_inst->find_pin(rpin->name());
-          if (real_pin != NULL && real_pin->net() != NULL)
+          if (real_pin != nullptr && real_pin->net() != nullptr)
             vport->vpin()->hookup(static_cast<PKNet *>(real_pin->net()));
         }
       }

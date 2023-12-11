@@ -287,7 +287,7 @@ protected:
    *  \param[in] type    GObjType object
    */
   GObject(CellGraph *context, GObjType *type)
-      : context_(context), obj_type_(type), rule_to_lock_(true) {}
+      : context_(context), rule_to_lock_(true), obj_type_(type) {}
 
   /*! \brief GObjType getter
    *

@@ -12,7 +12,7 @@ namespace Place {
 class PLCInstance;
 class Tile;
 /************************************************************************/
-/* SiteµÄ¶¨ÒåÀà                                                         */
+/* Siteï¿½Ä¶ï¿½ï¿½ï¿½ï¿½ï¿½                                                         */
 /************************************************************************/
 struct Site {
   enum SiteType {
@@ -32,23 +32,23 @@ struct Site {
     NUM_OF_SITE_TYPE
   };
 
-  SiteType _type;      // ¸ÃsiteµÄÀàÐÍ
-  Tile *_owner;        // ¸ÃsiteÊôÓÚÄÇ¸öTile
-  int _occ, _capacity; // ¸Ãsite±»Õ¼ÓÃµÄÊ÷Ä¾ºÍÈÝÁ¿
-  Point _logic_pos;    // ¸ÃsiteµÄÂß¼­Î»ÖÃ
+  SiteType _type;      // ï¿½ï¿½siteï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+  Tile *_owner;        // ï¿½ï¿½siteï¿½ï¿½ï¿½ï¿½ï¿½Ç¸ï¿½Tile
+  int _occ, _capacity; // ï¿½ï¿½siteï¿½ï¿½Õ¼ï¿½Ãµï¿½ï¿½ï¿½Ä¾ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+  Point _logic_pos;    // ï¿½ï¿½siteï¿½ï¿½ï¿½ß¼ï¿½Î»ï¿½ï¿½
 
-  typedef std::vector<PLCInstance *> OccInsts; // ¸Ãsite±»Õ¼ÓÃµÄinstance
+  typedef std::vector<PLCInstance *> OccInsts; // ï¿½ï¿½siteï¿½ï¿½Õ¼ï¿½Ãµï¿½instance
   OccInsts _occ_insts;
 
   typedef std::vector<Point> AvailablePos;
-  AvailablePos _available_pos; // ¸ÃsiteÔÚÐ¾Æ¬ÉÏµÄ¿É½»»»Î»ÖÃ
+  AvailablePos _available_pos; // ï¿½ï¿½siteï¿½ï¿½Ð¾Æ¬ï¿½ÏµÄ¿É½ï¿½ï¿½ï¿½Î»ï¿½ï¿½
 
   Site(SiteType t, Tile *o)
       : _type(t), _owner(o), _occ(0), _capacity(0), _logic_pos() {}
 
-  bool has_macro() const;                     // ¸ÃsiteÀïÃæÊÇ·ñÓÐmacroµ¥Ôª
-  bool has_fixed_insts() const;               // ¸ÃsiteÊÇ·ñÓÐfixµ¥Ôª
-  FLOORPLAN::SwapableType macro_type() const; // µÃµ½¸ÃsiteµÄmacro type
+  bool has_macro() const;                     // ï¿½ï¿½siteï¿½ï¿½ï¿½ï¿½ï¿½Ç·ï¿½ï¿½ï¿½macroï¿½ï¿½Ôª
+  bool has_fixed_insts() const;               // ï¿½ï¿½siteï¿½Ç·ï¿½ï¿½ï¿½fixï¿½ï¿½Ôª
+  FLOORPLAN::SwapableType macro_type() const; // ï¿½Ãµï¿½ï¿½ï¿½siteï¿½ï¿½macro type
 
   // "get" here means some algorithm used in these functions, not simply get the
   // value so these function should be take serious
@@ -61,7 +61,7 @@ struct Site {
   }
 };
 /************************************************************************/
-/* TileµÄ¶¨ÒåÀà                                                         */
+/* Tileï¿½Ä¶ï¿½ï¿½ï¿½ï¿½ï¿½                                                         */
 /************************************************************************/
 class Tile {
 public:
@@ -69,20 +69,20 @@ public:
     for (Sites::value_type &s : _sites)
       delete s.second;
   }
-  // ÉèÖÃ/µÃµ½TileµÄÀàÐÍ
+  // ï¿½ï¿½ï¿½ï¿½/ï¿½Ãµï¿½Tileï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
   void set_type(const std::string &type) { _type = type; }
   std::string type() const { return _type; }
-  // ÉèÖÃ/µÃµ½TileµÄÎïÀíÎ»ÖÃ
+  // ï¿½ï¿½ï¿½ï¿½/ï¿½Ãµï¿½Tileï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Î»ï¿½ï¿½
   void set_phy_pos(const Point &phy_pos) { _phy_pos = phy_pos; }
   Point phy_pos() const { return _phy_pos; }
-  // µÃµ½ÀïÃæµÄsites
+  // ï¿½Ãµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½sites
   typedef std::map<Site::SiteType, Site *> Sites;
   Sites &sites() { return _sites; }
-  // ÅÐ¶ÏÊÇ·ñ´æÔÚtypeÐÍµÄsite
+  // ï¿½Ð¶ï¿½ï¿½Ç·ï¿½ï¿½ï¿½ï¿½typeï¿½Íµï¿½site
   bool exist_site(Site::SiteType type) const { return _sites.count(type); }
-  // µÃµ½Ä³Ò»ÀàÐÍµÄsite
+  // ï¿½Ãµï¿½Ä³Ò»ï¿½ï¿½ï¿½Íµï¿½site
   Site &site(Site::SiteType type) { return *_sites[type]; }
-  // Ôö¼ÓÄ³Ò»ÀàÐÍµÄsite
+  // ï¿½ï¿½ï¿½ï¿½Ä³Ò»ï¿½ï¿½ï¿½Íµï¿½site
   Site &add_site(Site::SiteType type) {
     Site *site = new Site(type, this);
     _sites.insert(std::make_pair(type, site));
@@ -90,10 +90,10 @@ public:
   }
 
 private:
-  std::string _type; // ¼ÇÂ¼¸ÃTileµÄÀàÐÍ
+  std::string _type; // ï¿½ï¿½Â¼ï¿½ï¿½Tileï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
   Point _phy_pos;    // Phy position
 
-  Sites _sites; // ´æ´¢ÀïÃæµÄsites,map
+  Sites _sites; // ï¿½æ´¢ï¿½ï¿½ï¿½ï¿½ï¿½sites,map
 };
 
 class DeviceInfo {
@@ -101,7 +101,7 @@ public:
   typedef std::map<Site::SiteType, int> RscStat;
   typedef std::map<Site::SiteType, std::vector<Point>> RscAvaPos;
 
-  DeviceInfo() : _inv_of_chan_width(DEVICE::INV_OF_CHAN_WIDTH), _scale() {}
+  DeviceInfo() : _scale(), _inv_of_chan_width(DEVICE::INV_OF_CHAN_WIDTH) {}
 
   bool is_logic_site(Site::SiteType type) { return type > Site::IGNORE; }
 

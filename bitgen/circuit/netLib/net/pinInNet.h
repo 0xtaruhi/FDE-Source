@@ -14,7 +14,7 @@ private:
 
 public:
   pinNet(const std::string &info, instLib *refInstLib = 0)
-      : _refInstLib(refInstLib), cktBase("", nullptr) {
+      : cktBase("", nullptr), _refInstLib(refInstLib) {
     constructFromXDL(info);
   }
 

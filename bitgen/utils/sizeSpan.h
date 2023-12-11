@@ -17,11 +17,11 @@ struct sizeSpan {
   static void extractCoordinate(const char *coordinate, char xAxis, int &x,
                                 char yAxis, int &y);
 
-  sizeSpan &operator=(const sizeSpan &t) {
-    _rowSpan = t._rowSpan;
-    _columnSpan = t._columnSpan;
-    return *this;
-  }
+  // sizeSpan &operator=(const sizeSpan &t) {
+  //   _rowSpan = t._rowSpan;
+  //   _columnSpan = t._columnSpan;
+  //   return *this;
+  // }
 };
 
 inline bool operator==(const sizeSpan &lhs, const sizeSpan &rhs) {

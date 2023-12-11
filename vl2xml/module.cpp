@@ -500,8 +500,9 @@ void VerilogModule::ConnectInstance(Module &cell, Instance &inst,
           exit(1);
         }
         // single bit net but have you considered dangling ports??
-      } else
-        ; // just do nothing for high bit of RAM
+      } else {
+        // just do nothing for high bit of RAM
+      }
     }
   }
 }
@@ -808,8 +809,8 @@ void VerilogModule::ParsePrimaryNet(string name, Expression *start,
 void VerilogModule::ParsePrimaryNet(Primary *prim, list<string> &namelist) {
   PUSH_STEP;
   string netname;
-  // standard identifier the start and stop will be nullptr the same time but may
-  // still by multi bits like ADDR if so you need to consider that condition
+  // standard identifier the start and stop will be nullptr the same time but
+  // may still by multi bits like ADDR if so you need to consider that condition
   if (prim->range.start == nullptr || prim->range.stop == nullptr) {
     // use the STL algorithm find_if may perform better but i don't know it yet
     // ^_^

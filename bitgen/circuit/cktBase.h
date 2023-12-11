@@ -23,7 +23,7 @@ protected:
 public:
   // for XDL
   cktBase(const std::string &name, xdlMatch *matchResults = 0)
-      : _name(name), _matchResults(matchResults), _nlBase(nullptr) {}
+      : _name(name), _nlBase(nullptr), _matchResults(matchResults) {}
   // for XML
   cktBase(COS::Object *nlBase = 0)
       : _name(""), _nlBase(nlBase), _matchResults(nullptr) {}

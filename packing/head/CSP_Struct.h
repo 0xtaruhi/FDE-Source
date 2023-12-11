@@ -444,6 +444,8 @@ public:
    */
   Query(Variable *src, Variable *tar, int w, BConstraint *bc, QueryEnum qt);
 
+  virtual ~Query() {}
+
   /*! \brief source %Variable getter
    *
    *  \return The source Variable

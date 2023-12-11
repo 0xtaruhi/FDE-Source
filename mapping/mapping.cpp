@@ -107,7 +107,7 @@ MapCut::MapCut(MapCut *cut0, MapCut *cut1, Instance *cutRoot, int lutSize)
       if (cut1->leaves[j] == leaves[i])
         index1[j] = i;
   }
-  truthtable = calcTruthtable(leaves.size(), move(index0), move(index1),
+  truthtable = calcTruthtable(leaves.size(), std::move(index0), std::move(index1),
                               cut0->truthtable, cut1->truthtable,
                               root->property_value(pTruthtableItems));
 
@@ -193,13 +193,13 @@ void addCut(CutVec &allCuts, CutPtr cut) {
 }
 
 auto getAllCuts(Instance *node, string pinName) {
-  auto leafCut = make_unique<MapCut>(getFaninPin(node, pinName));
+  auto leafCut = std::make_unique<MapCut>(getFaninPin(node, pinName));
   auto allCuts = vector<MapCut *>{leafCut.get()};
   if (auto inst = getFaninInstance(node, pinName); inst) {
     auto &pAll = inst->property_cref(pAllCuts);
     allCuts.insert(allCuts.end(), pAll.begin(), pAll.end());
   }
-  return make_pair(move(leafCut), allCuts);
+  return make_pair(std::move(leafCut), allCuts);
 }
 
 void enumNode(Instance *node, int lutSize) {
@@ -340,7 +340,7 @@ void MappingManager::doReadDesign() {
 
   ASSERTS(_args.inputType == "edif"); // edif from Yosys
   IO::using_edif();
-  // cell_lib的改名需要在loadedif中处理，不能直接传递参数，使用property传递改名要求
+  // cell_lib锟侥革拷锟斤拷锟斤拷要锟斤拷loadedif锟叫达拷锟斤拷锟斤拷锟斤拷锟斤拷直锟接达拷锟捷诧拷锟斤拷锟斤拷使锟斤拷property锟斤拷锟捷革拷锟斤拷要锟斤拷
   auto &pRename = create_temp_property<string>(DESIGN, "cell_lib_rename");
   _pDesign->set_property(pRename, "cell_lib=LIB");
   _pDesign->load("edif", _args.inputFile);

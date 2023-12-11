@@ -333,11 +333,14 @@ void Instance::dissolve() {
     if (Net *onet = pin->net()) {
       //				pin->disconnect();
       //				onet->clear_connections();
-      if (Net *inet = pin->down_pin()->net())
-        if (Net *rnet = inet->property_value(rel_net))
+      if (Net *inet = pin->down_pin()->net()) {
+        if (Net *rnet = inet->property_value(rel_net)) {
           rnet->merge(onet);
-        else
+        }
+        else {
           inet->set_property(rel_net, onet);
+        }
+      }
     }
   }
 

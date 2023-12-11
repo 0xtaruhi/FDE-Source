@@ -11,7 +11,7 @@ using boost::adaptors::filtered;
 using std::ostream;
 using namespace COS;
 
-typedef std::pair<Property<string> *, char *> init_pair;
+typedef std::pair<Property<string> *, const char *> init_pair;
 init_pair init_props[] = {
     init_pair(&create_temp_property<string>(INSTANCE, "F#INIT_HEX"), "f.INIT"),
     init_pair(&create_temp_property<string>(INSTANCE, "G#INIT_HEX"), "g.INIT"),
@@ -121,15 +121,18 @@ void write_module(const Module *mod, ostream &os) {
       vname = rename(vname);
       os << "  wire " << vname << ";\n";
       if (nports)
-        for (const Pin *pin : net->pins() | filtered(is_mpin))
-          if (pin->is_source())
+        for (const Pin *pin : net->pins() | filtered(is_mpin)) {
+          if (pin->is_source()) {
             str_assign +=
                 (format("  assign %s = %s;\n") % vname % rename(pin->name()))
                     .str();
-          else
+          }
+          else {
             str_assign +=
                 (format("  assign %s = %s;\n") % rename(pin->name()) % vname)
                     .str();
+          }
+        }
     }
     const_cast<Net *>(net)->set_property(VNAME, vname);
   }

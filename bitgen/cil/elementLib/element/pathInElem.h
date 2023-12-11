@@ -23,7 +23,7 @@ public:
   bool searchMe(const std::string &in, const std::string &out) const;
 
   sramElem *addCfgSram(sramElem *sram) { return _cfgInfo.addSram(sram); }
-  sramElem &getCfgSram(const std::string &sramName) const {
+  sramElem &getCfgSram(const std::string &sramName) {
     return _cfgInfo.getSram(sramName);
   }
 

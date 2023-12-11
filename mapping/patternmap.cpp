@@ -27,13 +27,15 @@ void addBuf(Design *pDesign) {
     case INOUT:
       Pio.push_back(port);
       break;
+    default:
+      break;
     }
   }
 
   for (Port *pi : Pi) {
     ASSERTS(pi->dir() == INPUT);
     for (Pin *pin : pi->mpins()) {
-      if (!pin->is_connected()) { // Èç¹ûÊäÈëPortÐü¿Õ
+      if (!pin->is_connected()) { // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Portï¿½ï¿½ï¿½ï¿½
         FDU_LOG(WARN) << "The Pi{" << pin->name() << ") has no fanout";
         Instance *ibuf = top->create_instance("Buf-pad-" + pin->name(), IBUF);
         Net *net = top->create_net(pin->name());
@@ -48,7 +50,7 @@ void addBuf(Design *pDesign) {
             break;
           }
         }
-        if (isClk) { // Ìí¼Óclk_bufºÍclk_ibuf
+        if (isClk) { // ï¿½ï¿½ï¿½ï¿½clk_bufï¿½ï¿½clk_ibuf
           Instance *clk_buf =
               top->create_instance("Buf-pad-" + pin->name(), CKBUF);
           Instance *clk_ibuf =
@@ -61,7 +63,7 @@ void addBuf(Design *pDesign) {
           Net *net2 = top->create_net("net_Buf-pad-" + pin->name());
           clk_buf->find_pin("O")->connect(net2);
           clk_ibuf->find_pin("I")->connect(net2);
-        } else { // Õý³£inputÀàÐÍport
+        } else { // ï¿½ï¿½ï¿½ï¿½inputï¿½ï¿½ï¿½ï¿½port
           Instance *ibuf = top->create_instance("Buf-pad-" + pin->name(), IBUF);
           ibuf->find_pin("O")->connect(pin->net());
           pin->net()->rename("net_Buf-pad-" + pin->name());
@@ -72,7 +74,7 @@ void addBuf(Design *pDesign) {
       }
     }
   }
-  // Ìí¼Óipad
+  // ï¿½ï¿½ï¿½ï¿½ipad
   for (Port *pi : Pi) {
     ASSERTS(pi->dir() == INPUT);
     for (Pin *pin : pi->mpins()) {
@@ -92,7 +94,7 @@ void addBuf(Design *pDesign) {
       pin->reconnect(net);
     }
   }
-  // Ìí¼Óopad
+  // ï¿½ï¿½ï¿½ï¿½opad
   for (Port *po : Po) {
     ASSERTS(po->dir() == OUTPUT);
     for (Pin *pin : po->mpins()) {

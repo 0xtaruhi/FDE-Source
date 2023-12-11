@@ -30,7 +30,7 @@ void funcInCfgElemSite::getContentsOfFunc(vecBits &bits,
         ++addrSize;
       }
     }
-    vector<int> truthTab =
+    std::vector<int> truthTab =
         Exp2LUT(cfgElement._cfgElemFunc._name, addrSize).toVec();
     for (sramInCfgElemSite *sram : _srams) {
       if (sram->_optAddr >= 0) {

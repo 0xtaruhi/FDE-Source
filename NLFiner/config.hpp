@@ -12,14 +12,13 @@
 namespace FDU {
 namespace NLF {
 
-using namespace std;
 using namespace FDU::XML;
 
 class Config {
 public:
-  typedef vector<string> vec_str;
-  typedef vector<size_t> vec_int;
-  typedef map<string, string> bit_map;
+  typedef std::vector<string> vec_str;
+  typedef std::vector<size_t> vec_int;
+  typedef std::map<string, string> bit_map;
   typedef bit_map::value_type bit_pair;
 
   Config(const string &name = "") : _name(name) {}
@@ -54,8 +53,8 @@ private:
 
 class ConfigRepo {
 public:
-  typedef map<string, Config *> conf_map;
-  typedef map<string, conf_map> repo;
+  typedef std::map<string, Config *> conf_map;
+  typedef std::map<string, conf_map> repo;
 
   void add_config(const string &block, const string &pm, Config *pmConfig) {
     _config[block][pm] = pmConfig;

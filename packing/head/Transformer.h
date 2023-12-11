@@ -9,7 +9,6 @@
 #include <boost/scoped_ptr.hpp>
 
 using namespace COS;
-using namespace std;
 
 namespace PACK {
 

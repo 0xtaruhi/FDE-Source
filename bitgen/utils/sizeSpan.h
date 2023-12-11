@@ -5,8 +5,6 @@
 #include <sstream>
 #include <string>
 
-using namespace std;
-
 struct sizeSpan {
   int _rowSpan;
   int _columnSpan;

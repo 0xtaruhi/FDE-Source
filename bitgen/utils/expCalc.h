@@ -8,14 +8,13 @@
 #include <string>
 
 ////////////////////////////////////////////////////////////////////////////
-using namespace std;
 using namespace BOOST_SPIRIT_CLASSIC_NS;
 
 ////////////////////////////////////////////////////////////////////////////
 // push_bool
 
 struct push_bool {
-  push_bool(stack<bool> &eval_) : eval(eval_) {}
+  push_bool(std::stack<bool> &eval_) : eval(eval_) {}
 
   void operator()(char const *str, char const * /*end*/) const {
     bool n = atoi(str) != 0 ? true : false;
@@ -23,7 +22,7 @@ struct push_bool {
     //		cout << "push\t" << bool(n) << endl;
   }
 
-  stack<bool> &eval;
+  std::stack<bool> &eval;
 };
 
 //////////////////////////////////////////////////////////////////////////
@@ -36,7 +35,7 @@ template <class _Ty> struct logical_xor {
 };
 
 template <typename op> struct do_op {
-  do_op(op const &the_op, stack<bool> &eval_) : m_op(the_op), eval(eval_) {}
+  do_op(op const &the_op, std::stack<bool> &eval_) : m_op(the_op), eval(eval_) {}
 
   void operator()(char const *, char const *) const {
     bool rhs = eval.top();
@@ -51,10 +50,10 @@ template <typename op> struct do_op {
   }
 
   op m_op;
-  stack<bool> &eval;
+  std::stack<bool> &eval;
 };
 
-template <class op> do_op<op> make_op(op const &the_op, stack<bool> &eval) {
+template <class op> do_op<op> make_op(op const &the_op, std::stack<bool> &eval) {
   return do_op<op>(the_op, eval);
 }
 
@@ -62,7 +61,7 @@ template <class op> do_op<op> make_op(op const &the_op, stack<bool> &eval) {
 // operation : ~
 
 struct do_not {
-  do_not(stack<bool> &eval_) : eval(eval_) {}
+  do_not(std::stack<bool> &eval_) : eval(eval_) {}
 
   void operator()(char const *, char const *) const {
     bool lhs = eval.top();
@@ -74,14 +73,14 @@ struct do_not {
     eval.push(lhs);
   }
 
-  stack<bool> &eval;
+  std::stack<bool> &eval;
 };
 
 ////////////////////////////////////////////////////////////////////////////
 // bool calculator
 
 struct boolCalc : public grammar<boolCalc> {
-  boolCalc(stack<bool> &eval_) : eval(eval_) {}
+  boolCalc(std::stack<bool> &eval_) : eval(eval_) {}
 
   template <typename ScannerT> struct definition {
     definition(boolCalc const &self) {
@@ -94,21 +93,21 @@ struct boolCalc : public grammar<boolCalc> {
           ;
 
       term =
-          factor >> *(('*' >> factor)[make_op(logical_and<bool>(), self.eval)] |
-                      ('&' >> factor)[make_op(logical_and<bool>(), self.eval)] |
+          factor >> *(('*' >> factor)[make_op(std::logical_and<bool>(), self.eval)] |
+                      ('&' >> factor)[make_op(std::logical_and<bool>(), self.eval)] |
                       ('@' >> factor)[make_op(logical_xor<bool>(), self.eval)] |
                       ('^' >> factor)[make_op(logical_xor<bool>(), self.eval)]);
 
       expression =
-          term >> *(('+' >> term)[make_op(logical_or<bool>(), self.eval)] |
-                    ('|' >> term)[make_op(logical_or<bool>(), self.eval)]);
+          term >> *(('+' >> term)[make_op(std::logical_or<bool>(), self.eval)] |
+                    ('|' >> term)[make_op(std::logical_or<bool>(), self.eval)]);
     }
 
     rule<ScannerT> expression, term, factor, integer;
     rule<ScannerT> const &start() const { return expression; }
   };
 
-  stack<bool> &eval;
+  std::stack<bool> &eval;
 };
 
 //////////////////////////////////////////////////////////////////////////

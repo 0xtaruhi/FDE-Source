@@ -7,7 +7,6 @@
 namespace FDU {
 namespace NLF {
 
-using namespace std;
 using namespace COS;
 
 class NLFiner {
@@ -21,7 +20,7 @@ class NLFiner {
     string to_match;
   };
 
-  typedef vector<string> vec_str;
+  typedef std::vector<string> vec_str;
 
 public:
   NLFiner(Design *design, Design *cell_lib, ConfigRepo *repo)
@@ -31,7 +30,7 @@ public:
 
 private:
   void rebuild_verbose_netlist();
-  void rebuild_verbose_instance(Instance *inst, map<string, size_t> &name_repo);
+  void rebuild_verbose_instance(Instance *inst, std::map<string, size_t> &name_repo);
   void copy_template_cell_lib();
   void remove_unused_module();
 

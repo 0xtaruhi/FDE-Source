@@ -51,7 +51,7 @@ void cktTileLibBstr::recordCktCfgs1000K() {
     string siteName = cfg._siteName;
     if (archlib->is_io_bound(siteName)) {
       cfg._siteName =
-          "IOB" + to_string((archlib->find_pad_by_name(siteName)).z);
+          "IOB" + std::to_string((archlib->find_pad_by_name(siteName)).z);
       if (cfg._tileName == "TM" || cfg._tileName == "BM")
         cfg._siteName = "GCLK" + cfg._siteName;
     }
@@ -102,7 +102,7 @@ void cktTileLibBstr::recordCktCfgsFDP80K() {
 
     if (archlib->is_io_bound(siteName)) {
       cfg._siteName =
-          "IOB" + to_string((archlib->find_pad_by_name(siteName)).z);
+          "IOB" + std::to_string((archlib->find_pad_by_name(siteName)).z);
       if (cfg._tileName == "TM" || cfg._tileName == "BM")
         cfg._siteName = "GCLK" + cfg._siteName;
 
@@ -150,7 +150,7 @@ void cktTileLibBstr::recordCktCfgsFDP80K() {
         std::string init = cfg._cfgElemName.substr(6, 2);
         int frm;
         sscanf(init.c_str(), "%x", &frm);
-        int word_bl[256]; // ´æ·ÅµçÂ·ÎÄ¼þxdlµÄÏà¹ØÐÅÏ¢
+        int word_bl[256]; // ï¿½ï¿½Åµï¿½Â·ï¿½Ä¼ï¿½xdlï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ï¢
         std::string word = cfg._cfgElemFunc._name;
         int id = 255;
         for (std::string::size_type ix = 0; ix != word.size(); ++ix) {
@@ -172,7 +172,7 @@ void cktTileLibBstr::recordCktCfgsFDP80K() {
       else if (cfgType == "INIT_") {
         BitGen::bitstream::cktTileBstr::tileBstr &ckttileBstr_i =
             pcktTile->getTileBstr();
-        if (ckttileBstr_i.empty()) { // Ô¤´¦ÀíÐ£ÑéÎ»²»ÐèÒª³õÊ¼»¯µÄÇé¿ö
+        if (ckttileBstr_i.empty()) { // Ô¤ï¿½ï¿½ï¿½ï¿½Ð£ï¿½ï¿½Î»ï¿½ï¿½ï¿½ï¿½Òªï¿½ï¿½Ê¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
           for (int idx_sram = 0; idx_sram < 320 * 8 * 8; ++idx_sram) {
             ckttileBstr->push_back(0);
           }

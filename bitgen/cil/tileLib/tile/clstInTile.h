@@ -46,7 +46,7 @@ class siteSramTile {
   //const_sramTileIter  = cilContainer<sramInSiteSramTile>::const_iterator;
 
 private:
-  unordered_map<string, sramInSiteSramTile *> _srams;
+  std::unordered_map<string, sramInSiteSramTile *> _srams;
   std::string _refSiteName;
   std::string _refTileName;
   siteLib *_refSiteLib;

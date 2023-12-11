@@ -157,7 +157,7 @@ void CMDLoaderBase::exportBitFile(const std::string &outputFile) {
     ASSERT(zofs, "CMDLoader: can not open ... " + outputFile);
     zofs << _ofs.str();
   } else {
-    ofstream ofs(outputFile.c_str());
+    std::ofstream ofs(outputFile.c_str());
     ASSERT(ofs.is_open(), "CMDLoader: can not open ... " + outputFile);
     ofs << _ofs.str();
   }

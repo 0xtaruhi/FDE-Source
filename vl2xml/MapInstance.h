@@ -6,8 +6,6 @@
 
 namespace VL2XML_PARSER {
 
-// using namespace std;
-
 class MapInstance {
 public:
   MapInstance();

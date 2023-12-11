@@ -1,6 +1,5 @@
 #include "utils/expCalc.h"
 #include "log.h"
-#include "utils.h"
 #include <sstream>
 
 Exp2LUT::Exp2LUT(const std::string &expr, int bitAmount)
@@ -10,7 +9,7 @@ Exp2LUT::Exp2LUT(const std::string &expr, int bitAmount)
   if (expr.substr(0, 2) == "0x")
     HexToTable();
   else
-    expr.size() == _bitAmount &&expr.find("A") == string::npos ? BinaryToTable()
+    expr.size() == _bitAmount &&expr.find("A") == std::string::npos ? BinaryToTable()
                                                                : ExpToTable();
 }
 
@@ -67,7 +66,7 @@ void Exp2LUT::ExpToTable() {
       }
     }
 
-    stack<bool> tVal;
+    std::stack<bool> tVal;
     boolCalc calc(tVal);
     ASSERTD(!boolExp.empty(), "Exp2LUT: empty expression");
     parse_info<> result = parse(boolExp.c_str(), calc, space_p);

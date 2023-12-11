@@ -118,7 +118,7 @@ public:
 
   typedef std::vector<PLCInstance *> ConnectedInsts;
   const ConnectedInsts &connected_insts() const { return _connected_insts; }
-  int num_connected_insts() const { return _connected_insts.size(); }
+  size_t num_connected_insts() const { return _connected_insts.size(); }
   void store_connected_insts();
 
 private:

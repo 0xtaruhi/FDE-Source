@@ -22,7 +22,7 @@ public:
   // instructions
   typedef PtrVector<Instruct>::const_range_type const_instructs_type;
 
-  int num_instructs() const { return instructs_.size(); }
+  size_t num_instructs() const { return instructs_.size(); }
   const_instructs_type instructs() const { return instructs_.range(); }
 
   template <typename I> inline I *create_instruct();
@@ -62,7 +62,7 @@ public:
   typedef PtrVector<TranTestCase>::const_range_type const_cases_type;
   typedef PtrVector<TranTestCase>::const_iterator const_case_iter;
 
-  int num_cases() const { return test_cases_.size(); }
+  size_t num_cases() const { return test_cases_.size(); }
   const_cases_type test_cases() const { return test_cases_.range(); }
   TranTestCase *create_test_cases() {
     return test_cases_.add(new TranTestCase(this));

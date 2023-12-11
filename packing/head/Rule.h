@@ -36,7 +36,7 @@ public:
   typedef PtrVector<TestCase>::const_range_type const_cases_type;
   typedef PtrVector<TestCase>::const_iterator const_case_iter;
 
-  int num_cases() const { return test_cases_.size(); }
+  size_t num_cases() const { return test_cases_.size(); }
   const_cases_type test_cases() const { return test_cases_.range(); }
   TestCase *create_case() { return test_cases_.add(new TestCase); }
 
@@ -65,7 +65,7 @@ public:
   typedef PtrVector<Operation>::const_range_type const_operations_type;
   typedef PtrVector<Operation>::const_iterator const_operation_iter;
 
-  int num_operations() const { return operations_.size(); }
+  size_t num_operations() const { return operations_.size(); }
   const_operations_type operations() const { return operations_.range(); }
   Operation *create_operation(const string &target = KEY_WORD::TOP_CELL) {
     return operations_.add(new Operation(target));
@@ -88,7 +88,7 @@ public:
   typedef PtrVector<Layer>::const_iterator const_layer_iter;
   typedef PtrVector<Layer>::iterator layer_iter;
 
-  int num_layers() const { return layers_.size(); }
+  size_t num_layers() const { return layers_.size(); }
   const_layers_type layers() const { return layers_.range(); }
   layers_type layers() { return layers_.range(); }
   Layer *create_layer() { return layers_.add(new Layer()); }

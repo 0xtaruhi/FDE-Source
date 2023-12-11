@@ -99,7 +99,7 @@ void write_module(const Module *mod, ostream &os) {
   for (const Net *net : mod->nets()) {
     string vname = net->name();
     auto is_mpin = [](const Pin *pin) { return pin->is_mpin(); };
-    int nports = count_if(net->pins(), is_mpin);
+    auto nports = count_if(net->pins(), is_mpin);
     if (!(nports == 1 && vname == find_if(net->pins(), is_mpin)->name())) {
       vname = rename(vname);
       os << "  wire " << vname << ";\n";

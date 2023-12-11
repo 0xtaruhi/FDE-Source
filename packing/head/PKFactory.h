@@ -134,7 +134,7 @@ public:
       const_vpins_type;
   typedef boost::iterator_range<std::list<VPin *>::iterator> vpins_type;
 
-  int num_vpins() const { return vpins_.size(); }
+  size_t num_vpins() const { return vpins_.size(); }
   const_vpins_type vpins() const {
     return const_vpins_type(vpins_.begin(), vpins_.end());
   }

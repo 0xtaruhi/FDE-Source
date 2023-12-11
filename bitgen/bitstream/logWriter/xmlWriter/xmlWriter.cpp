@@ -44,13 +44,13 @@ void xmlWriter::writeNormal() {
   set_attribute(root, "amount", to_string(tileBits.size()), COPY_VALUE);
 
   xml_node *logicNodes = create_element(root, "logic");
-  int logicAmount =
+  auto logicAmount =
       std::count_if(tileBits.begin(), tileBits.end(),
                     [](const bitTile &bit) { return bit.isLogic(); });
   set_attribute(logicNodes, "amount", to_string(logicAmount), COPY_VALUE);
 
   xml_node *routeNodes = create_element(root, "route");
-  int routeAmount =
+  auto routeAmount =
       std::count_if(tileBits.begin(), tileBits.end(),
                     [](const bitTile &bit) { return bit.isRoute(); });
   set_attribute(routeNodes, "amount", to_string(routeAmount), COPY_VALUE);

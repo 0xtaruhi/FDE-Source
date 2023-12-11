@@ -299,8 +299,8 @@ void Router::save_base_cost() {
     base_cost_infos_[SINK_COST_INDEX].base_cost = 0.;
   }
 
-  int max_idx = base_cost_infos_.size();
-  for (int i = SEGX_COST_INDEX_START; i < max_idx; ++i) {
+  size_t max_idx = base_cost_infos_.size();
+  for (size_t i = SEGX_COST_INDEX_START; i < max_idx; ++i) {
     if (rt_params_.bcost_type == INTRINSTIC_DELAY)
       base_cost_infos_[i].base_cost =
           base_cost_infos_[i].TLinear + base_cost_infos_[i].TQuadratic;

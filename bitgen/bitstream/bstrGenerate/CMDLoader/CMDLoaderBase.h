@@ -115,7 +115,7 @@ inline void CMDLoaderBase::mountSMFA(int majorAddr,
 
 inline void CMDLoaderBase::reverse(std::vector<int> &FRMBits,
                                    int bits_per_grp_reversed) {
-  for (int i = 0, size = FRMBits.size(); i < size; i += bits_per_grp_reversed)
+  for (size_t i = 0, size = FRMBits.size(); i < size; i += bits_per_grp_reversed)
     for (int j = i, end = j + bits_per_grp_reversed - 1; j < end; ++j, --end)
       std::swap(FRMBits[j], FRMBits[end]);
 }

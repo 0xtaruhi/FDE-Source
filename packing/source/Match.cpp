@@ -95,7 +95,7 @@ void VCell::compute_seed_factor() {
     }
   }
 
-  int num_terminals = 0;
+  size_t num_terminals = 0;
   for (PKNet *net : mark_net) {
     num_terminals += net->num_vpins();
     net->clear_touch_flag();

@@ -336,14 +336,14 @@ public:
    *  Incoming arc means the %GNode is the target node of the GArc
    *  \return Number of incoming arcs
    */
-  int num_incoming_arcs() const { return incoming_arcs_.size(); }
+  size_t num_incoming_arcs() const { return incoming_arcs_.size(); }
 
   /*! \brief number of outgoing arcs
    *
    *  Outgoing arc means the %GNode is the source node of the GArc
    *  \return Number of outgoing arcs
    */
-  int num_outgoing_arcs() const { return outgoing_arcs_.size(); }
+  size_t num_outgoing_arcs() const { return outgoing_arcs_.size(); }
 
   /*! \brief arc iteration typedef
    *
@@ -618,7 +618,7 @@ public:
    *  when the corresponding net unhook a pin.
    *  \return Number of pure sinks on this %GArc
    */
-  int num_sinks() const { return arc_type_->sink_names_.size(); }
+  size_t num_sinks() const { return arc_type_->sink_names_.size(); }
 
   /*! \brief iterator_range of sink pin names
    *

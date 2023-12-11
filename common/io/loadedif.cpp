@@ -486,10 +486,10 @@ Token Parser::parse_property() {
 Token Parser::parse_e() {
   Token tok = parse();
   ASSERTLN(tok.type() == T_INT, "e: integer required");
-  double d = tok.value<int64_t>();
+  double d = static_cast<double>(tok.value<int64_t>());
   tok = parse();
   ASSERTLN(tok.type() == T_INT, "e: integer required");
-  int e = tok.value<int64_t>();
+  auto e = tok.value<int64_t>();
   for (; e > 0; e--)
     d *= 10.;
   for (; e < 0; e++)

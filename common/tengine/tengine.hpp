@@ -114,7 +114,7 @@ public:
 
   otedges_type out_tedges() { return _out_tedges.range(); }
   const_otedges_type out_tedges() const { return _out_tedges.range(); }
-  int num_out_tedges() const { return _out_tedges.size(); }
+  size_t num_out_tedges() const { return _out_tedges.size(); }
 
   typedef SharedTESet<TEdge> InTEdgeSet;
   typedef InTEdgeSet::iterator itedge_iter;
@@ -124,7 +124,7 @@ public:
 
   itedges_type in_tedges() { return _in_tedges.range(); }
   const_itedges_type in_tedges() const { return _in_tedges.range(); }
-  int num_in_tedges() const { return _in_tedges.size(); }
+  size_t num_in_tedges() const { return _in_tedges.size(); }
 
   typedef std::vector<TData> TDataVec;
   typedef TDataVec::iterator tdata_iter;
@@ -144,7 +144,7 @@ public:
   const_tdata_type t_reqs() const {
     return const_tdata_type(_t_req_vec.begin(), _t_req_vec.end());
   }
-  int num_tdata() const { return _t_arr_vec.size(); }
+  size_t num_tdata() const { return _t_arr_vec.size(); }
   TData t_arr(int t_idx) const { return _t_arr_vec[t_idx]; }
   void resize_tdata(int i) {
     _t_arr_vec.resize(i, TData(TPara::MINIMUM_FLOAT, TPara::MINIMUM_FLOAT));
@@ -222,7 +222,7 @@ public:
 
   tnodes_type tnodes() { return _tnodes.range(); }
   const_tnodes_type tnodes() const { return _tnodes.range(); }
-  int num_tnodes() const { return _tnodes.size(); }
+  size_t num_tnodes() const { return _tnodes.size(); }
 
   typedef std::vector<TData> TDataVec;
   typedef TDataVec::iterator tdata_iter;
@@ -254,7 +254,7 @@ protected:
   const_sorted_tnodes_type sorted_tnodes() const {
     return _sorted_tnodes.range();
   }
-  int num_sorted_tnodes() const { return _sorted_tnodes.size(); }
+  size_t num_sorted_tnodes() const { return _sorted_tnodes.size(); }
 
   void load_rt_delay();
   void create_tgraph();

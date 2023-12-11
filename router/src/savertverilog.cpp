@@ -211,7 +211,7 @@ void set_gsb_default(Instance *inst, elemLib *elemlib) {
 void add_config(Instance *inst, string from, string to, elemLib *elementlib) {
 
   Module *mod = inst->down_module();
-  Net *net_to, *net_from;
+  // Net *net_to, *net_from;
   string port_to, port_from;
   RRGArchInstance *instanceref = nullptr;
   Element *ele;
@@ -510,7 +510,7 @@ void write_module(FPGADesign *fpgadesign, Module *mod, string cil_fname,
   auto is_mpin = [](const Pin *pin) { return pin->is_mpin(); };
   for (const Net *net : mod->nets()) {
     string vname = net->name();
-    int nports = count_if(net->pins(), is_mpin);
+    auto nports = count_if(net->pins(), is_mpin);
     if (!(nports == 1 && vname == find_if(net->pins(), is_mpin)->name())) {
       vname = rename(vname);
       os << "  wire " << vname << ";\n";

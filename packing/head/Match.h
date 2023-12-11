@@ -73,7 +73,7 @@ public:
 
   Rule *rule() const { return rule_; }
   PKCell *image_cell() const { return image_cell_; }
-  int num_matches() const { return matches_.size(); }
+  auto num_matches() const { return matches_.size(); }
   const_matches_type matches() const { return matches_.range(); }
   matches_type matches() { return matches_.range(); }
 

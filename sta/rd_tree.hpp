@@ -128,7 +128,7 @@ public:
   const_nodes_type children() const {
     return const_nodes_type(children_.begin(), children_.end());
   }
-  int num_children() const { return children_.size(); }
+  auto num_children() const { return children_.size(); }
 
   bool is_root() const { return !parent(); }
   bool is_leave() const { return !num_children(); }

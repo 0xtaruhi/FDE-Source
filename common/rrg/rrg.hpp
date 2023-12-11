@@ -52,7 +52,7 @@ public:
   typedef T *TPtr;
   TPtr next();
 
-  int size() const { return _mem_trunk.size(); }
+  size_t size() const { return _mem_trunk.size(); }
   void reset() { _next_pos = 0; }
 
 protected:
@@ -101,7 +101,7 @@ public:
   const_paths_type paths() const {
     return const_paths_type(_paths.begin(), _paths.end());
   }
-  int num_paths() const { return _paths.size(); }
+  size_t num_paths() const { return _paths.size(); }
 
   Path *add_path(RRGArchNet *f_net, RRGArchNet *t_net, ArchPath *owner) {
     return _paths.add(new Path(f_net, t_net, owner));
@@ -281,7 +281,7 @@ public:
 
   switches_type switches() { return _switches.range(); }
   const_switches_type switches() const { return _switches.range(); }
-  int num_switches() const { return _switches.size(); }
+  size_t num_switches() const { return _switches.size(); }
 
   string full_name() const;
   RRGArchNet *owner() const { return _owner; }
@@ -332,7 +332,7 @@ public:
 
   nodes_type nodes() { return _nodes.range(); }
   const_nodes_type nodes() const { return _nodes.range(); }
-  int num_nodes() const { return _nodes.size(); }
+  size_t num_nodes() const { return _nodes.size(); }
   int num_pips() const { return _info._num_pips; }
 
   void build_rrg();

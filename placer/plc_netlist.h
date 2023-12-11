@@ -225,7 +225,7 @@ inline bool SwapObject::exist_qualified_pos(int rows, const Point &logic_pos,
   //	return false;
 
   std::vector<bool> flags(rows, false);
-  int carry_size = DEVICE::carry_chain[0].size();
+  size_t carry_size = DEVICE::carry_chain[0].size();
   for (int row : _qualified_pos[logic_pos.y][index])
     flags[row] = true;
   return flags[logic_pos.x];

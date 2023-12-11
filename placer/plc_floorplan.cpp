@@ -583,7 +583,7 @@ Floorplan::satisfy_cst_rules_for_carrychain(SwapObject *from_obj, Point &pos_to,
 void Floorplan::update_qualified_pos_for_carrychain(int tile_col, int index) {
   static int num_rows = _fpga.size().x - 1;
   vector<int> carry_chain_index = DEVICE::carry_chain[index];
-  int carry_size = DEVICE::carry_chain[0].size();
+  size_t carry_size = DEVICE::carry_chain[0].size();
 
   for (NLInfo::MacroInfo::CarryChains::value_type &chain :
        _nl_info.carry_chains()) {

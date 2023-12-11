@@ -388,7 +388,7 @@ void IReconnectOpt::parse(const string &sparam, TranTestCase *test_case) {
                                   KEY_WORD::SLICE_INST);
   new_instr->old_pname_ = avec[1];
 
-  for (int i = 1; i < pvec.size(); ++i) {
+  for (size_t i = 1; i < pvec.size(); ++i) {
     split_specific(pvec[i], avec, ".");
     ASSERT(avec.size() == 2,
            POErrMsg(POErrMsg::UEXP_ARG_FMT) % pvec[i] % INSTR_NAME);
@@ -456,7 +456,7 @@ void IUsePin::parse(const string &sparam, TranTestCase *test_case) {
   IUsePin *new_instr = test_case->create_instruct<IUsePin>();
 
   StrVec avec;
-  for (int i = 0; i < pvec.size(); ++i) {
+  for (size_t i = 0; i < pvec.size(); ++i) {
     split_specific(pvec[i], avec, ".");
     ASSERT(avec.size() == 2,
            POErrMsg(POErrMsg::UEXP_ARG_FMT) % pvec[i] % INSTR_NAME);
@@ -612,7 +612,7 @@ void IReconnect2::parse(const string &sparam, TranTestCase *test_case) {
                                   KEY_WORD::SLICE_INST);
   new_instr->old_pname_ = avec[1];
 
-  for (int i = 1; i < pvec.size(); ++i) {
+  for (size_t i = 1; i < pvec.size(); ++i) {
     split_specific(pvec[i], avec, ".");
     ASSERT(avec.size() == 2,
            POErrMsg(POErrMsg::UEXP_ARG_FMT) % pvec[i] % INSTR_NAME);
@@ -905,7 +905,7 @@ Object *IReconnectOpt::execute() const {
          TFErrMsg(TFErrMsg::UFND_ELEM) % "pin" % old_pname_ % INSTR_NAME);
 
   Net *net = old_pin->net();
-  for (int i = 0; i < opt_inames_i_.size(); ++i) {
+  for (size_t i = 0; i < opt_inames_i_.size(); ++i) {
 
     Instance *new_inst = tf->find_instance(opt_inames_i_[i]);
     ASSERT(new_inst, TFErrMsg(TFErrMsg::UFND_ELEM) % "instance" %
@@ -1003,7 +1003,7 @@ Object *IDupConnect::execute() const {
 Object *IUsePin::execute() const {
   Transformer *tf = co_case_->co_operation()->transformer();
 
-  for (int i = 0; i < opt_inames_i_.size(); ++i) {
+  for (size_t i = 0; i < opt_inames_i_.size(); ++i) {
     Instance *inst = tf->find_instance(opt_inames_i_[i]);
     ASSERT(inst, TFErrMsg(TFErrMsg::UFND_ELEM) % "instance" %
                      opt_inames_i_[i].name % INSTR_NAME);
@@ -1075,7 +1075,7 @@ Object *ICloneProperty::execute() const {
   // 450
   Property<string> *prop =
       dynamic_cast<Property<string> *>(src_inst->find_property(prop_name_));
-  // ÐÞ¸Ä´Ë´¦µÄÂß¼­ prop£¬ÒòÎªproÓÐÖµ²»´ú±íÊÇsrc_instµÄpro£¬ÓÐ¿ÉÄÜÊÇ±ðµÄpro
+  // ï¿½Þ¸Ä´Ë´ï¿½ï¿½ï¿½ï¿½ß¼ï¿½ propï¿½ï¿½ï¿½ï¿½Îªproï¿½ï¿½Öµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½src_instï¿½ï¿½proï¿½ï¿½ï¿½Ð¿ï¿½ï¿½ï¿½ï¿½Ç±ï¿½ï¿½pro
   if (prop && src_inst->property_exist(*prop))
     tar_inst->set_property(p, src_inst->property_value(*prop));
   else

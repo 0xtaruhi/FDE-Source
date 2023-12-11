@@ -12,9 +12,9 @@ namespace VL2XML_PARSER {
 class Vl2xmlApp {
 public:
   Vl2xmlApp()
-      : _needClarify(false), _needExportXML(false), _needReport(false),
-        _needVerilog(false), _needRename(true), _needEncrypt(true),
-        _verilogDesign(NULL)
+      : _verilogDesign(nullptr), _needClarify(false), _needExportXML(false),
+        _needReport(false), _needVerilog(false), _needRename(true),
+        _needEncrypt(true)
   //				_topCircuit(new Cell)
   {}
   ~Vl2xmlApp() {

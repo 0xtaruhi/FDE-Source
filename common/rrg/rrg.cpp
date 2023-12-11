@@ -10,7 +10,6 @@ namespace RRG {
 
 using namespace std;
 using namespace boost;
-using boost::adaptors::filtered;
 
 namespace LIBRARY {
 const string PRIM = "primitive";
@@ -56,7 +55,7 @@ template <typename T> void MemPool<T>::init(int init_size) {
 }
 
 template <typename T> void MemPool<T>::release() {
-  for (int i = 0; i < _mem_seg.size(); ++i)
+  for (size_t i = 0; i < _mem_seg.size(); ++i)
     delete[] _mem_seg[i];
 }
 

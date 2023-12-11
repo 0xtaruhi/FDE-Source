@@ -40,7 +40,7 @@ struct MapCut {
 
   MapCut(Pin *leaf)
       : leaves{leaf}, signature{pinSignature(leaf)}, truthtable{2} {}
-  MapCut(MapCut *cut0, MapCut *cut1, Instance *cutRoot, int lutSize);
+  MapCut(MapCut *cut0, MapCut *cut1, Instance *cutRoot, size_t lutSize);
 
   void addLeaf(Pin *pin) {
     for (Pin *p : leaves)
@@ -78,14 +78,14 @@ uint32_t calcTruthtable(int n, vector<int> index0, vector<int> index1,
   return items;
 }
 
-int oneCount(uint32_t n) {
-  int count = 0;
-  for (; n; n &= n - 1)
+size_t oneCount(uint32_t n) {
+  size_t count = 0;
+  for (; n != 0; n &= n - 1)
     ++count;
   return count;
 }
 
-MapCut::MapCut(MapCut *cut0, MapCut *cut1, Instance *cutRoot, int lutSize)
+MapCut::MapCut(MapCut *cut0, MapCut *cut1, Instance *cutRoot, size_t lutSize)
     : root{cutRoot}, signature{cut0->signature | cut1->signature} {
   if (oneCount(signature) > lutSize)
     return; // invalid
@@ -99,11 +99,11 @@ MapCut::MapCut(MapCut *cut0, MapCut *cut1, Instance *cutRoot, int lutSize)
 
   vector<int> index0(cut0->leaves.size(), -1);
   vector<int> index1(cut1->leaves.size(), -1);
-  for (int i = 0; i < leaves.size(); i++) {
-    for (int j = 0; j < cut0->leaves.size(); j++)
+  for (size_t i = 0; i < leaves.size(); i++) {
+    for (size_t j = 0; j < cut0->leaves.size(); j++)
       if (cut0->leaves[j] == leaves[i])
         index0[j] = i;
-    for (int j = 0; j < cut1->leaves.size(); j++)
+    for (size_t j = 0; j < cut1->leaves.size(); j++)
       if (cut1->leaves[j] == leaves[i])
         index1[j] = i;
   }
@@ -236,7 +236,7 @@ vector<Instance *> getLutRoots(vector<Instance *> &dfsNodes) {
       max_level = max(max_level, node->property_value(pBestCut)->level);
     }
   FDU_LOG(INFO) << "max level: " << max_level;
-  for (int i = 0; i < lutRootNodes.size(); i++) {
+  for (size_t i = 0; i < lutRootNodes.size(); i++) {
     Instance *node = lutRootNodes[i];
     for (Pin *leaf : node->property_value(pBestCut)->leaves) {
       Instance *nodeA = leaf->instance();
@@ -277,7 +277,7 @@ void setTruthtableProperty(Instance *inst, uint32_t truthtable) {
   stringstream ss;
   ss << hex << uppercase << truthtable;
   string ts = ss.str();
-  int len = (1 << (k - 2));
+  unsigned long len = (1 << (k - 2));
   while (ts.size() < len)
     ts = "0" + ts;
   if (ts.size() == 8) {

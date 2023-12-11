@@ -103,7 +103,7 @@ public:
   };
 
   TNode(TNodeType type, Pin *owner, int index)
-      : _visited(false), _type(type), _owner(owner), _index(index) {}
+      : _visited(false), _index(index), _type(type), _owner(owner) {}
   virtual ~TNode() {}
 
   typedef TESet<TEdge> OutTEdgeSet;
@@ -211,7 +211,7 @@ public:
   enum WORK_MODE { REBUILD, INCREMENT };
 
   explicit TEngine(TDesign *t = nullptr)
-      : _t_domains(TPara::DEFAULT_TDOMAINS), _target(t) {}
+      : _target(t), _t_domains(TPara::DEFAULT_TDOMAINS) {}
   virtual ~TEngine() {}
 
   typedef TESet<TNode> TNodeSet;

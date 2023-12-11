@@ -24,7 +24,7 @@ public:
       _col = col;
 
       c = new T *[_row];
-      for (int row = 0; row < _row; ++row)
+      for (size_t row = 0; row < _row; ++row)
         c[row] = new T[_col];
     } else {
       _row = _col = 0;
@@ -33,7 +33,7 @@ public:
   }
 
   void deallocate() {
-    for (int row = 0; row < _row; ++row)
+    for (size_t row = 0; row < _row; ++row)
       delete[] c[row];
     delete[] c;
   }

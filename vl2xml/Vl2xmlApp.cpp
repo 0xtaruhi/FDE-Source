@@ -34,7 +34,6 @@ namespace VL2XML_PARSER {
 namespace po = boost::program_options;
 using boost::replace_all;
 using boost::property_tree::ptree;
-using std::cerr;
 using std::cout;
 using std::endl;
 using std::ifstream;

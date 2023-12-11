@@ -16,6 +16,11 @@ endif()
 # Set C++11 Standard
 set(CMAKE_CXX_STANDARD 17)
 
+# gcc/clang flags
+if (CMAKE_CXX_COMPILER_ID MATCHES "GNU")
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wno-unused-parameter -Wno-unused-variable -Wno-unused-but-set-variable -Wno-unused-function -Wno-unused-private-field -Wno-unused-local-typedefs -Wno-unused-local-typedef -Wno-unused-value -Wno-unused-result -Wno-unused-label")
+endif()
+
 add_subdirectory(3rdparty/rapidxml)
 add_subdirectory(common)
 add_subdirectory(vl2xml)

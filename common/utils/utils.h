@@ -33,8 +33,8 @@ struct Point {
   }
   bool operator!=(const Point &_c) const { return !(operator==(_c)); }
   bool operator<(const Point &_c) const {
-    return x < _c.x || x == _c.x && y < _c.y ||
-           x == _c.x && y == _c.y && z < _c.z;
+    return x < _c.x || (x == _c.x && y < _c.y) ||
+           (x == _c.x && y == _c.y && z < _c.z);
   }
 };
 

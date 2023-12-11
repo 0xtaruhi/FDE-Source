@@ -1,6 +1,5 @@
 #include "loadedif.hpp"
 #include "io/fileio.hpp"
-#include "usingedif.h"
 #include <boost/algorithm/string.hpp>
 #include <boost/lexical_cast.hpp>
 #include <cctype>
@@ -68,7 +67,7 @@ Rename::Rename(const string &nname, const string &oname)
     old_name = oname;
 }
 Rename::Rename(const string &name, int size)
-    : new_name(name), old_name(name), is_bus(true), msb(size - 1), lsb(0) {}
+    : old_name(name), new_name(name), is_bus(true), msb(size - 1), lsb(0) {}
 
 const string &Rename::name() const {
   static regex complex_ex("\\$.*\\$.*");
@@ -77,8 +76,7 @@ const string &Rename::name() const {
 }
 
 Parser::Parser(Design *design, istream &is)
-    : _source(is), _line(1), cur_design(design), cur_lib(0), cur_module(0),
-      cur_net(0), _funcs({{"edif", &Parser::parse_continue},
+    : _funcs({{"edif", &Parser::parse_continue},
                           {"rename", &Parser::parse_rename},
                           {"external", &Parser::parse_library},
                           {"library", &Parser::parse_library},
@@ -104,7 +102,8 @@ Parser::Parser(Design *design, istream &is)
                           {"number", &Parser::parse_continue},
                           {"e", &Parser::parse_e},
                           {"array", &Parser::parse_array},
-                          {"member", &Parser::parse_member}}) {
+                          {"member", &Parser::parse_member}}), cur_design(design), cur_lib(0), cur_module(0), cur_net(0),
+      _source(is), _line(1) {
   auto &pRename = create_temp_property<string>(DESIGN, "cell_lib_rename");
   auto pvRename = design->property_value<string>(pRename);
   static regex rename_ex("(.+)=(.+)");

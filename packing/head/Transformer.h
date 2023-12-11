@@ -52,7 +52,7 @@ template <typename T> inline T *TranTestCase::create_test_expr(bool is_invert) {
 class TranOperation {
 public:
   TranOperation(const string &target, Transformer *tf)
-      : target_(target), co_tf_(tf) {}
+      : co_tf_(tf), target_(target) {}
 
   void load_target();
   Transformer *transformer() const { return co_tf_; }

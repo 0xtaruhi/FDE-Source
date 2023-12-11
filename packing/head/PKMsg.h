@@ -10,7 +10,8 @@ namespace PACK {
 
 class MsgFormat {
 public:
-  MsgFormat(const std::string &format_str = "", const std::string &msg_head = "")
+  MsgFormat(const std::string &format_str = "",
+            const std::string &msg_head = "")
       : formator_(format_str), msg_head_(msg_head) {}
 
   template <class T> MsgFormat &operator%(const T &parm) {

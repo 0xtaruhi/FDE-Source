@@ -15,14 +15,14 @@ void Variable::check_constraints(std::vector<Variable *> &conflict_vars) {
 }
 
 BConstraint::BConstraint(Variable *var, int weight, ConstraintEnum type)
-    : var1_(var), var2_(var), weight_(weight), type_(type), active_(true) {
+    : var1_(var), var2_(var), weight_(weight), active_(true), type_(type) {
   var1_->add_constraint(this);
   ++weight_;
 }
 
 BConstraint::BConstraint(Variable *var1, Variable *var2, int weight,
                          ConstraintEnum type)
-    : var1_(var1), var2_(var2), weight_(weight), type_(type), active_(true) {
+    : var1_(var1), var2_(var2), weight_(weight), active_(true), type_(type) {
   var1_->add_constraint(this);
   var2_->add_constraint(this);
   weight_ += 2;

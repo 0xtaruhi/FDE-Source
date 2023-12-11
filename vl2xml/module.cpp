@@ -19,9 +19,9 @@ namespace VL2XML_PARSER {
 /* get macro */
 
 VerilogModule::VerilogModule()
-    : design(NULL), ports(NULL), assignments(NULL), alwaysBlocks(NULL),
-      initialBlocks(NULL), functions(NULL), instantiations(NULL),
-      IsTopModule(true), IsConverted(false) {}
+    : IsTopModule(true), IsConverted(false), design(nullptr), ports(nullptr),
+      assignments(nullptr), alwaysBlocks(nullptr), initialBlocks(nullptr),
+      functions(nullptr), instantiations(nullptr) {}
 
 VerilogModule::~VerilogModule() {
   if (!DELETE_UPON_DESTRUCTION)
@@ -440,7 +440,7 @@ void VerilogModule::ConnectInstance(Module &cell, Instance &inst,
   if (pg) {
     int msb = pg->msb(), lsb = pg->lsb();
     list<string>::iterator name_it = namelist.begin();
-    if (pg->width() != namelist.size()) {
+    if (static_cast<size_t>(pg->width()) != namelist.size()) {
       ; // Need to add warning here
     }
     for (const Pin *port : pg->mpins()) {

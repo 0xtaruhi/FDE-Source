@@ -32,8 +32,8 @@ private:
 public:
   linkCluster(const std::string &refSiteName, siteLib *refSiteLib,
               sizeSpan containerSize)
-      : CilBase("link"), _refSiteName(refSiteName), _refSiteLib(refSiteLib),
-        _containerSize(containerSize) {
+      : CilBase("link"), _refSiteName(refSiteName), _containerSize(containerSize),
+        _refSiteLib(refSiteLib) {
     construct();
   }
 

@@ -9,7 +9,7 @@ namespace PACK {
 
 class PKApp {
 public:
-  PKApp() : desc_("Allow Options"), fEncry_(true) {}
+  PKApp() : fEncry_(true), desc_("Allow Options") {}
 
   static PKApp &instance() { return instance_; }
 

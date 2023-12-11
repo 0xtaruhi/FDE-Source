@@ -41,7 +41,7 @@ public:
 
 protected:
   TestExpr(TranTestCase *c, bool is_inverted)
-      : co_case_(c), is_inverted_(is_inverted) {}
+      : is_inverted_(is_inverted), co_case_(c) {}
 
 protected:
   bool is_inverted_;

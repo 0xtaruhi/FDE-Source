@@ -153,11 +153,11 @@ void createConst(Design *pDesign) {
 
   vector<Instance *> torelease;
   for (Instance *inst : top->instances()) {
-    if (inst->down_module() == VCC && inst != iVcc ||
+    if ((inst->down_module() == VCC && inst != iVcc) ||
         inst->down_module() == YVCC) {
       connect_or_merge(iVcc->pin(0), inst->pin(0)->net());
       torelease.push_back(inst);
-    } else if (inst->down_module() == GND && inst != iGnd ||
+    } else if ((inst->down_module() == GND && inst != iGnd) ||
                inst->down_module() == YGND) {
       connect_or_merge(iGnd->pin(0), inst->pin(0)->net());
       torelease.push_back(inst);

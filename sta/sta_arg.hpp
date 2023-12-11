@@ -8,8 +8,8 @@ namespace STA {
 
 struct STAArg {
   STAArg()
-      : config("STA.conf"), encrypt_out(true), dump_spice_for_net(false),
-        dump_dot_for_net(false), num_path(5), grm_name("GSB") {}
+      : grm_name("GSB"), config("STA.conf"), encrypt_out(true),
+        dump_spice_for_net(false), dump_dot_for_net(false), num_path(5) {}
 
   bool parse_command(int argc, char *argv[]);
 

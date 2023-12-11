@@ -116,7 +116,7 @@ private:
 class RRGArchNet : public Net {
 public:
   RRGArchNet(const std::string &name, NetType type, Module *owner, Bus *bus)
-      : Net(name, type, owner, bus), _index(RRGPara::UNDEF_INT), _pptrs() {}
+      : Net(name, type, owner, bus), _pptrs(), _index(RRGPara::UNDEF_INT) {}
 
   int index() const { return _index; }
   void set_index(int id) { _index = id; }
@@ -212,8 +212,8 @@ public:
   enum RRG_SW_TYPE { DUMMY, PT, BUF };
 
   RRGSwitch(ArchPath *o, RRGNode *f, RRGNode *t, const Point &pos)
-      : _owner(o), _from_node(f), _to_node(t), _from_net(nullptr),
-        _to_net(nullptr), _pos(pos) {}
+      : _pos(pos), _from_net(nullptr), _to_net(nullptr), _owner(o),
+        _from_node(f), _to_node(t) {}
   virtual ~RRGSwitch() {}
 
   ArchPath *owner() const { return _owner; }

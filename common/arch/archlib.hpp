@@ -178,15 +178,15 @@ public:
   bool is_io_bound(const string &n);
 
   void set_LUT_inputs(int num) { _LUT_inputs = num; }
-  int get_LUT_inputs() const { return _LUT_inputs; }
+  auto get_LUT_inputs() const { return _LUT_inputs; }
 
   void set_slice_num(int num) { _slice_per_tile = num; }
-  int get_slice_num() const { return _slice_per_tile; }
+  auto get_slice_num() const { return _slice_per_tile; }
   void add_carry_chain(vector<int> chain) { _carry_chain.push_back(chain); }
   vector<vector<int>> get_carry_chain() { return _carry_chain; }
   //		void	set_carry_num(int carry_num)		  {_carry_num =
   // carry_num;}
-  int get_carry_num() { return _carry_chain.size(); }
+  auto get_carry_num() { return _carry_chain.size(); }
 
   void add_bram_col(int col) { _bram_col.push_back(col); }
   bool is_bram(int col);

@@ -564,7 +564,7 @@ public:
   string attr;
   string type;
   int lineno;
-  Attribute(string t, string o, string a) : type(t), owner(o), attr(a) {}
+  Attribute(string t, string o, string a) : owner(o), attr(a), type(t) {}
 };
 
 } // namespace VL2XML_PARSER

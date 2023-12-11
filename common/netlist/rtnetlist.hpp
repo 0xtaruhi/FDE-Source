@@ -17,7 +17,7 @@ public:
   const string &from() const { return _from_port; }
   const string &to() const { return _to_port; }
   const Point &position() const { return _position; }
-  const pip_dir dir() const { return _dir; }
+  pip_dir dir() const { return _dir; }
 
 private:
   string _from_port;

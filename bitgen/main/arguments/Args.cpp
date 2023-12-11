@@ -1,4 +1,4 @@
-#include "main/arguments/Args.h"
+#include "Args.h"
 #include "log.h"
 
 #include <boost/filesystem.hpp>
@@ -6,6 +6,8 @@
 
 using namespace FDU;
 using namespace boost::filesystem;
+
+namespace po = boost::program_options;
 
 //////////////////////////////////////////////////////////////////////////
 // global
@@ -28,11 +30,13 @@ const char *Args::_FORMAT = "\t%1% = \"%2%\"\n";
 void Args::tryParse(int argc, char *argv[]) {
   try {
     po::options_description visible("Allowed options");
-    visible.add_options()("arch,a", po::value<string>(),
+    visible.add_options()("arch,a", po::value<std::string>(),
                           "arch    file path (default at 1st)")(
-        "cil,c", po::value<string>(), "cil     file path (default at 2nd)")(
-        "netlist,n", po::value<string>(), "netlist file path (default at 3rd)")(
-        "bitstream,b", po::value<string>(),
+        "cil,c", po::value<std::string>(),
+        "cil     file path (default at 2nd)")(
+        "netlist,n", po::value<std::string>(),
+        "netlist file path (default at 3rd)")(
+        "bitstream,b", po::value<std::string>(),
         "output  file path (default at 4th)")(
         "partialbitstream,p", po::value<int>(),
         "partial bitstream tilecol")("frm,f", "export  frm format bitstream")(
@@ -40,8 +44,9 @@ void Args::tryParse(int argc, char *argv[]) {
         "help,h", "show help messages");
 
     po::options_description hidden("Hidden options");
-    hidden.add_options()("lib,l", po::value<string>(), "library directory")(
-        "work,w", po::value<string>(), "working directory")(
+    hidden.add_options()("lib,l", po::value<std::string>(),
+                         "library directory")(
+        "work,w", po::value<std::string>(), "working directory")(
         "log,o", "output log file or not")("noencrypt,e",
                                            "run as NOT encrypt version");
 
@@ -71,19 +76,19 @@ void Args::tryParse(int argc, char *argv[]) {
     // 		}
 
     if (vm.count("arch")) {
-      _arch = vm["arch"].as<string>();
+      _arch = vm["arch"].as<std::string>();
     }
 
     if (vm.count("cil")) {
-      _cil = vm["cil"].as<string>();
+      _cil = vm["cil"].as<std::string>();
     }
 
     if (vm.count("netlist")) {
-      _netlist = vm["netlist"].as<string>();
+      _netlist = vm["netlist"].as<std::string>();
     }
 
     if (vm.count("bitstream")) {
-      _bitstream = vm["bitstream"].as<string>();
+      _bitstream = vm["bitstream"].as<std::string>();
     }
 
     _partialbitstream = -1;
@@ -104,11 +109,11 @@ void Args::tryParse(int argc, char *argv[]) {
     }
 
     if (vm.count("lib")) {
-      _lib_dir = vm["lib"].as<string>();
+      _lib_dir = vm["lib"].as<std::string>();
     }
 
     if (vm.count("work")) {
-      _work_dir = vm["work"].as<string>();
+      _work_dir = vm["work"].as<std::string>();
     }
 
     if (vm.count("log")) {
@@ -128,7 +133,7 @@ void Args::tryParse(int argc, char *argv[]) {
     }
 
     check();
-  } catch (exception &e) {
+  } catch (std::exception &e) {
     FDU_LOG(INFO) << e.what();
     dispHelp();
   }
@@ -159,8 +164,8 @@ void Args::check() {
     if (_logSwitch) {
       _log_dir =
           _work_dir + _LOGFILE_PATH + _netlist.substr(0, _netlist.find('.'));
-      string default_log = _log_dir + "\\default";
-      string circuit_log = _log_dir + "\\circuit";
+      std::string default_log = _log_dir + "\\default";
+      std::string circuit_log = _log_dir + "\\circuit";
       create_directory(path(_log_dir));
       create_directory(path(default_log));
       create_directory(path(circuit_log));

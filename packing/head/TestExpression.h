@@ -5,168 +5,168 @@
 
 namespace PACK {
 
-	class TranTestCase;
+class TranTestCase;
 
-	enum TExprType { 
-		UKWN_EXPR = -1
-		, TTRUE
-		, TFANIN_TYPE
-		, TSLICE_FULL
-		, TPIN_USED
-		, TINST_USED
-		, TCURRENT_PROCESS
-		, NUM_TEST_EXPR
-	};
+enum TExprType {
+  UKWN_EXPR = -1,
+  TTRUE,
+  TFANIN_TYPE,
+  TSLICE_FULL,
+  TPIN_USED,
+  TINST_USED,
+  TCURRENT_PROCESS,
+  NUM_TEST_EXPR
+};
 
-	std::istream& operator >> (std::istream& s, TExprType& itype);
+std::istream &operator>>(std::istream &s, TExprType &itype);
 
-	class TestExprParser {
-		typedef void (*PTEHandler)(const string&, TranTestCase*, bool);
+class TestExprParser {
+  typedef void (*PTEHandler)(const string &, TranTestCase *, bool);
 
-	public:
-		static void parse_test_expr(const string&, TranTestCase*);
+public:
+  static void parse_test_expr(const string &, TranTestCase *);
 
-	public:
-		static PTEHandler    parsing_array[NUM_TEST_EXPR];
-		//static boost::smatch regex_m;
+public:
+  static PTEHandler parsing_array[NUM_TEST_EXPR];
+  // static boost::smatch regex_m;
+};
 
-	};
+class TestExpr {
+  friend class TestExprParser;
 
-	class TestExpr {
-		friend class TestExprParser;
-	public:
-		//virtual string name()    const = 0;
-		virtual bool   execute() const = 0;
+public:
+  // virtual string name()    const = 0;
+  virtual bool execute() const = 0;
+  virtual ~TestExpr() {}
 
-	protected:
-		TestExpr(TranTestCase* c, bool is_inverted) 
-			: co_case_(c), is_inverted_(is_inverted) {}
+protected:
+  TestExpr(TranTestCase *c, bool is_inverted)
+      : co_case_(c), is_inverted_(is_inverted) {}
 
-	protected:
-		bool          is_inverted_;
-		TranTestCase* co_case_;
-	};
+protected:
+  bool is_inverted_;
+  TranTestCase *co_case_;
+};
 
-	class TTrue : public TestExpr {
-		friend class TestExprParser;
-	public:
-		TTrue(TranTestCase* c, bool is_inverted) 
-			: TestExpr(c, is_inverted) {}
+class TTrue : public TestExpr {
+  friend class TestExprParser;
 
-		//string name()    const { return TEXPR_NAME; }
-		bool   execute() const;
+public:
+  TTrue(TranTestCase *c, bool is_inverted) : TestExpr(c, is_inverted) {}
 
-	private:
-		static void parse(const string&, TranTestCase*, bool);
+  // string name()    const { return TEXPR_NAME; }
+  bool execute() const;
 
-	public:
-		static const int         NUM_PARAM;
-		static const char* const TEXPR_NAME;
-	};
+private:
+  static void parse(const string &, TranTestCase *, bool);
 
-	class TFaninType : public TestExpr {
-		friend class TestExprParser;
-	public:
-		TFaninType(TranTestCase* c, bool is_inverted) 
-			: TestExpr(c, is_inverted) {}
+public:
+  static const int NUM_PARAM;
+  static const char *const TEXPR_NAME;
+};
 
-		//string name()    const { return TEXPR_NAME; }
-		bool   execute() const;
+class TFaninType : public TestExpr {
+  friend class TestExprParser;
 
-	private:
-		static void parse(const string&, TranTestCase*, bool);
+public:
+  TFaninType(TranTestCase *c, bool is_inverted) : TestExpr(c, is_inverted) {}
 
-	private:
-		NameInfo iname_i_;
-		string   pname_;
-		std::vector<string> tnames_;
+  // string name()    const { return TEXPR_NAME; }
+  bool execute() const;
 
-	public:
-		static const int         NUM_PARAM;
-		static const char* const TEXPR_NAME;
-	};
+private:
+  static void parse(const string &, TranTestCase *, bool);
 
-	class TSliceFull : public TestExpr {
-		friend class TestExprParser;
-	public:
-		TSliceFull(TranTestCase* c, bool is_inverted) 
-			: TestExpr(c, is_inverted) {}
+private:
+  NameInfo iname_i_;
+  string pname_;
+  std::vector<string> tnames_;
 
-		//string name()    const { return TEXPR_NAME; }
-		bool execute() const;
+public:
+  static const int NUM_PARAM;
+  static const char *const TEXPR_NAME;
+};
 
-	private:
-		static void parse(const string&, TranTestCase*, bool);
+class TSliceFull : public TestExpr {
+  friend class TestExprParser;
 
-	public:
-		static const int         NUM_PARAM;
-		static const char* const TEXPR_NAME;
-	};
+public:
+  TSliceFull(TranTestCase *c, bool is_inverted) : TestExpr(c, is_inverted) {}
 
-	class TPinUsed : public TestExpr {
-		friend class TestExprParser;
-	public:
-		TPinUsed(TranTestCase* c, bool is_inverted) 
-			: TestExpr(c, is_inverted) {}
+  // string name()    const { return TEXPR_NAME; }
+  bool execute() const;
 
-		//string name()    const { return TEXPR_NAME; }
-		bool   execute() const;
+private:
+  static void parse(const string &, TranTestCase *, bool);
 
-	private:
-		static void parse(const string&, TranTestCase*, bool);
+public:
+  static const int NUM_PARAM;
+  static const char *const TEXPR_NAME;
+};
 
-	private:
-		NameInfo iname_i_;
-		string   pname_;
+class TPinUsed : public TestExpr {
+  friend class TestExprParser;
 
-	public:
-		static const int         NUM_PARAM;
-		static const char* const TEXPR_NAME;
-	};
+public:
+  TPinUsed(TranTestCase *c, bool is_inverted) : TestExpr(c, is_inverted) {}
 
-	///////////sophie////////////////
-	class TInstUsed : public TestExpr{
-		friend class TestExprParser;
-	public:
-		TInstUsed(TranTestCase* c, bool is_inverted)
-			: TestExpr(c, is_inverted){}
+  // string name()    const { return TEXPR_NAME; }
+  bool execute() const;
 
-		bool execute ()const;
-	private:
-		static void parse(const string&, TranTestCase*, bool);
+private:
+  static void parse(const string &, TranTestCase *, bool);
 
-	private:
-		NameInfo cname_i_;
-		NameInfo iname_i_;
+private:
+  NameInfo iname_i_;
+  string pname_;
 
-	public:
-		static const int         NUM_PARAM;
-		static const char* const TEXPR_NAME;
+public:
+  static const int NUM_PARAM;
+  static const char *const TEXPR_NAME;
+};
 
+///////////sophie////////////////
+class TInstUsed : public TestExpr {
+  friend class TestExprParser;
 
-	};
-	///////////sophie////////////////
-	class TCurrentProcess : public TestExpr{
-		friend class TestExprParser;
-	public:
-		TCurrentProcess(TranTestCase* c, bool is_inverted)
-			: TestExpr(c, is_inverted){}
+public:
+  TInstUsed(TranTestCase *c, bool is_inverted) : TestExpr(c, is_inverted) {}
 
-		bool execute ()const;
-	private:
-		static void parse(const string&, TranTestCase*, bool);
+  bool execute() const;
 
-	private:
-		NameInfo iname_i_;
-		string   prop_name_;
-		string   prop_value_;
+private:
+  static void parse(const string &, TranTestCase *, bool);
 
-	public:
-		static const int         NUM_PARAM;
-		static const char* const TEXPR_NAME;
+private:
+  NameInfo cname_i_;
+  NameInfo iname_i_;
 
+public:
+  static const int NUM_PARAM;
+  static const char *const TEXPR_NAME;
+};
+///////////sophie////////////////
+class TCurrentProcess : public TestExpr {
+  friend class TestExprParser;
 
-	};
-}
+public:
+  TCurrentProcess(TranTestCase *c, bool is_inverted)
+      : TestExpr(c, is_inverted) {}
+
+  bool execute() const;
+
+private:
+  static void parse(const string &, TranTestCase *, bool);
+
+private:
+  NameInfo iname_i_;
+  string prop_name_;
+  string prop_value_;
+
+public:
+  static const int NUM_PARAM;
+  static const char *const TEXPR_NAME;
+};
+} // namespace PACK
 
 #endif

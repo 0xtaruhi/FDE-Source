@@ -5,18 +5,20 @@
 
 #include <string>
 
-namespace BitGen { namespace circuit {
+namespace BitGen {
+namespace circuit {
 
-	class cktHandler{
-	protected:
-		Circuit* _curCkt;
+class cktHandler {
+protected:
+  Circuit *_curCkt;
 
-	public:
-		explicit cktHandler(Circuit* curCkt) : _curCkt(curCkt) {}
+public:
+  explicit cktHandler(Circuit *curCkt) : _curCkt(curCkt) {}
 
-		virtual void parse(const std::string& file) = 0;
-	};
+  virtual void parse(const std::string &file) = 0;
+};
 
-}}
+} // namespace circuit
+} // namespace BitGen
 
 #endif

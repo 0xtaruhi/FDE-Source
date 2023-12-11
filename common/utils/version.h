@@ -1,8 +1,8 @@
 #ifndef FDE_VERSION_H_
 #define FDE_VERSION_H_
 
-#include <boost/format.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
+#include <boost/format.hpp>
 
 /*
  * FDE Version History:
@@ -24,15 +24,21 @@
  * 3.5.1				Compile common to static lib
  */
 
-#define FDE_NAME		"FDE2018" 
-#define FDE_VERSION		"3.5.1"
-#define FDE_VER_NUM		 30501
-#define FDE_COPYRIGHT	"Copyright(C) 2005-2018. CAD Team, State Key Laboratory of ASIC & System, Fudan University"
+#define FDE_NAME "FDE2018"
+#define FDE_VERSION "3.5.1"
+#define FDE_VER_NUM 30501
+#define FDE_COPYRIGHT                                                          \
+  "Copyright(C) 2005-2018. CAD Team, State Key Laboratory of ASIC & System, "  \
+  "Fudan University"
 
-inline std::string fde_copyright(const char* prog_name)
-{ return boost::str(boost::format("%1% Release %2% -- %3%\n%4%\n") % FDE_NAME % FDE_VERSION % prog_name % FDE_COPYRIGHT); }
+inline std::string fde_copyright(const char *prog_name) {
+  return boost::str(boost::format("%1% Release %2% -- %3%\n%4%\n") % FDE_NAME %
+                    FDE_VERSION % prog_name % FDE_COPYRIGHT);
+}
 
-inline std::string timestamp()
-{ return boost::posix_time::to_simple_string(boost::posix_time::second_clock::local_time()); }
+inline std::string timestamp() {
+  return boost::posix_time::to_simple_string(
+      boost::posix_time::second_clock::local_time());
+}
 
 #endif

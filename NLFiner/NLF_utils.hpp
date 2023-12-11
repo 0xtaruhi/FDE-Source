@@ -1,24 +1,26 @@
 #ifndef __SR_UTILS_H__
 #define __SR_UTILS_H__
 
-#include <iostream>
 #include <boost/format.hpp>
+#include <iostream>
 
-namespace FDU { namespace NLF {
+namespace FDU {
+namespace NLF {
 
-	//////////////////////////////////////////////////////////////////////////
-	// preprocessor
+//////////////////////////////////////////////////////////////////////////
+// preprocessor
 
-	#define EXCEPTION_HANDLE
+#define EXCEPTION_HANDLE
 
-	//////////////////////////////////////////////////////////////////////////
-	// cmd user information
+//////////////////////////////////////////////////////////////////////////
+// cmd user information
 
-	namespace UserInfo {
-		extern boost::format copy_rights_fmt;
-		extern boost::format progress_fmt;
-		extern boost::format finish_fmt;
-	}
-}}
+namespace UserInfo {
+extern boost::format copy_rights_fmt;
+extern boost::format progress_fmt;
+extern boost::format finish_fmt;
+} // namespace UserInfo
+} // namespace NLF
+} // namespace FDU
 
 #endif

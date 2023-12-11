@@ -1,655 +1,643 @@
 #include "plc_floorplan.h"
-#include "plc_const_infer.h"
 #include "arch/archlib.hpp"
-#include "plc_utils.h"
 #include "plc_args.h"
+#include "plc_const_infer.h"
+#include "plc_utils.h"
 #include <boost/lexical_cast.hpp>
-#include <boost/tuple/tuple.hpp>
 #include <boost/range/adaptors.hpp>
+#include <boost/tuple/tuple.hpp>
 
-//#include "report.h"
-//#include "reportmanager.hpp"
+// #include "report.h"
+// #include "reportmanager.hpp"
 
+namespace FDU {
+namespace Place {
 
-namespace FDU { namespace Place {
-
-
-	using boost::lexical_cast;
-	using namespace std;
-	using namespace boost;
-	//using namespace boost::lambda;
+using boost::lexical_cast;
+using namespace std;
+using namespace boost;
+// using namespace boost::lambda;
 //	using namespace boost::adaptors;
-	using namespace ARCH;
+using namespace ARCH;
 
-	/************************************************************************/
-	/*	¹¦ÄÜ£ºÎª²¼¾ÖÄ£ÄâÍË»ð¹ý³Ì×öºÃ×¼±¸
-	 *	²ÎÊý£ºvoid
-	 *	·µ»ØÖµ£ºvoid
-	 *	ËµÃ÷£º
-	 */
-	/************************************************************************/
-	bool Floorplan::ready_for_place(string output_file)
-	{
-		//ÉèÖÃÆ÷¼þ¹æÄ£
-        bool isAllFixed;
-		_dev_info.set_device_scale(FPGADesign::instance()->scale());
-		//ÉèÖÃÃ¿¸ötileÖÐµÄsiliceÊýÄ¿
-		_dev_info.set_slice_num(FPGADesign::instance()->get_slice_num());
-		_dev_info.set_carry_num(FPGADesign::instance()->get_carry_num());
-		_dev_info.set_carry_chain(FPGADesign::instance()->get_carry_chain());
-		_dev_info.set_lut_inputs(FPGADesign::instance()->get_LUT_inputs());
-		vector<vector<int>> a= DEVICE::carry_chain;
-		//Í³¼ÆÍø±íÐÅÏ¢
-		_nl_info.classify_used_resource();
-		//Í³¼ÆÆ÷¼þ¿ÉÓÃ×ÊÔ´
-		_dev_info.sum_up_rsc_in_device();
-		//Êä³öÍø±í×ÊÔ´ÐÅÏ¢
-		_nl_info.echo_netlist_resource();
-		_nl_info.echo_resource_usage(_dev_info.rsc_in_device());
-		//Êä³öreport
-		_nl_info.writeReport(_dev_info.rsc_in_device(), output_file);
-		//°´ÕÕÐèÇó½¨Á¢Ò»¸öFPGA
-		INFO(CONSOLE::PROGRESS % "50" % "build FPGA architecture");
-		build_fpga();
-		//³õÊ¼»¯²¼¾Ö
-		INFO(CONSOLE::PROGRESS % "60" % "begin to initially place");
-		isAllFixed = init_place();
-        return isAllFixed;
-	}
-	/************************************************************************/
-	/*	¹¦ÄÜ£º´´½¨Ò»¸öFPGA
-	*	²ÎÊý£ºvoid
-	*	·µ»ØÖµ£ºvoid
-	*	ËµÃ÷£º
-	*/
-	/************************************************************************/
-	void Floorplan::build_fpga()
-	{
-		Property<DeviceInfo::RscStat>& site_infos = create_temp_property<DeviceInfo::RscStat>(COS::MODULE, CELL::SITE_INFO);
-		int rows = _dev_info.device_scale().x;
-		int cols = _dev_info.device_scale().y;
-		//_fpgaÊÇÒ»¸öTile¾ØÕó
-		_fpga.renew(rows, cols);
+/************************************************************************/
+/*	ï¿½ï¿½ï¿½Ü£ï¿½Îªï¿½ï¿½ï¿½ï¿½Ä£ï¿½ï¿½ï¿½Ë»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½×¼ï¿½ï¿½
+ *	ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½void
+ *	ï¿½ï¿½ï¿½ï¿½Öµï¿½ï¿½void
+ *	Ëµï¿½ï¿½ï¿½ï¿½
+ */
+/************************************************************************/
+bool Floorplan::ready_for_place(string output_file) {
+  // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä£
+  bool isAllFixed;
+  _dev_info.set_device_scale(FPGADesign::instance()->scale());
+  // ï¿½ï¿½ï¿½ï¿½Ã¿ï¿½ï¿½tileï¿½Ðµï¿½siliceï¿½ï¿½Ä¿
+  _dev_info.set_slice_num(FPGADesign::instance()->get_slice_num());
+  _dev_info.set_carry_num(FPGADesign::instance()->get_carry_num());
+  _dev_info.set_carry_chain(FPGADesign::instance()->get_carry_chain());
+  _dev_info.set_lut_inputs(FPGADesign::instance()->get_LUT_inputs());
+  vector<vector<int>> a = DEVICE::carry_chain;
+  // Í³ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ï¢
+  _nl_info.classify_used_resource();
+  // Í³ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ô´
+  _dev_info.sum_up_rsc_in_device();
+  // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ô´ï¿½ï¿½Ï¢
+  _nl_info.echo_netlist_resource();
+  _nl_info.echo_resource_usage(_dev_info.rsc_in_device());
+  // ï¿½ï¿½ï¿½report
+  _nl_info.writeReport(_dev_info.rsc_in_device(), output_file);
+  // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ò»ï¿½ï¿½FPGA
+  INFO(CONSOLE::PROGRESS % "50" % "build FPGA architecture");
+  build_fpga();
+  // ï¿½ï¿½Ê¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+  INFO(CONSOLE::PROGRESS % "60" % "begin to initially place");
+  isAllFixed = init_place();
+  return isAllFixed;
+}
+/************************************************************************/
+/*	ï¿½ï¿½ï¿½Ü£ï¿½ï¿½ï¿½ï¿½ï¿½Ò»ï¿½ï¿½FPGA
+ *	ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½void
+ *	ï¿½ï¿½ï¿½ï¿½Öµï¿½ï¿½void
+ *	Ëµï¿½ï¿½ï¿½ï¿½
+ */
+/************************************************************************/
+void Floorplan::build_fpga() {
+  Property<DeviceInfo::RscStat> &site_infos =
+      create_temp_property<DeviceInfo::RscStat>(COS::MODULE, CELL::SITE_INFO);
+  int rows = _dev_info.device_scale().x;
+  int cols = _dev_info.device_scale().y;
+  //_fpgaï¿½ï¿½Ò»ï¿½ï¿½Tileï¿½ï¿½ï¿½ï¿½
+  _fpga.renew(rows, cols);
 
-		for(int row = 0; row < rows; ++row){
-			for(int col = 0; col < cols; ++col){
-				ArchInstance* tile_inst = FPGADesign::instance()->get_inst_by_pos(Point(row, col));
-				ArchCell*	  tile_cell = tile_inst->down_module();
+  for (int row = 0; row < rows; ++row) {
+    for (int col = 0; col < cols; ++col) {
+      ArchInstance *tile_inst =
+          FPGADesign::instance()->get_inst_by_pos(Point(row, col));
+      ArchCell *tile_cell = tile_inst->down_module();
 
-				Tile& tile = _fpga.at(row, col);
-				tile.set_type(tile_cell->name());
-				tile.set_phy_pos(tile_inst->phy_pos());
+      Tile &tile = _fpga.at(row, col);
+      tile.set_type(tile_cell->name());
+      tile.set_phy_pos(tile_inst->phy_pos());
 
-				DeviceInfo::RscStat& rsc_stat = *tile_cell->property_ptr(site_infos);
-				for (DeviceInfo::RscStat::value_type& rsc: rsc_stat) {
-					Site& site = tile.add_site(rsc.first);
-					if(site._type == Site::IOB){
-						for(int z = 0; z < rsc.second; ++z){
-							if(FPGADesign::instance()->is_io_bound(Point(row, col, z)))
-								++site._capacity;
-						}
-					}
-					else if(site._type == Site::BLOCKRAM){
-						if(tile_cell->name() == DEVICE::LBRAMD || 
-						   tile_cell->name() == DEVICE::RBRAMD)
-							++site._capacity;
-						else
-							site._capacity = 0;
-					}
-					else 
-						site._capacity = rsc.second;
-					site._occ_insts.resize(rsc.second, NULL);
-					site._logic_pos = Point(row, col);
-					if(site._capacity)
-						_dev_info.add_rsc_ava_pos(site._type, Point(row, col));
-				}
-			}
-		}
+      DeviceInfo::RscStat &rsc_stat = *tile_cell->property_ptr(site_infos);
+      for (DeviceInfo::RscStat::value_type &rsc : rsc_stat) {
+        Site &site = tile.add_site(rsc.first);
+        if (site._type == Site::IOB) {
+          for (int z = 0; z < rsc.second; ++z) {
+            if (FPGADesign::instance()->is_io_bound(Point(row, col, z)))
+              ++site._capacity;
+          }
+        } else if (site._type == Site::BLOCKRAM) {
+          if (tile_cell->name() == DEVICE::LBRAMD ||
+              tile_cell->name() == DEVICE::RBRAMD)
+            ++site._capacity;
+          else
+            site._capacity = 0;
+        } else
+          site._capacity = rsc.second;
+        site._occ_insts.resize(rsc.second, NULL);
+        site._logic_pos = Point(row, col);
+        if (site._capacity)
+          _dev_info.add_rsc_ava_pos(site._type, Point(row, col));
+      }
+    }
+  }
 
-		for(int row = 0; row < rows; ++row){
-			for(int col = 0; col < cols; ++col){
-				for (Tile::Sites::value_type& type_site_map: _fpga.at(row, col).sites()){
-					Site*			  site = type_site_map.second;
-					vector<Point>& ava_pos = _dev_info.rsc_ava_pos(site->_type);
-					site->_available_pos.assign(ava_pos.begin(), ava_pos.end());
-				}
-			}
-		}
-	}
+  for (int row = 0; row < rows; ++row) {
+    for (int col = 0; col < cols; ++col) {
+      for (Tile::Sites::value_type &type_site_map :
+           _fpga.at(row, col).sites()) {
+        Site *site = type_site_map.second;
+        vector<Point> &ava_pos = _dev_info.rsc_ava_pos(site->_type);
+        site->_available_pos.assign(ava_pos.begin(), ava_pos.end());
+      }
+    }
+  }
+}
 
-	/************************************************************************/
-	/*	¹¦ÄÜ£º³õÊ¼»¯²¼¾Ö
-	*	²ÎÊý£ºvoid
-	*	·µ»ØÖµ£ºvoid
-	*	ËµÃ÷£º
-	*/
-	/************************************************************************/
-	bool Floorplan::init_place()
-	{
+/************************************************************************/
+/*	ï¿½ï¿½ï¿½Ü£ï¿½ï¿½ï¿½Ê¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+ *	ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½void
+ *	ï¿½ï¿½ï¿½ï¿½Öµï¿½ï¿½void
+ *	Ëµï¿½ï¿½ï¿½ï¿½
+ */
+/************************************************************************/
+bool Floorplan::init_place() {
 #ifdef CONST_GENERATE
-		ConstantsGener						const_gener;
-		const_gener.generate_constants(_nl_info.design());
+  ConstantsGener const_gener;
+  const_gener.generate_constants(_nl_info.design());
 #endif
-        bool isAllFixed;
-        //¼ì²éºÍ±£´æÔ¼Êø
-        check_and_save_cst();
-		//ÕÒµ½designÍø±íÖÐµÄcarry chain
-		CarryChainInference::CarryChains	carrys;
-		CarryChainInference					carry_infer;
-		carry_infer.inference(_nl_info.design(), carrys);
-		//ÕÒµ½designÍø±íÖÐµÄLut6
-		LUT6Inference::LUT6s				lut6s;
-		LUT6Inference						lut6_infer;
-		lut6_infer.inference(_nl_info.design(), lut6s);
-		
-		//³õÊ¼»¯²¼¾Öcarry chain
-		init_place_carrychain(carrys);
-		//³õÊ¼»¯²¼¾Ölut6
-		init_place_lut6(lut6s);
-		//³õÊ¼»¯²¼¾Ösite
-		isAllFixed = init_place_site();
-		//¼ì²éÃ¿¸önet¿´ÊÇ·ñÉèÖÃÎªignored
-		set_ignored_nets();
-		//´æ´¢Ã¿¸önetÁ¬½ÓµÄinstance,¶ÔÓÚignored net²»´æ´¢
-		for (PLCNet* net: static_cast<PLCModule*>(_nl_info.design()->top_module())->nets())
-				 net->store_connected_insts();
-		//³õÊ¼»¯²¼¾ÖÍê³ÉÒÔºó£¬¸üÐÂÐÅÏ¢£¬¸üÐÂÄÚÈÝ¿´update_qualified_pos_for_carrychain½âÊÍ
-		for(int col = 0; col < _dev_info.device_scale().y; ++col){
-			for (NLInfo::MacroInfo::CarryChains::value_type& chain: _nl_info.carry_chains()){
-				for (SwapObject* obj: chain.second)
-					obj->init_qualified_pos_tile_col(col);
- 			}
-			for(int index = 0; index < DEVICE::NUM_CARRY_PER_TILE; ++index)
-				update_qualified_pos_for_carrychain(col, index);
-		}
-        return isAllFixed;
-	}
+  bool isAllFixed;
+  // ï¿½ï¿½ï¿½Í±ï¿½ï¿½ï¿½Ô¼ï¿½ï¿½
+  check_and_save_cst();
+  // ï¿½Òµï¿½designï¿½ï¿½ï¿½ï¿½ï¿½Ðµï¿½carry chain
+  CarryChainInference::CarryChains carrys;
+  CarryChainInference carry_infer;
+  carry_infer.inference(_nl_info.design(), carrys);
+  // ï¿½Òµï¿½designï¿½ï¿½ï¿½ï¿½ï¿½Ðµï¿½Lut6
+  LUT6Inference::LUT6s lut6s;
+  LUT6Inference lut6_infer;
+  lut6_infer.inference(_nl_info.design(), lut6s);
 
-	/************************************************************************/
-	/*	¹¦ÄÜ£º³õÊ¼»¯carry chain
-	*	²ÎÊý£ºcarrys£ºCarryChains£¬Íø±íÖÐµÄcarry chain¼¯ºÏ
-	*	·µ»ØÖµ£ºvoid
-	*	ËµÃ÷£º
-	*/
-	/************************************************************************/	
-	void Floorplan::init_place_carrychain(CarryChainInference::CarryChains& carrys)
-	{
-		//¶ÔÍø±íÖÐÕÒµ½µÄÃ¿Ò»¸öcarry chain
-		for (CarryChainInference::CarryChains::value_type& carry: carrys) {
-			//¸øÍø±íÐÅÏ¢ÀïÃæÔö¼ÓÒ»¸ö¿É½»»»¶ÔÏó
-			SwapObject* obj = _nl_info.add_swap_object(FLOORPLAN::CARRY_CHAIN);
-			//ÉèÖÃ¿É½»»»¶ÔÏóµÄÊôÐÔ
-			obj->fill(carry.second);
-			//ÎªÍø±íÔö¼ÓÒ»¸öcarry chainµÄ¿É½»»»¶ÔÏó
-			_nl_info.add_carry_swap_obj(obj);
+  // ï¿½ï¿½Ê¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½carry chain
+  init_place_carrychain(carrys);
+  // ï¿½ï¿½Ê¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½lut6
+  init_place_lut6(lut6s);
+  // ï¿½ï¿½Ê¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½site
+  isAllFixed = init_place_site();
+  // ï¿½ï¿½ï¿½Ã¿ï¿½ï¿½netï¿½ï¿½ï¿½Ç·ï¿½ï¿½ï¿½ï¿½ï¿½Îªignored
+  set_ignored_nets();
+  // ï¿½æ´¢Ã¿ï¿½ï¿½netï¿½ï¿½ï¿½Óµï¿½instance,ï¿½ï¿½ï¿½ï¿½ignored netï¿½ï¿½ï¿½æ´¢
+  for (PLCNet *net :
+       static_cast<PLCModule *>(_nl_info.design()->top_module())->nets())
+    net->store_connected_insts();
+  // ï¿½ï¿½Ê¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ôºó£¬¸ï¿½ï¿½ï¿½ï¿½ï¿½Ï¢ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ý¿ï¿½update_qualified_pos_for_carrychainï¿½ï¿½ï¿½ï¿½
+  for (int col = 0; col < _dev_info.device_scale().y; ++col) {
+    for (NLInfo::MacroInfo::CarryChains::value_type &chain :
+         _nl_info.carry_chains()) {
+      for (SwapObject *obj : chain.second)
+        obj->init_qualified_pos_tile_col(col);
+    }
+    for (int index = 0; index < DEVICE::NUM_CARRY_PER_TILE; ++index)
+      update_qualified_pos_for_carrychain(col, index);
+  }
+  return isAllFixed;
+}
 
-			vector<Point> chain_pos_vec;
-			const int MAX_LOOP_NUM = 5;
-			int		  loop_count   = 0;
-			//ÕÒµ½Ò»¸ö³õÊ¼»¯Î»ÖÃ
-			while(!find_init_pos_for_carrychain(carry.second.size(), chain_pos_vec)){ 
-				ASSERT(++loop_count < MAX_LOOP_NUM, 
-					   (CONSOLE::PLC_ERROR % (carry.first + ": can NOT place carry chain."))); 
-			}
+/************************************************************************/
+/*	ï¿½ï¿½ï¿½Ü£ï¿½ï¿½ï¿½Ê¼ï¿½ï¿½carry chain
+ *	ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½carrysï¿½ï¿½CarryChainsï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ðµï¿½carry chainï¿½ï¿½ï¿½ï¿½
+ *	ï¿½ï¿½ï¿½ï¿½Öµï¿½ï¿½void
+ *	Ëµï¿½ï¿½ï¿½ï¿½
+ */
+/************************************************************************/
+void Floorplan::init_place_carrychain(
+    CarryChainInference::CarryChains &carrys) {
+  // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Òµï¿½ï¿½ï¿½Ã¿Ò»ï¿½ï¿½carry chain
+  for (CarryChainInference::CarryChains::value_type &carry : carrys) {
+    // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ï¢ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ò»ï¿½ï¿½ï¿½É½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+    SwapObject *obj = _nl_info.add_swap_object(FLOORPLAN::CARRY_CHAIN);
+    // ï¿½ï¿½ï¿½Ã¿É½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+    obj->fill(carry.second);
+    // Îªï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ò»ï¿½ï¿½carry chainï¿½Ä¿É½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+    _nl_info.add_carry_swap_obj(obj);
 
-			ASSERT(chain_pos_vec.size() == carry.second.size(), 
-				   (CONSOLE::PLC_ERROR % "illegal found positions for carry chain."));
+    vector<Point> chain_pos_vec;
+    const int MAX_LOOP_NUM = 5;
+    int loop_count = 0;
+    // ï¿½Òµï¿½Ò»ï¿½ï¿½ï¿½ï¿½Ê¼ï¿½ï¿½Î»ï¿½ï¿½
+    while (!find_init_pos_for_carrychain(carry.second.size(), chain_pos_vec)) {
+      ASSERT(++loop_count < MAX_LOOP_NUM,
+             (CONSOLE::PLC_ERROR %
+              (carry.first + ": can NOT place carry chain.")));
+    }
 
-			for(int i = 0; i < chain_pos_vec.size(); ++i){
-				Point		 pos  = chain_pos_vec[i];
-				PLCInstance* inst = carry.second[i];
-				Site&		 site = _fpga.at(pos).site(Site::SLICE);
-				
-				++site._occ;
-				site._occ_insts[pos.z] = inst;
+    ASSERT(chain_pos_vec.size() == carry.second.size(),
+           (CONSOLE::PLC_ERROR % "illegal found positions for carry chain."));
 
-				inst->set_swapable_type(FLOORPLAN::CARRY_CHAIN);
-				inst->set_curr_logic_pos(pos);
-				inst->set_curr_loc_site(&site);
-			}
-		}
-	}
+    for (int i = 0; i < chain_pos_vec.size(); ++i) {
+      Point pos = chain_pos_vec[i];
+      PLCInstance *inst = carry.second[i];
+      Site &site = _fpga.at(pos).site(Site::SLICE);
 
-	void Floorplan::init_place_lut6(LUT6Inference::LUT6s& lut6s)
-	{
-		typedef pair<PLCInstance*, PLCInstance*>	LUT6;
+      ++site._occ;
+      site._occ_insts[pos.z] = inst;
 
-		vector<Point>& ava_pos = _dev_info.rsc_ava_pos(Site::SLICE);
+      inst->set_swapable_type(FLOORPLAN::CARRY_CHAIN);
+      inst->set_curr_logic_pos(pos);
+      inst->set_curr_loc_site(&site);
+    }
+  }
+}
 
-		for (LUT6& lut6: lut6s) {
-			int		rand_idx;
-			Site*	slice_site = NULL;
-			do {
-				rand_idx   = rand() % ava_pos.size();
-				slice_site = &_fpga.at(ava_pos[rand_idx]).site(Site::SLICE);
-			} while (slice_site->_occ != 0);
+void Floorplan::init_place_lut6(LUT6Inference::LUT6s &lut6s) {
+  typedef pair<PLCInstance *, PLCInstance *> LUT6;
 
-			PLCInstance* src_slice	= lut6.first;
-			PLCInstance* sink_slice = lut6.second;
-			
-			slice_site->_occ_insts[0] = src_slice;
-			slice_site->_occ_insts[1] = sink_slice;
-			slice_site->_occ		  = DEVICE::NUM_SLICE_PER_TILE;
+  vector<Point> &ava_pos = _dev_info.rsc_ava_pos(Site::SLICE);
 
-			Point pos = ava_pos[rand_idx];
-			src_slice->set_curr_logic_pos(Point(pos.x, pos.y, 0));
-			sink_slice->set_curr_logic_pos(Point(pos.x, pos.y, 1));
+  for (LUT6 &lut6 : lut6s) {
+    int rand_idx;
+    Site *slice_site = NULL;
+    do {
+      rand_idx = rand() % ava_pos.size();
+      slice_site = &_fpga.at(ava_pos[rand_idx]).site(Site::SLICE);
+    } while (slice_site->_occ != 0);
 
-			src_slice->set_curr_loc_site(slice_site);
-			sink_slice->set_curr_loc_site(slice_site);
+    PLCInstance *src_slice = lut6.first;
+    PLCInstance *sink_slice = lut6.second;
 
-			src_slice->set_swapable_type(FLOORPLAN::LUT6);
-			sink_slice->set_swapable_type(FLOORPLAN::LUT6);
+    slice_site->_occ_insts[0] = src_slice;
+    slice_site->_occ_insts[1] = sink_slice;
+    slice_site->_occ = DEVICE::NUM_SLICE_PER_TILE;
 
-			SwapObject* obj = _nl_info.add_swap_object(FLOORPLAN::LUT6);
-			obj->fill(src_slice);
-			obj->fill(sink_slice);
+    Point pos = ava_pos[rand_idx];
+    src_slice->set_curr_logic_pos(Point(pos.x, pos.y, 0));
+    sink_slice->set_curr_logic_pos(Point(pos.x, pos.y, 1));
 
-			_dev_info.pop_rsc_ava_pos(Site::SLICE, rand_idx);
-		}
-	}
+    src_slice->set_curr_loc_site(slice_site);
+    sink_slice->set_curr_loc_site(slice_site);
 
-	bool Floorplan::init_place_site()
-	{
-		for (PLCInstance* inst: static_cast<PLCModule*>(_nl_info.design()->top_module())->instances())
-		{
-			Site::SiteType site_type = lexical_cast<Site::SiteType>(inst->module_type());
+    src_slice->set_swapable_type(FLOORPLAN::LUT6);
+    sink_slice->set_swapable_type(FLOORPLAN::LUT6);
 
-			if(!_dev_info.is_logic_site(site_type)		||
-				site_type == Site::GCLKIOB				|| 
-				inst->is_fixed()							||
-				inst->is_macro()							||
-				site_type == Site::VCC)
-				continue;
+    SwapObject *obj = _nl_info.add_swap_object(FLOORPLAN::LUT6);
+    obj->fill(src_slice);
+    obj->fill(sink_slice);
 
-			vector<Point>& ava_pos   = _dev_info.rsc_ava_pos(site_type);
-			int			   rand_idx  = rand() % ava_pos.size();
-			Site*		   site      = &_fpga.at(ava_pos[rand_idx]).site(site_type);
+    _dev_info.pop_rsc_ava_pos(Site::SLICE, rand_idx);
+  }
+}
 
-			while(site->_occ >= site->_capacity)
-			{
-				_dev_info.pop_rsc_ava_pos(site_type, rand_idx);
-				ASSERT(ava_pos.size(), (CONSOLE::PLC_ERROR % "NOT enough resource to place this design."));
+bool Floorplan::init_place_site() {
+  for (PLCInstance *inst :
+       static_cast<PLCModule *>(_nl_info.design()->top_module())->instances()) {
+    Site::SiteType site_type =
+        lexical_cast<Site::SiteType>(inst->module_type());
 
-				rand_idx = rand() % ava_pos.size();
-				site = &_fpga.at(ava_pos[rand_idx]).site(site_type);
-			}
+    if (!_dev_info.is_logic_site(site_type) || site_type == Site::GCLKIOB ||
+        inst->is_fixed() || inst->is_macro() || site_type == Site::VCC)
+      continue;
 
-			Point pos = ava_pos[rand_idx];
-			pos.z     = site->get_unocc_z_pos();
-			site->_occ_insts[pos.z] = inst;
-			++site->_occ;
+    vector<Point> &ava_pos = _dev_info.rsc_ava_pos(site_type);
+    int rand_idx = rand() % ava_pos.size();
+    Site *site = &_fpga.at(ava_pos[rand_idx]).site(site_type);
 
-			inst->set_curr_logic_pos(pos);
-			inst->set_curr_loc_site(site);
-			inst->set_swapable_type(FLOORPLAN::SITE);
+    while (site->_occ >= site->_capacity) {
+      _dev_info.pop_rsc_ava_pos(site_type, rand_idx);
+      ASSERT(ava_pos.size(), (CONSOLE::PLC_ERROR %
+                              "NOT enough resource to place this design."));
 
-			SwapObject* obj = _nl_info.add_swap_object(FLOORPLAN::SITE);
-			obj->fill(inst);
-		}
-        return (_nl_info.num_swap_objects() == 0) ;
-        
-	}
+      rand_idx = rand() % ava_pos.size();
+      site = &_fpga.at(ava_pos[rand_idx]).site(site_type);
+    }
 
-	bool Floorplan::find_init_pos_for_carrychain(int chain_length, std::vector<Point>& pos)
-	{
-		string DeviceName = FPGADesign::instance()->name();
-		int BottomRow = 3;
-		if (DeviceName == "FDP500K")
-			BottomRow = 5;
-		static const int ROW_OF_BOT_CENTER_TILE = _dev_info.device_scale().x - BottomRow;
-		static const int rows  = _dev_info.device_scale().x;
-		static const int cols  = _dev_info.device_scale().y;
+    Point pos = ava_pos[rand_idx];
+    pos.z = site->get_unocc_z_pos();
+    site->_occ_insts[pos.z] = inst;
+    ++site->_occ;
 
-		static int  tile_col   = cols / 2;
-		static bool used_lower = cols % 2 ? false : true;
+    inst->set_curr_logic_pos(pos);
+    inst->set_curr_loc_site(site);
+    inst->set_swapable_type(FLOORPLAN::SITE);
 
-		bool  found = false;
-		vector<int> carry_chain1 = DEVICE::carry_chain[0];//¶ÔÓÚV2£¬³õÊ¼»¯²¼¾ÖÊ±½øÎ»Á´Ö»¿¼ÂÇ²¼¾ÖÔÚ0£¬1Î»ÖÃ
-	
-		Point chain_pos(ROW_OF_BOT_CENTER_TILE, tile_col, 0);
-		while(tile_col >= 0 && tile_col < cols)
-		{
-			if(_fpga.at(chain_pos).exist_site(Site::SLICE))
-			{
-				for(int row = chain_pos.x; row >= 0; --row)
-				{
-					Tile& tile = _fpga.at(row, tile_col);
-					if(tile.exist_site(Site::SLICE))
-					{
-						for (int zpos: carry_chain1)
-						{
-							if(!tile.site(Site::SLICE)._occ_insts[zpos])
-							{
-								pos.push_back(Point(row, tile_col, zpos));
-								if (pos.size() >= chain_length)
-									break;
-							}
-							else
-							{
-								pos.clear();
-								break;					//½øÎ»Á´µÄÆðÊ¼µãÖ»²¼ÔÚz=0µÄÎ»ÖÃ
-							}
-						}
-					}
-					
-					if(pos.size() >= chain_length)
-					{
-						found = true;
-						break;
-					}
-				}
-			}
-			
-			if (used_lower)
-				tile_col = cols - tile_col - 1;
-			else
-				tile_col = cols - tile_col;
-			used_lower  = !used_lower;
-			chain_pos.y = tile_col;
+    SwapObject *obj = _nl_info.add_swap_object(FLOORPLAN::SITE);
+    obj->fill(inst);
+  }
+  return (_nl_info.num_swap_objects() == 0);
+}
 
-			if(found)	return true;
-			else		pos.clear();
-		}
+bool Floorplan::find_init_pos_for_carrychain(int chain_length,
+                                             std::vector<Point> &pos) {
+  string DeviceName = FPGADesign::instance()->name();
+  int BottomRow = 3;
+  if (DeviceName == "FDP500K")
+    BottomRow = 5;
+  static const int ROW_OF_BOT_CENTER_TILE =
+      _dev_info.device_scale().x - BottomRow;
+  static const int rows = _dev_info.device_scale().x;
+  static const int cols = _dev_info.device_scale().y;
 
-		if(tile_col < 0 || tile_col >= cols)
-		{
-			tile_col = cols / 2;
-			used_lower = cols % 2 ? false : true;
-		}
+  static int tile_col = cols / 2;
+  static bool used_lower = cols % 2 ? false : true;
 
-		return false;
-	}
+  bool found = false;
+  vector<int> carry_chain1 =
+      DEVICE::carry_chain[0]; // ï¿½ï¿½ï¿½ï¿½V2ï¿½ï¿½ï¿½ï¿½Ê¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê±ï¿½ï¿½Î»ï¿½ï¿½Ö»ï¿½ï¿½ï¿½Ç²ï¿½ï¿½ï¿½ï¿½ï¿½0ï¿½ï¿½1Î»ï¿½ï¿½
 
-	/************************************************************************/
-	/*	¹¦ÄÜ£ºÕÒµ½Ò»¸ö¿É½»»»µÄµ¥Ôªsite
-	 *	²ÎÊý£º
-			from_obj:	Òª½»»»µÄµ¥Ôª
-			pos_to:		Ä¿µÄµØÖ·
-			rlim:		¾àÀëÔ¼Êø
-	 *	·µ»ØÖµ£ºResult : pair<bool, FLOORPLAN::SwapableType>£¬ËµÃ÷ÊÇÄÄÒ»ÖÖ¿É½»»»ÀàÐÍ
-	 *	ËµÃ÷£º		
-	 *		Ëæ»ú´Ó_available_posÖÐÕÒµ½Ò»¸ö¿É½»»»µÄÎ»ÖÃ£¬Èç¹û²»Âú×ãrlim£¬ÄÇÃ´¾Í½«Æä
-	 *		´Ó_available_posÀïÃæÌÞ³ý£¬ÕâÑù_available_posÒ²¾ÍÖð²½±äÐ¡
-	 *
-	 *		ÌÞ³ýµÄ±ê×¼£º
-	 */
-	/************************************************************************/
-	Floorplan::Result Floorplan::satisfy_cst_rules_for_site(SwapObject* from_obj, Point& pos_to, double rlim)
-	{
-		//µÃµ½form objºÍto objµÄÐÅÏ¢
-		Site& site_from   = from_obj->base_loc_site();
-		int   rand_to_idx = rand() % site_from._available_pos.size();
-		pos_to			  = site_from._available_pos[rand_to_idx];
-		Site& site_to     = _fpga.at(pos_to).site(site_from._type);
-		
-		// if the site type is macro ,we don't accept this swap
-		//µÃµ½to objµÄºêÀàÐÍ
-		FLOORPLAN::SwapableType site_to_macro_type = site_to.macro_type();
-		//Èç¹ûfromÊÇcarry chainÇÒtoÊÇLUT6£¬ÄÇÃ´·µ»Ø
-		if(site_from.macro_type() == FLOORPLAN::CARRY_CHAIN && 
-		   site_to_macro_type	  == FLOORPLAN::LUT6)
-			return make_pair(false, FLOORPLAN::IGNORE);
-		//Èç¹ûfromÊÇfix£¬ÇÒtoÊÇLUT6
-		if(site_from.has_fixed_insts() && site_to_macro_type == FLOORPLAN::LUT6)
-			return make_pair(false, FLOORPLAN::IGNORE);
-		// µÃµ½µØÖ·ÐÅÏ¢
-		Point pos_from	   = site_from._logic_pos;
-		Point phy_pos_from = site_from._owner->phy_pos();
-		Point phy_pos_to   = site_to._owner->phy_pos();
-		//ÅÐ¶ÏÊÇ·ñÔÚrlim·¶Î§ÄÚ£¬²¢ÇÒtoºÍfrom²»ÖØºÏ
+  Point chain_pos(ROW_OF_BOT_CENTER_TILE, tile_col, 0);
+  while (tile_col >= 0 && tile_col < cols) {
+    if (_fpga.at(chain_pos).exist_site(Site::SLICE)) {
+      for (int row = chain_pos.x; row >= 0; --row) {
+        Tile &tile = _fpga.at(row, tile_col);
+        if (tile.exist_site(Site::SLICE)) {
+          for (int zpos : carry_chain1) {
+            if (!tile.site(Site::SLICE)._occ_insts[zpos]) {
+              pos.push_back(Point(row, tile_col, zpos));
+              if (pos.size() >= chain_length)
+                break;
+            } else {
+              pos.clear();
+              break; // ï¿½ï¿½Î»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê¼ï¿½ï¿½Ö»ï¿½ï¿½ï¿½ï¿½z=0ï¿½ï¿½Î»ï¿½ï¿½
+            }
+          }
+        }
 
-		// optimization for IOB and BLOCKRAM
-		if ( site_from._type == Site::IOB || site_from._type == Site::BLOCKRAM ) 
-			rlim = max_rlim();
+        if (pos.size() >= chain_length) {
+          found = true;
+          break;
+        }
+      }
+    }
 
-		if ( abs(phy_pos_from.x - phy_pos_to.x) <= rlim && 
-			 abs(phy_pos_from.y - phy_pos_to.y) <= rlim &&
-			(pos_from.x != pos_to.x || pos_from.y != pos_to.y) )
-		{
-			int num_fixed_insts = 0, num_carrychain_insts = 0;
-			//¶ÔÃ¿Ò»¸öto obj£¬¼ì²éfixºÍcarry chainÕ¼ÓÃµÄÊýÄ¿
-			for (PLCInstance* inst: site_to._occ_insts) {
-				if(inst == NULL) continue;
-				//Èç¹ûÊÇfix
-				if(inst->is_fixed()) 
-					++num_fixed_insts ;
-				//Èç¹û±»ÓÃ×÷carry chain
-				else if(inst->swapable_type() == FLOORPLAN::CARRY_CHAIN)
-					++num_carrychain_insts;
-			}
-			//Èç¹ûfixÊýÄ¿ºÍcarry chainµÄÊýÄ¿Ð¡ÓÚÈÝÁ¿£¬ËµÃ÷»¹ÓÐ¿ÉÒÔ½»»»µÄ
-			if (num_fixed_insts + num_carrychain_insts < site_to._capacity)
-				return make_pair(true, site_to_macro_type);
-			//Èç¹ûfixµÄÊýÄ¿´óÓÚµÈÓÚÈÝÁ¿ËµÃ÷Ã»ÓÐ¿ÉÒÔ½»»»µÄ
-			else if(num_fixed_insts >= site_to._capacity)
-				site_from.pop_unavailable_pos(rand_to_idx);
-			//Èç¹ûcarry chainµÄÊýÄ¿´óÓÚµÈÓÚÈÝÁ¿µÄ»°Ô­ÒâÎª²»ÄÜpop£¬
-			//ÒòÎª¿¼ÂÇµ½carry chain±»½»»»×ßºó¸ÃÎ»ÖÃ¾Í¿ÉÓÃÓÚ½»»»¡£
-			//ºóÀ´·¢ÏÖ»áµ±available_posÖ»ÓÐÒ»¸öÎ»ÖÃ²¢ÇÒ¸ÃÎ»ÖÃ¾ù±»carry chainÕ¼¾Ýºó£¬
-			//Èô²»pop»áµ¼ÖÂËÀÑ­»·£¬ËùÒÔ»¹ÊÇÓ¦¸Ãpop
-			else if(num_carrychain_insts >= site_to._capacity)
-				site_from.pop_unavailable_pos(rand_to_idx);
-		} else {
-			//Èç¹û²»ÔÚ·¶Î§ÄÚ£¬popµô
-			site_from.pop_unavailable_pos(rand_to_idx);
-		}
+    if (used_lower)
+      tile_col = cols - tile_col - 1;
+    else
+      tile_col = cols - tile_col;
+    used_lower = !used_lower;
+    chain_pos.y = tile_col;
 
-		return make_pair(false, FLOORPLAN::IGNORE);
-	}
-	/************************************************************************/
-	/*	¹¦ÄÜ£ºÕÒµ½Ò»¸ö¿É½»»»µÄLUT6
-	 *	²ÎÊý£º
-		from_obj:	Òª½»»»µÄµ¥Ôª
-		pos_to:		Ä¿µÄµØÖ·
-		rlim:		¾àÀëÔ¼Êø
-	 *	·µ»ØÖµ£ºResult : pair<bool, FLOORPLAN::SwapableType>£¬ËµÃ÷ÊÇÄÄÒ»ÖÖ¿É½»»»ÀàÐÍ
-	 *	ËµÃ÷£º		
-	 *		Ëæ»ú´Ó_available_posÖÐÕÒµ½Ò»¸ö¿É½»»»µÄÎ»ÖÃ£¬Èç¹û²»Âú×ãrlim£¬ÄÇÃ´¾Í½«Æä
- 	 *		´Ó_available_posÀïÃæÌÞ³ý£¬ÕâÑù_available_posÒ²¾ÍÖð²½±äÐ¡
-	 *
-	 *		ÌÞ³ýµÄ±ê×¼£º
-	 */
-	/************************************************************************/
-	Floorplan::Result Floorplan::satisfy_cst_rules_for_lut6(SwapObject* from_obj, Point& pos_to, double rlim)
-	{
-		//Ëæ»úÑ¡È¡Ò»¸öto position
-		Site& site_from   = from_obj->base_loc_site();
-		int   rand_to_idx = rand() % site_from._available_pos.size();
-		pos_to			  = site_from._available_pos[rand_to_idx];
-		Site& site_to     = _fpga.at(pos_to).site(site_from._type);
-		//Èç¹ûsite_toÓÐfix£¬ÄÇÃ´·µ»Ø
-		//ÕâÀïÓÐÎÊÌâ£ºÈç¹ûÈ«¶¼ÊÇfixed£¬ÄÇÃ´Ñ­»·ÍË²»³ö
-		if(site_to.has_fixed_insts())
-			return make_pair(false, FLOORPLAN::IGNORE);
-		//Èç¹ûto objµÄºêÀàÐÍÎªcarry chain,·µ»Ø
-		FLOORPLAN::SwapableType site_to_macro_type = site_to.macro_type();
-		if(site_to_macro_type == FLOORPLAN::CARRY_CHAIN) {
-			// if not pop here, it will cause infinite loop in some cases
-			site_from.pop_unavailable_pos(rand_to_idx);
-			return make_pair(false, FLOORPLAN::IGNORE);
-		}
-		//µÃµ½fromºÍtoµÄµØÖ·ÐÅÏ¢
-		Point pos_from	   = site_from._logic_pos;
-		Point phy_pos_from = site_from._owner->phy_pos();
-		Point phy_pos_to   = site_to._owner->phy_pos();
-		//Âú×ãrlimÔ¼Êø
-		if ( abs(phy_pos_from.x - phy_pos_to.x) <= rlim && 
-			 abs(phy_pos_from.y - phy_pos_to.y) <= rlim &&
-			(pos_from.x != pos_to.x || pos_from.y != pos_to.y) )
-		{
-			return make_pair(true, site_to_macro_type);
-		} else {
-			//²»Âú×ã£¬ÌÞ³ý
-			site_from.pop_unavailable_pos(rand_to_idx);
-			return make_pair(false, FLOORPLAN::IGNORE);
-		}
-	}
-	/************************************************************************/
-	/*	¹¦ÄÜ£ºÕÒµ½Ò»¸ö¿É½»»»µÄcarry chain
-	 *	²ÎÊý£º
-			from_obj:	Òª½»»»µÄµ¥Ôª
-			pos_to:		Ä¿µÄµØÖ·
-			rlim:		¾àÀëÔ¼Êø
-	 *	·µ»ØÖµ£ºResult : pair<bool, FLOORPLAN::SwapableType>£¬ËµÃ÷ÊÇÄÄÒ»ÖÖ¿É½»»»ÀàÐÍ
-	 *	ËµÃ÷£º		
-	 *		Ëæ»ú´Ó_available_posÖÐÕÒµ½Ò»¸ö¿É½»»»µÄÎ»ÖÃ£¬Èç¹û²»Âú×ãrlim£¬ÄÇÃ´¾Í½«Æä
-	 *		´Ó_available_posÀïÃæÌÞ³ý£¬ÕâÑù_available_posÒ²¾ÍÖð²½±äÐ¡
-	 *
-	 *		ÌÞ³ýµÄ±ê×¼£º
-	 */
-	/************************************************************************/
-	Floorplan::Result Floorplan::satisfy_cst_rules_for_carrychain(SwapObject* from_obj, Point& pos_to, double rlim)
-	{
-// 		Site& site_from   = from_obj->base_loc_site();
-// 		int carry_size = DEVICE::carry_chain[0].size();
-// 		//Éú³ÉÈý´ÎËæ»úÊé£¬ÔÚ¸ø½øÎ»Á´×¨ÓÃµÄqualified_posÖÐÕÒ¿ÉÓÃµÄ×ø±ê
-// 		//ÓëÕÒsiteµÄ×ø±êÏà±È£¬ÕâÑùÕÒ³öÀ´µÄ×ø±ê¿Ï¶¨ÊÇÄÜÓÃµÄ£¬³ý·Ç³¬³öÁËrlimµÄ·¶Î§¡£
-// 		SwapObject::QualifiedPos& qualified_pos = from_obj->get_qualified_pos();
-// 		int rand_index_of_y = rand()%qualified_pos.size();
-// 		SwapObject::QualifiedPos::iterator it = qualified_pos.begin();
-// 		for(int i = 0; i < rand_index_of_y; i++)
-// 			it++;
-// 		int y = it -> first;
-// 		int rand_index_of_carry = rand()%DEVICE::carry_chain.size();
-// 		int z = rand_index_of_carry * carry_size;
-// 		int rand_index_of_x =rand()%qualified_pos[y][rand_index_of_carry].size();
-// 		int x = qualified_pos[y][rand_index_of_carry][rand_index_of_x];
-// 
-// 		pos_to.x = x;
-// 		pos_to.y = y;
-// 		pos_to.z = z;
-// 
-// 		Site& site_to      = _fpga.at(pos_to).site(site_from._type);
-// 		Point pos_from	   = site_from._logic_pos;
-// 		Point phy_pos_from = site_from._owner->phy_pos();
-// 		Point phy_pos_to   = site_to._owner->phy_pos();
-// 
-// 		if ( abs(phy_pos_from.x - phy_pos_to.x) <= rlim && 
-// 			 abs(phy_pos_from.y - phy_pos_to.y) <= rlim &&
-// 			(pos_from.x != pos_to.x || pos_from.y != pos_to.y) )
-// 		{
-// 			return make_pair(true, FLOORPLAN::SITE);
-// 		} else {
-// 			//Èç¹û³¬³öÁËrlimµÄ·¶Î§£¬popµôÏàÓ¦µÄ×ø±ê£¬Èç¹ûÊÇx³¬³öµÄ»°£¬Ö»É¾³ýÕâ¸öx×ø±ê
-// 			if(abs(phy_pos_from.x - phy_pos_to.x) > rlim)
-// 			{
-// 				qualified_pos[y][rand_index_of_carry][rand_index_of_x] =qualified_pos[y][rand_index_of_carry].back();
-// 				qualified_pos[y].pop_back();
-// 			}
-// 			//Èç¹ûÊÇy³¬³örlim·¶Î§£¬popµôÕûÁÐµÄ×ø±ê
-// 			if(abs(phy_pos_from.y - phy_pos_to.y) > rlim)
-// 				qualified_pos.erase(y);
-// 		
-// 			return make_pair(false, FLOORPLAN::IGNORE);
-// 		}
-		Site& site_from   = from_obj->base_loc_site();
-		int   rand_to_idx = rand() % site_from._available_pos.size();
-		pos_to			  = site_from._available_pos[rand_to_idx];
+    if (found)
+      return true;
+    else
+      pos.clear();
+  }
 
-		bool is_qualified = false;
-		for (int index = 0; index < DEVICE::carry_chain.size(); index++)
-		{
-			if(from_obj->exist_qualified_pos(_dev_info.device_scale().x, pos_to, index)) {
-				is_qualified = true;
-				pos_to.z = index * DEVICE::carry_chain[0].size(); 
-				break;
-			}
-		}
-		if(!is_qualified) {
-			// if not pop here, it will cause infinite loop in some cases
-			site_from.pop_unavailable_pos(rand_to_idx);
-			return make_pair(false, FLOORPLAN::IGNORE);
-		}
+  if (tile_col < 0 || tile_col >= cols) {
+    tile_col = cols / 2;
+    used_lower = cols % 2 ? false : true;
+  }
 
-		Site& site_to      = _fpga.at(pos_to).site(site_from._type);
-		Point pos_from	   = site_from._logic_pos;
-		Point phy_pos_from = site_from._owner->phy_pos();
-		Point phy_pos_to   = site_to._owner->phy_pos();
+  return false;
+}
 
-		if ( abs(phy_pos_from.x - phy_pos_to.x) <= rlim && 
-			abs(phy_pos_from.y - phy_pos_to.y) <= rlim &&
-			(pos_from.x != pos_to.x || pos_from.y != pos_to.y) )
-		{
-			return make_pair(true, FLOORPLAN::SITE);
-		} else {
-			site_from.pop_unavailable_pos(rand_to_idx);
-			return make_pair(false, FLOORPLAN::IGNORE);
-		}
-	}
-	/************************************************************************/
-	/*	¹¦ÄÜ£º¸üÐÂÖÆ¶¨ÁÐµÄz×ø±êµÄÒ»ÁÐµÄqualified_posÖµ
-	 *	²ÎÊý£º
-	 *		tile_col:int,tileÖÐµÄÁÐ×ø±ê
-	 *		z_pos:int,¸ÃÁÐµÄz×ø±ê
-	 *	·µ»ØÖµ£ºvoid
-	 *	ËµÃ÷£º
-	 */
-	/************************************************************************/	
-	void Floorplan::update_qualified_pos_for_carrychain(int tile_col, int index)
-	{
-		static int num_rows = _fpga.size().x - 1;
-		vector<int> carry_chain_index = DEVICE::carry_chain[index];
-		int carry_size = DEVICE::carry_chain[0].size();
+/************************************************************************/
+/*	ï¿½ï¿½ï¿½Ü£ï¿½ï¿½Òµï¿½Ò»ï¿½ï¿½ï¿½É½ï¿½ï¿½ï¿½ï¿½Äµï¿½Ôªsite
+ *	ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+                from_obj:	Òªï¿½ï¿½ï¿½ï¿½ï¿½Äµï¿½Ôª
+                pos_to:		Ä¿ï¿½Äµï¿½Ö·
+                rlim:		ï¿½ï¿½ï¿½ï¿½Ô¼ï¿½ï¿½
+ *	ï¿½ï¿½ï¿½ï¿½Öµï¿½ï¿½Result : pair<bool, FLOORPLAN::SwapableType>ï¿½ï¿½Ëµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ò»ï¿½Ö¿É½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+ *	Ëµï¿½ï¿½ï¿½ï¿½
+ *		ï¿½ï¿½ï¿½ï¿½ï¿½_available_posï¿½ï¿½ï¿½Òµï¿½Ò»ï¿½ï¿½ï¿½É½ï¿½ï¿½ï¿½ï¿½ï¿½Î»ï¿½Ã£ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½rlimï¿½ï¿½ï¿½ï¿½Ã´ï¿½Í½ï¿½ï¿½ï¿½
+ *
+ ï¿½ï¿½_available_posï¿½ï¿½ï¿½ï¿½ï¿½Þ³ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½_available_posÒ²ï¿½ï¿½ï¿½ð²½±ï¿½Ð¡
+ *
+ *		ï¿½Þ³ï¿½ï¿½Ä±ï¿½×¼ï¿½ï¿½
+ */
+/************************************************************************/
+Floorplan::Result Floorplan::satisfy_cst_rules_for_site(SwapObject *from_obj,
+                                                        Point &pos_to,
+                                                        double rlim) {
+  // ï¿½Ãµï¿½form objï¿½ï¿½to objï¿½ï¿½ï¿½ï¿½Ï¢
+  Site &site_from = from_obj->base_loc_site();
+  int rand_to_idx = rand() % site_from._available_pos.size();
+  pos_to = site_from._available_pos[rand_to_idx];
+  Site &site_to = _fpga.at(pos_to).site(site_from._type);
 
-		for (NLInfo::MacroInfo::CarryChains::value_type& chain: _nl_info.carry_chains()){
-			for (SwapObject* obj: chain.second)
-				obj->clr_qualified_pos(tile_col, index);
-		}
+  // if the site type is macro ,we don't accept this swap
+  // ï¿½Ãµï¿½to objï¿½Äºï¿½ï¿½ï¿½ï¿½ï¿½
+  FLOORPLAN::SwapableType site_to_macro_type = site_to.macro_type();
+  // ï¿½ï¿½ï¿½fromï¿½ï¿½carry chainï¿½ï¿½toï¿½ï¿½LUT6ï¿½ï¿½ï¿½ï¿½Ã´ï¿½ï¿½ï¿½ï¿½
+  if (site_from.macro_type() == FLOORPLAN::CARRY_CHAIN &&
+      site_to_macro_type == FLOORPLAN::LUT6)
+    return make_pair(false, FLOORPLAN::IGNORE);
+  // ï¿½ï¿½ï¿½fromï¿½ï¿½fixï¿½ï¿½ï¿½ï¿½toï¿½ï¿½LUT6
+  if (site_from.has_fixed_insts() && site_to_macro_type == FLOORPLAN::LUT6)
+    return make_pair(false, FLOORPLAN::IGNORE);
+  // ï¿½Ãµï¿½ï¿½ï¿½Ö·ï¿½ï¿½Ï¢
+  Point pos_from = site_from._logic_pos;
+  Point phy_pos_from = site_from._owner->phy_pos();
+  Point phy_pos_to = site_to._owner->phy_pos();
+  // ï¿½Ð¶ï¿½ï¿½Ç·ï¿½ï¿½ï¿½rlimï¿½ï¿½Î§ï¿½Ú£ï¿½ï¿½ï¿½ï¿½ï¿½toï¿½ï¿½fromï¿½ï¿½ï¿½Øºï¿½
 
-		int				length = 0;
-		vector<Point>	consecutive_pos_vec;
-		for(int tile_row = num_rows; tile_row >= 0; --tile_row)
-		{
-			Tile& tile = _fpga.at(tile_row, tile_col);
-			if(tile.exist_site(Site::SLICE))
-			{
-				Site& slice_site = tile.site(Site::SLICE);
-				bool continue_flag = true;
-				for(int i=0; i < carry_chain_index.size(); i++)
-				{
-					int zpos=carry_chain_index[i];
-					PLCInstance* slice_inst = slice_site._occ_insts[zpos];
-					if(!slice_inst || (!slice_inst->is_macro() && !slice_inst->is_fixed()))
-					{
-						++length;
-						if(i == 0)//Ö»°ÑtileÖÐ½øÎ»Á´µÄ¿ªÊ¼Î»ÖÃ×÷Îª½øÎ»Á´µÄÆðÊ¼µã
-						consecutive_pos_vec.push_back(Point(tile_row, tile_col, zpos));
-					}
-					else
-					{
-						continue_flag = false;//Èç¹ûÔÚÒ»¸ötileÖÐµÄ½øÎ»Á´³öÏÖÁË±»Õ¼ÓÐµÄinst£¬Ôò×ø±êµÄÁ¬ÐøÐÔ±»ÖÐ¶Ï
-						break;
-					}
-				}
-				if(continue_flag)	
-				continue;
-			} 
-			else if(tile_row > 0)
-				continue;
-			
-			//¸üÐÂcarry chainµÄ¿ÉÓÃÎ»ÖÃ
-			if(length != 0)
-			{
-				for (NLInfo::MacroInfo::CarryChains::value_type& chain: _nl_info.carry_chains()) {
-					if(chain.first <= length)
-					{
-						int index_for_pos = consecutive_pos_vec.size();
-						//ÏÂÃæÕâ¸öwhileÑ­»·¼ÆËãÔÚ´æ´¢Á¬Ðø×ø±êvectorÖÐÄÜ·ÅÏÂ½øÎ»Á´µÄ×îºóÒ»¸ö×ø±êµÄË÷ÒýºÅ
-						//ÒòÎªconsecutive_pos_vecÖÐÖ»´æÁËÃ¿¸ötileÖÐ½øÎ»Á´¿ªÊ¼µÄ×ø±ê£¬ËùÒÔ¼ÆËã·½·¨±È½ÏÆæ¹Ö
-						while ((length - (index_for_pos-1)*carry_size) < chain.first)
-							index_for_pos--;
-						for (SwapObject* obj: chain.second) {
-							for(int i = 0; i < index_for_pos; ++i)
-								obj->add_qualified_pos(index,consecutive_pos_vec[i]);
-						}
-					}
-				}
-				length = 0;
-				consecutive_pos_vec.clear();
-			}
-		} // end of "for"
-	}
+  // optimization for IOB and BLOCKRAM
+  if (site_from._type == Site::IOB || site_from._type == Site::BLOCKRAM)
+    rlim = max_rlim();
+
+  if (abs(phy_pos_from.x - phy_pos_to.x) <= rlim &&
+      abs(phy_pos_from.y - phy_pos_to.y) <= rlim &&
+      (pos_from.x != pos_to.x || pos_from.y != pos_to.y)) {
+    int num_fixed_insts = 0, num_carrychain_insts = 0;
+    // ï¿½ï¿½Ã¿Ò»ï¿½ï¿½to objï¿½ï¿½ï¿½ï¿½ï¿½fixï¿½ï¿½carry chainÕ¼ï¿½Ãµï¿½ï¿½ï¿½Ä¿
+    for (PLCInstance *inst : site_to._occ_insts) {
+      if (inst == NULL)
+        continue;
+      // ï¿½ï¿½ï¿½ï¿½ï¿½fix
+      if (inst->is_fixed())
+        ++num_fixed_insts;
+      // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½carry chain
+      else if (inst->swapable_type() == FLOORPLAN::CARRY_CHAIN)
+        ++num_carrychain_insts;
+    }
+    // ï¿½ï¿½ï¿½fixï¿½ï¿½Ä¿ï¿½ï¿½carry chainï¿½ï¿½ï¿½ï¿½Ä¿Ð¡ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ëµï¿½ï¿½ï¿½ï¿½ï¿½Ð¿ï¿½ï¿½Ô½ï¿½ï¿½ï¿½ï¿½ï¿½
+    if (num_fixed_insts + num_carrychain_insts < site_to._capacity)
+      return make_pair(true, site_to_macro_type);
+    // ï¿½ï¿½ï¿½fixï¿½ï¿½ï¿½ï¿½Ä¿ï¿½ï¿½ï¿½Úµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ëµï¿½ï¿½Ã»ï¿½Ð¿ï¿½ï¿½Ô½ï¿½ï¿½ï¿½ï¿½ï¿½
+    else if (num_fixed_insts >= site_to._capacity)
+      site_from.pop_unavailable_pos(rand_to_idx);
+    // ï¿½ï¿½ï¿½carry chainï¿½ï¿½ï¿½ï¿½Ä¿ï¿½ï¿½ï¿½Úµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä»ï¿½Ô­ï¿½ï¿½Îªï¿½ï¿½ï¿½ï¿½popï¿½ï¿½
+    // ï¿½ï¿½Îªï¿½ï¿½ï¿½Çµï¿½carry chainï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ßºï¿½ï¿½Î»ï¿½Ã¾Í¿ï¿½ï¿½ï¿½ï¿½Ú½ï¿½ï¿½ï¿½ï¿½ï¿½
+    // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö»áµ±available_posÖ»ï¿½ï¿½Ò»ï¿½ï¿½Î»ï¿½Ã²ï¿½ï¿½Ò¸ï¿½Î»ï¿½Ã¾ï¿½ï¿½ï¿½carry chainÕ¼ï¿½Ýºï¿½
+    // ï¿½ï¿½ï¿½ï¿½popï¿½áµ¼ï¿½ï¿½ï¿½ï¿½Ñ­ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ô»ï¿½ï¿½ï¿½Ó¦ï¿½ï¿½pop
+    else if (num_carrychain_insts >= site_to._capacity)
+      site_from.pop_unavailable_pos(rand_to_idx);
+  } else {
+    // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ú·ï¿½Î§ï¿½Ú£ï¿½popï¿½ï¿½
+    site_from.pop_unavailable_pos(rand_to_idx);
+  }
+
+  return make_pair(false, FLOORPLAN::IGNORE);
+}
+/************************************************************************/
+/*	ï¿½ï¿½ï¿½Ü£ï¿½ï¿½Òµï¿½Ò»ï¿½ï¿½ï¿½É½ï¿½ï¿½ï¿½ï¿½ï¿½LUT6
+ *	ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+        from_obj:	Òªï¿½ï¿½ï¿½ï¿½ï¿½Äµï¿½Ôª
+        pos_to:		Ä¿ï¿½Äµï¿½Ö·
+        rlim:		ï¿½ï¿½ï¿½ï¿½Ô¼ï¿½ï¿½
+ *	ï¿½ï¿½ï¿½ï¿½Öµï¿½ï¿½Result : pair<bool, FLOORPLAN::SwapableType>ï¿½ï¿½Ëµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ò»ï¿½Ö¿É½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+ *	Ëµï¿½ï¿½ï¿½ï¿½
+ *		ï¿½ï¿½ï¿½ï¿½ï¿½_available_posï¿½ï¿½ï¿½Òµï¿½Ò»ï¿½ï¿½ï¿½É½ï¿½ï¿½ï¿½ï¿½ï¿½Î»ï¿½Ã£ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½rlimï¿½ï¿½ï¿½ï¿½Ã´ï¿½Í½ï¿½ï¿½ï¿½
+ *
+ ï¿½ï¿½_available_posï¿½ï¿½ï¿½ï¿½ï¿½Þ³ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½_available_posÒ²ï¿½ï¿½ï¿½ð²½±ï¿½Ð¡
+ *
+ *		ï¿½Þ³ï¿½ï¿½Ä±ï¿½×¼ï¿½ï¿½
+ */
+/************************************************************************/
+Floorplan::Result Floorplan::satisfy_cst_rules_for_lut6(SwapObject *from_obj,
+                                                        Point &pos_to,
+                                                        double rlim) {
+  // ï¿½ï¿½ï¿½Ñ¡È¡Ò»ï¿½ï¿½to position
+  Site &site_from = from_obj->base_loc_site();
+  int rand_to_idx = rand() % site_from._available_pos.size();
+  pos_to = site_from._available_pos[rand_to_idx];
+  Site &site_to = _fpga.at(pos_to).site(site_from._type);
+  // ï¿½ï¿½ï¿½site_toï¿½ï¿½fixï¿½ï¿½ï¿½ï¿½Ã´ï¿½ï¿½ï¿½ï¿½
+  // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½â£ºï¿½ï¿½ï¿½È«ï¿½ï¿½ï¿½ï¿½fixedï¿½ï¿½ï¿½ï¿½Ã´Ñ­ï¿½ï¿½ï¿½Ë²ï¿½ï¿½ï¿½
+  if (site_to.has_fixed_insts())
+    return make_pair(false, FLOORPLAN::IGNORE);
+  // ï¿½ï¿½ï¿½to objï¿½Äºï¿½ï¿½ï¿½ï¿½ï¿½Îªcarry chain,ï¿½ï¿½ï¿½ï¿½
+  FLOORPLAN::SwapableType site_to_macro_type = site_to.macro_type();
+  if (site_to_macro_type == FLOORPLAN::CARRY_CHAIN) {
+    // if not pop here, it will cause infinite loop in some cases
+    site_from.pop_unavailable_pos(rand_to_idx);
+    return make_pair(false, FLOORPLAN::IGNORE);
+  }
+  // ï¿½Ãµï¿½fromï¿½ï¿½toï¿½Äµï¿½Ö·ï¿½ï¿½Ï¢
+  Point pos_from = site_from._logic_pos;
+  Point phy_pos_from = site_from._owner->phy_pos();
+  Point phy_pos_to = site_to._owner->phy_pos();
+  // ï¿½ï¿½ï¿½ï¿½rlimÔ¼ï¿½ï¿½
+  if (abs(phy_pos_from.x - phy_pos_to.x) <= rlim &&
+      abs(phy_pos_from.y - phy_pos_to.y) <= rlim &&
+      (pos_from.x != pos_to.x || pos_from.y != pos_to.y)) {
+    return make_pair(true, site_to_macro_type);
+  } else {
+    // ï¿½ï¿½ï¿½ï¿½ï¿½ã£¬ï¿½Þ³ï¿½
+    site_from.pop_unavailable_pos(rand_to_idx);
+    return make_pair(false, FLOORPLAN::IGNORE);
+  }
+}
+/************************************************************************/
+/*	ï¿½ï¿½ï¿½Ü£ï¿½ï¿½Òµï¿½Ò»ï¿½ï¿½ï¿½É½ï¿½ï¿½ï¿½ï¿½ï¿½carry chain
+ *	ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+                from_obj:	Òªï¿½ï¿½ï¿½ï¿½ï¿½Äµï¿½Ôª
+                pos_to:		Ä¿ï¿½Äµï¿½Ö·
+                rlim:		ï¿½ï¿½ï¿½ï¿½Ô¼ï¿½ï¿½
+ *	ï¿½ï¿½ï¿½ï¿½Öµï¿½ï¿½Result : pair<bool, FLOORPLAN::SwapableType>ï¿½ï¿½Ëµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ò»ï¿½Ö¿É½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+ *	Ëµï¿½ï¿½ï¿½ï¿½
+ *		ï¿½ï¿½ï¿½ï¿½ï¿½_available_posï¿½ï¿½ï¿½Òµï¿½Ò»ï¿½ï¿½ï¿½É½ï¿½ï¿½ï¿½ï¿½ï¿½Î»ï¿½Ã£ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½rlimï¿½ï¿½ï¿½ï¿½Ã´ï¿½Í½ï¿½ï¿½ï¿½
+ *
+ ï¿½ï¿½_available_posï¿½ï¿½ï¿½ï¿½ï¿½Þ³ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½_available_posÒ²ï¿½ï¿½ï¿½ð²½±ï¿½Ð¡
+ *
+ *		ï¿½Þ³ï¿½ï¿½Ä±ï¿½×¼ï¿½ï¿½
+ */
+/************************************************************************/
+Floorplan::Result
+Floorplan::satisfy_cst_rules_for_carrychain(SwapObject *from_obj, Point &pos_to,
+                                            double rlim) {
+  // 		Site& site_from   = from_obj->base_loc_site();
+  // 		int carry_size = DEVICE::carry_chain[0].size();
+  // 		//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½é£¬ï¿½Ú¸ï¿½ï¿½ï¿½Î»ï¿½ï¿½×¨ï¿½Ãµï¿½qualified_posï¿½ï¿½ï¿½Ò¿ï¿½ï¿½Ãµï¿½ï¿½ï¿½ï¿½ï¿½
+  // 		//ï¿½ï¿½ï¿½ï¿½siteï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½È£ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ò³ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ï¶ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ÃµÄ£ï¿½ï¿½ï¿½ï¿½Ç³ï¿½ï¿½ï¿½ï¿½ï¿½rlimï¿½Ä·ï¿½Î§ï¿½ï¿½
+  // 		SwapObject::QualifiedPos& qualified_pos =
+  // from_obj->get_qualified_pos(); 		int rand_index_of_y =
+  // rand()%qualified_pos.size();
+  // SwapObject::QualifiedPos::iterator it = qualified_pos.begin();
+  // for(int i = 0; i < rand_index_of_y; i++) 			it++;
+  // int y = it -> first; 		int rand_index_of_carry =
+  // rand()%DEVICE::carry_chain.size(); 		int z = rand_index_of_carry *
+  // carry_size; 		int rand_index_of_x
+  // =rand()%qualified_pos[y][rand_index_of_carry].size(); 		int x =
+  // qualified_pos[y][rand_index_of_carry][rand_index_of_x];
+  //
+  // 		pos_to.x = x;
+  // 		pos_to.y = y;
+  // 		pos_to.z = z;
+  //
+  // 		Site& site_to      = _fpga.at(pos_to).site(site_from._type);
+  // 		Point pos_from	   = site_from._logic_pos;
+  // 		Point phy_pos_from = site_from._owner->phy_pos();
+  // 		Point phy_pos_to   = site_to._owner->phy_pos();
+  //
+  // 		if ( abs(phy_pos_from.x - phy_pos_to.x) <= rlim &&
+  // 			 abs(phy_pos_from.y - phy_pos_to.y) <= rlim &&
+  // 			(pos_from.x != pos_to.x || pos_from.y != pos_to.y) )
+  // 		{
+  // 			return make_pair(true, FLOORPLAN::SITE);
+  // 		} else {
+  // 			//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½rlimï¿½Ä·ï¿½Î§ï¿½ï¿½popï¿½ï¿½ï¿½ï¿½Ó¦ï¿½ï¿½ï¿½ï¿½ï¿½ê£¬ï¿½ï¿½ï¿½ï¿½ï¿½xï¿½ï¿½ï¿½ï¿½ï¿½Ä»ï¿½ï¿½ï¿½Ö»É¾ï¿½ï¿½ï¿½ï¿½ï¿½xï¿½ï¿½ï¿½ï¿½
+  // 			if(abs(phy_pos_from.x - phy_pos_to.x) > rlim)
+  // 			{
+  // 				qualified_pos[y][rand_index_of_carry][rand_index_of_x]
+  // =qualified_pos[y][rand_index_of_carry].back();
+  // qualified_pos[y].pop_back();
+  // 			}
+  // 			//ï¿½ï¿½ï¿½ï¿½ï¿½yï¿½ï¿½ï¿½ï¿½rlimï¿½ï¿½Î§ï¿½ï¿½popï¿½ï¿½ï¿½ï¿½ï¿½Ðµï¿½ï¿½ï¿½ï¿½ï¿½
+  // 			if(abs(phy_pos_from.y - phy_pos_to.y) > rlim)
+  // 				qualified_pos.erase(y);
+  //
+  // 			return make_pair(false, FLOORPLAN::IGNORE);
+  // 		}
+  Site &site_from = from_obj->base_loc_site();
+  int rand_to_idx = rand() % site_from._available_pos.size();
+  pos_to = site_from._available_pos[rand_to_idx];
+
+  bool is_qualified = false;
+  for (int index = 0; index < DEVICE::carry_chain.size(); index++) {
+    if (from_obj->exist_qualified_pos(_dev_info.device_scale().x, pos_to,
+                                      index)) {
+      is_qualified = true;
+      pos_to.z = index * DEVICE::carry_chain[0].size();
+      break;
+    }
+  }
+  if (!is_qualified) {
+    // if not pop here, it will cause infinite loop in some cases
+    site_from.pop_unavailable_pos(rand_to_idx);
+    return make_pair(false, FLOORPLAN::IGNORE);
+  }
+
+  Site &site_to = _fpga.at(pos_to).site(site_from._type);
+  Point pos_from = site_from._logic_pos;
+  Point phy_pos_from = site_from._owner->phy_pos();
+  Point phy_pos_to = site_to._owner->phy_pos();
+
+  if (abs(phy_pos_from.x - phy_pos_to.x) <= rlim &&
+      abs(phy_pos_from.y - phy_pos_to.y) <= rlim &&
+      (pos_from.x != pos_to.x || pos_from.y != pos_to.y)) {
+    return make_pair(true, FLOORPLAN::SITE);
+  } else {
+    site_from.pop_unavailable_pos(rand_to_idx);
+    return make_pair(false, FLOORPLAN::IGNORE);
+  }
+}
+/************************************************************************/
+/*	ï¿½ï¿½ï¿½Ü£ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ¶ï¿½ï¿½Ðµï¿½zï¿½ï¿½ï¿½ï¿½ï¿½Ò»ï¿½Ðµï¿½qualified_posÖµ
+ *	ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+ *		tile_col:int,tileï¿½Ðµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+ *		z_pos:int,ï¿½ï¿½ï¿½Ðµï¿½zï¿½ï¿½ï¿½ï¿½
+ *	ï¿½ï¿½ï¿½ï¿½Öµï¿½ï¿½void
+ *	Ëµï¿½ï¿½ï¿½ï¿½
+ */
+/************************************************************************/
+void Floorplan::update_qualified_pos_for_carrychain(int tile_col, int index) {
+  static int num_rows = _fpga.size().x - 1;
+  vector<int> carry_chain_index = DEVICE::carry_chain[index];
+  int carry_size = DEVICE::carry_chain[0].size();
+
+  for (NLInfo::MacroInfo::CarryChains::value_type &chain :
+       _nl_info.carry_chains()) {
+    for (SwapObject *obj : chain.second)
+      obj->clr_qualified_pos(tile_col, index);
+  }
+
+  int length = 0;
+  vector<Point> consecutive_pos_vec;
+  for (int tile_row = num_rows; tile_row >= 0; --tile_row) {
+    Tile &tile = _fpga.at(tile_row, tile_col);
+    if (tile.exist_site(Site::SLICE)) {
+      Site &slice_site = tile.site(Site::SLICE);
+      bool continue_flag = true;
+      for (int i = 0; i < carry_chain_index.size(); i++) {
+        int zpos = carry_chain_index[i];
+        PLCInstance *slice_inst = slice_site._occ_insts[zpos];
+        if (!slice_inst ||
+            (!slice_inst->is_macro() && !slice_inst->is_fixed())) {
+          ++length;
+          if (i == 0) // Ö»ï¿½ï¿½tileï¿½Ð½ï¿½Î»ï¿½ï¿½ï¿½Ä¿ï¿½Ê¼Î»ï¿½ï¿½ï¿½ï¿½Îªï¿½ï¿½Î»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê¼ï¿½ï¿½
+            consecutive_pos_vec.push_back(Point(tile_row, tile_col, zpos));
+        } else {
+          continue_flag =
+              false; // ï¿½ï¿½ï¿½ï¿½ï¿½Ò»ï¿½ï¿½tileï¿½ÐµÄ½ï¿½Î»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ë±ï¿½Õ¼ï¿½Ðµï¿½instï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ô±ï¿½ï¿½Ð¶ï¿½
+          break;
+        }
+      }
+      if (continue_flag)
+        continue;
+    } else if (tile_row > 0)
+      continue;
+
+    // ï¿½ï¿½ï¿½ï¿½carry chainï¿½Ä¿ï¿½ï¿½ï¿½Î»ï¿½ï¿½
+    if (length != 0) {
+      for (NLInfo::MacroInfo::CarryChains::value_type &chain :
+           _nl_info.carry_chains()) {
+        if (chain.first <= length) {
+          int index_for_pos = consecutive_pos_vec.size();
+          // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½whileÑ­ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ú´æ´¢ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½vectorï¿½ï¿½ï¿½Ü·ï¿½ï¿½Â½ï¿½Î»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ò»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+          // ï¿½ï¿½Îªconsecutive_pos_vecï¿½ï¿½Ö»ï¿½ï¿½ï¿½ï¿½Ã¿ï¿½ï¿½tileï¿½Ð½ï¿½Î»ï¿½ï¿½ï¿½ï¿½Ê¼ï¿½ï¿½ï¿½ï¿½ï¿½ê£¬ï¿½ï¿½ï¿½Ô¼ï¿½ï¿½ã·½ï¿½ï¿½ï¿½È½ï¿½ï¿½ï¿½ï¿½
+          while ((length - (index_for_pos - 1) * carry_size) < chain.first)
+            index_for_pos--;
+          for (SwapObject *obj : chain.second) {
+            for (int i = 0; i < index_for_pos; ++i)
+              obj->add_qualified_pos(index, consecutive_pos_vec[i]);
+          }
+        }
+      }
+      length = 0;
+      consecutive_pos_vec.clear();
+    }
+  } // end of "for"
+}
 
 // 	int Floorplan::index_of_carry_chain(int zpos)
 // 	{
@@ -672,771 +660,779 @@ namespace FDU { namespace Place {
 // 				break;
 // 			}
 // 		}
-// 		ASSERT(found,CONSOLE::PLC_ERROR % (zpos + ": don't have a carry chain."))
-// 		return index;
+// 		ASSERT(found,CONSOLE::PLC_ERROR % (zpos + ": don't have a carry
+// chain.")) 		return index;
 // 	}
 
-	void Floorplan::update_qualified_pos_for_carrychain(SwapInsts& from_insts, SwapInsts& to_insts)
-	{
-		typedef set<pair<int, int> >	AffectedZCols;
-		AffectedZCols					affected_z_cols;
+void Floorplan::update_qualified_pos_for_carrychain(SwapInsts &from_insts,
+                                                    SwapInsts &to_insts) {
+  typedef set<pair<int, int>> AffectedZCols;
+  AffectedZCols affected_z_cols;
 
-		PLCInstance* inst = NULL;
-		Point		 pos;
-		int			 index;
-		int			 carry_size = DEVICE::carry_chain[0].size();//Ã¿Ìõ½øÎ»Á´ËùÕ¼µÄslice¸öÊý
-		for(int i = 0; i < from_insts.size(); ++i){
-			inst = from_insts[i];
-			if(inst && lexical_cast<Site::SiteType>(inst->module_type()) == Site::SLICE){
-				pos = inst->past_logic_pos();
-				//index = index_of_carry_chain(pos.z);
-				index = pos.z/carry_size;
-				affected_z_cols.insert(make_pair(pos.y, index));
-				pos = inst->curr_logic_pos();
-				//index = index_of_carry_chain(pos.z);
-				index = pos.z/carry_size;
-				affected_z_cols.insert(make_pair(pos.y, index));
-			}
-			inst = to_insts[i];
-			if(inst && lexical_cast<Site::SiteType>(inst->module_type()) == Site::SLICE){
-				pos = inst->past_logic_pos();
-				//index = index_of_carry_chain(pos.z);
-				index = pos.z/carry_size;
-				affected_z_cols.insert(make_pair(pos.y, index));
-				pos = inst->curr_logic_pos();
-				//index = index_of_carry_chain(pos.z);
-				index = pos.z/carry_size;
-				affected_z_cols.insert(make_pair(pos.y, index));
-			}
-		}
-		//¶ÔÓÚÃ¿Ò»¸öÊÜÓ°ÏìµÄÁÐ½øÐÐ¸üÐÂ
-		for (const AffectedZCols::value_type& z_col: affected_z_cols)
-			update_qualified_pos_for_carrychain(z_col.first, z_col.second);
-	}
+  PLCInstance *inst = NULL;
+  Point pos;
+  int index;
+  int carry_size = DEVICE::carry_chain[0].size(); // Ã¿ï¿½ï¿½ï¿½ï¿½Î»ï¿½ï¿½ï¿½ï¿½Õ¼ï¿½ï¿½sliceï¿½ï¿½ï¿½ï¿½
+  for (int i = 0; i < from_insts.size(); ++i) {
+    inst = from_insts[i];
+    if (inst &&
+        lexical_cast<Site::SiteType>(inst->module_type()) == Site::SLICE) {
+      pos = inst->past_logic_pos();
+      // index = index_of_carry_chain(pos.z);
+      index = pos.z / carry_size;
+      affected_z_cols.insert(make_pair(pos.y, index));
+      pos = inst->curr_logic_pos();
+      // index = index_of_carry_chain(pos.z);
+      index = pos.z / carry_size;
+      affected_z_cols.insert(make_pair(pos.y, index));
+    }
+    inst = to_insts[i];
+    if (inst &&
+        lexical_cast<Site::SiteType>(inst->module_type()) == Site::SLICE) {
+      pos = inst->past_logic_pos();
+      // index = index_of_carry_chain(pos.z);
+      index = pos.z / carry_size;
+      affected_z_cols.insert(make_pair(pos.y, index));
+      pos = inst->curr_logic_pos();
+      // index = index_of_carry_chain(pos.z);
+      index = pos.z / carry_size;
+      affected_z_cols.insert(make_pair(pos.y, index));
+    }
+  }
+  // ï¿½ï¿½ï¿½ï¿½Ã¿Ò»ï¿½ï¿½ï¿½ï¿½Ó°ï¿½ï¿½ï¿½ï¿½Ð½ï¿½ï¿½Ð¸ï¿½ï¿½ï¿½
+  for (const AffectedZCols::value_type &z_col : affected_z_cols)
+    update_qualified_pos_for_carrychain(z_col.first, z_col.second);
+}
 
-	void Floorplan::swap_insts_for_site(SwapObject* from_obj,   Point&	   pos_to,
-										SwapInsts&  from_insts, SwapInsts& to_insts, 
-										FLOORPLAN::SwapableType to_type)
-	{
-		Site& site_from = from_obj->base_loc_site();
-		Site& site_to   = _fpga.at(pos_to).site(site_from._type);
+void Floorplan::swap_insts_for_site(SwapObject *from_obj, Point &pos_to,
+                                    SwapInsts &from_insts, SwapInsts &to_insts,
+                                    FLOORPLAN::SwapableType to_type) {
+  Site &site_from = from_obj->base_loc_site();
+  Site &site_to = _fpga.at(pos_to).site(site_from._type);
 
-		switch(to_type)
-		{
-			// only 1 site will be swapped
-			case FLOORPLAN::SITE:
-				do{
-					int rand_to_index = 0;
-					rand_to_index = rand() % site_to._capacity;
+  switch (to_type) {
+  // only 1 site will be swapped
+  case FLOORPLAN::SITE:
+    do {
+      int rand_to_index = 0;
+      rand_to_index = rand() % site_to._capacity;
 
-					// move to
-					if (rand_to_index >= site_to._occ){
-						pos_to.z = site_to.get_unocc_z_pos();
-						ASSERT(pos_to.z != -1, (CONSOLE::PLC_ERROR % "can NOT found unoccupation z pos."));
+      // move to
+      if (rand_to_index >= site_to._occ) {
+        pos_to.z = site_to.get_unocc_z_pos();
+        ASSERT(pos_to.z != -1,
+               (CONSOLE::PLC_ERROR % "can NOT found unoccupation z pos."));
 
-						from_obj->update_place_info(0, pos_to, site_to);
-						from_insts.push_back(from_obj->plc_insts()[0]);
-						to_insts.push_back(NULL);
-					} else { // swap with
-						PLCInstance* to_inst = site_to.get_occ_inst(rand_to_index);
-						if (!to_inst) continue;
-						pos_to = to_inst->curr_logic_pos();
+        from_obj->update_place_info(0, pos_to, site_to);
+        from_insts.push_back(from_obj->plc_insts()[0]);
+        to_insts.push_back(NULL);
+      } else { // swap with
+        PLCInstance *to_inst = site_to.get_occ_inst(rand_to_index);
+        if (!to_inst)
+          continue;
+        pos_to = to_inst->curr_logic_pos();
 
-						to_inst->set_curr_logic_pos(from_obj->base_logic_pos());
-						to_inst->set_curr_loc_site(&site_from);
-						from_obj->update_place_info(0, pos_to, site_to);
-						from_insts.push_back(from_obj->plc_insts()[0]);
-						to_insts.push_back(to_inst);
-					}
-					break;
-				} while(true);
-				break;
-			// 2 slices will be swapped
-			case FLOORPLAN::LUT6:
-				pos_to.z = 0;
-				for(int z = 0; z < DEVICE::NUM_SLICE_PER_TILE; ++z){
-					PLCInstance* from_inst = site_from._occ_insts[z];
-					PLCInstance* to_inst   = site_to._occ_insts[z];
-					if(from_inst){
-						from_inst->set_curr_logic_pos(Point(pos_to.x, pos_to.y, z));
-						from_inst->set_curr_loc_site(&site_to);
-					}
-					if(to_inst){
-						to_inst->set_curr_logic_pos(Point(site_from._logic_pos.x, site_from._logic_pos.y, z));
-						to_inst->set_curr_loc_site(&site_from);
-					}
-					from_insts.push_back(from_inst);
-					to_insts.push_back(to_inst);
-				}
-				break;
-			// only 1 slice will be swapped, meanwhile the to_slice is NOT part of carry chain
-			case FLOORPLAN::CARRY_CHAIN:
-				for(int z = 0; z < DEVICE::NUM_SLICE_PER_TILE; ++z){
-					PLCInstance* to_inst = site_to._occ_insts[z];
-					if(!to_inst || to_inst->swapable_type() != FLOORPLAN::CARRY_CHAIN){
-						if(to_inst){
-							to_inst->set_curr_logic_pos(from_obj->base_logic_pos());
-							to_inst->set_curr_loc_site(&site_from);
-						}
-						pos_to.z = z;
-						from_obj->update_place_info(0, pos_to, site_to);
-						from_insts.push_back(from_obj->plc_insts()[0]);
-						to_insts.push_back(to_inst);
-						break;
-					}
-				}
-				break;
-			default:
-				ASSERT(0, (CONSOLE::PLC_ERROR % "unknown swap object."));
-		}
-	}
+        to_inst->set_curr_logic_pos(from_obj->base_logic_pos());
+        to_inst->set_curr_loc_site(&site_from);
+        from_obj->update_place_info(0, pos_to, site_to);
+        from_insts.push_back(from_obj->plc_insts()[0]);
+        to_insts.push_back(to_inst);
+      }
+      break;
+    } while (true);
+    break;
+  // 2 slices will be swapped
+  case FLOORPLAN::LUT6:
+    pos_to.z = 0;
+    for (int z = 0; z < DEVICE::NUM_SLICE_PER_TILE; ++z) {
+      PLCInstance *from_inst = site_from._occ_insts[z];
+      PLCInstance *to_inst = site_to._occ_insts[z];
+      if (from_inst) {
+        from_inst->set_curr_logic_pos(Point(pos_to.x, pos_to.y, z));
+        from_inst->set_curr_loc_site(&site_to);
+      }
+      if (to_inst) {
+        to_inst->set_curr_logic_pos(
+            Point(site_from._logic_pos.x, site_from._logic_pos.y, z));
+        to_inst->set_curr_loc_site(&site_from);
+      }
+      from_insts.push_back(from_inst);
+      to_insts.push_back(to_inst);
+    }
+    break;
+  // only 1 slice will be swapped, meanwhile the to_slice is NOT part of carry
+  // chain
+  case FLOORPLAN::CARRY_CHAIN:
+    for (int z = 0; z < DEVICE::NUM_SLICE_PER_TILE; ++z) {
+      PLCInstance *to_inst = site_to._occ_insts[z];
+      if (!to_inst || to_inst->swapable_type() != FLOORPLAN::CARRY_CHAIN) {
+        if (to_inst) {
+          to_inst->set_curr_logic_pos(from_obj->base_logic_pos());
+          to_inst->set_curr_loc_site(&site_from);
+        }
+        pos_to.z = z;
+        from_obj->update_place_info(0, pos_to, site_to);
+        from_insts.push_back(from_obj->plc_insts()[0]);
+        to_insts.push_back(to_inst);
+        break;
+      }
+    }
+    break;
+  default:
+    ASSERT(0, (CONSOLE::PLC_ERROR % "unknown swap object."));
+  }
+}
 
-	void Floorplan::swap_insts_for_lut6(SwapObject* from_obj,   Point&	   pos_to,
-										SwapInsts&  from_insts, SwapInsts& to_insts, 
-										FLOORPLAN::SwapableType to_type)
-	{
-		Point pos_from  = from_obj->base_logic_pos();
-		
-		Site& site_from = from_obj->base_loc_site();
-		Site& site_to	= _fpga.at(pos_to).site(Site::SLICE);
+void Floorplan::swap_insts_for_lut6(SwapObject *from_obj, Point &pos_to,
+                                    SwapInsts &from_insts, SwapInsts &to_insts,
+                                    FLOORPLAN::SwapableType to_type) {
+  Point pos_from = from_obj->base_logic_pos();
 
-		for(int z = 0; z < DEVICE::NUM_SLICE_PER_TILE; ++z){
-			PLCInstance* from_inst = site_from._occ_insts[z];
-			PLCInstance* to_inst   = site_to._occ_insts[z];
+  Site &site_from = from_obj->base_loc_site();
+  Site &site_to = _fpga.at(pos_to).site(Site::SLICE);
 
-			from_inst->set_curr_logic_pos(Point(pos_to.x, pos_to.y, z));
-			from_inst->set_curr_loc_site(&site_to);
-			if(to_inst){
-				to_inst->set_curr_logic_pos(Point(pos_from.x, pos_from.y, z));
-				to_inst->set_curr_loc_site(&site_from);
-			}
-			from_insts.push_back(from_inst);
-			to_insts.push_back(to_inst);
-		}
-	}
+  for (int z = 0; z < DEVICE::NUM_SLICE_PER_TILE; ++z) {
+    PLCInstance *from_inst = site_from._occ_insts[z];
+    PLCInstance *to_inst = site_to._occ_insts[z];
 
-	void Floorplan::swap_insts_for_carrychain(SwapObject* from_obj,   Point&	 pos_to,
-											  SwapInsts&  from_insts, SwapInsts& to_insts, 
-											  FLOORPLAN::SwapableType to_type)
-	{
-		int				count = 0, length = from_obj->plc_insts().size();
-		vector<Point>	chain_to_pos_vec;
-		Point			cur_pos = pos_to;
-		while(count < length){
-			if(_fpga.at(cur_pos).exist_site(Site::SLICE)){
-				for(int i = 0; i < DEVICE::carry_chain[0].size(); i++)
-				{
-					++count;
-					Point tmp(cur_pos.x, cur_pos.y, cur_pos.z+i);
-					chain_to_pos_vec.push_back(tmp);
-					if(count == length)
-						break;
-				}
-				
-			}
-			--cur_pos.x;
-		}
-		ASSERT(from_obj->plc_insts().size() == chain_to_pos_vec.size(),
-			   (CONSOLE::PLC_ERROR % "illegal chain pos for swap."));
+    from_inst->set_curr_logic_pos(Point(pos_to.x, pos_to.y, z));
+    from_inst->set_curr_loc_site(&site_to);
+    if (to_inst) {
+      to_inst->set_curr_logic_pos(Point(pos_from.x, pos_from.y, z));
+      to_inst->set_curr_loc_site(&site_from);
+    }
+    from_insts.push_back(from_inst);
+    to_insts.push_back(to_inst);
+  }
+}
 
-		for(int i = 0; i < length; ++i){
-			PLCInstance* from_inst = from_obj->plc_insts()[i];
+void Floorplan::swap_insts_for_carrychain(SwapObject *from_obj, Point &pos_to,
+                                          SwapInsts &from_insts,
+                                          SwapInsts &to_insts,
+                                          FLOORPLAN::SwapableType to_type) {
+  int count = 0, length = from_obj->plc_insts().size();
+  vector<Point> chain_to_pos_vec;
+  Point cur_pos = pos_to;
+  while (count < length) {
+    if (_fpga.at(cur_pos).exist_site(Site::SLICE)) {
+      for (int i = 0; i < DEVICE::carry_chain[0].size(); i++) {
+        ++count;
+        Point tmp(cur_pos.x, cur_pos.y, cur_pos.z + i);
+        chain_to_pos_vec.push_back(tmp);
+        if (count == length)
+          break;
+      }
+    }
+    --cur_pos.x;
+  }
+  ASSERT(from_obj->plc_insts().size() == chain_to_pos_vec.size(),
+         (CONSOLE::PLC_ERROR % "illegal chain pos for swap."));
 
-			Point pos_from  = from_inst->curr_logic_pos();
-			Point pos_to	= chain_to_pos_vec[i];
+  for (int i = 0; i < length; ++i) {
+    PLCInstance *from_inst = from_obj->plc_insts()[i];
 
-			Site& site_from = *(from_inst->curr_loc_site());
-			Site& site_to	= _fpga.at(pos_to).site(Site::SLICE);
+    Point pos_from = from_inst->curr_logic_pos();
+    Point pos_to = chain_to_pos_vec[i];
 
-			PLCInstance* to_inst   = site_to._occ_insts[pos_to.z];
+    Site &site_from = *(from_inst->curr_loc_site());
+    Site &site_to = _fpga.at(pos_to).site(Site::SLICE);
 
-			from_inst->set_curr_logic_pos(pos_to);
-			from_inst->set_curr_loc_site(&site_to);
-			if(to_inst){
-				to_inst->set_curr_logic_pos(pos_from);
-				to_inst->set_curr_loc_site(&site_from);
-			}
-			from_insts.push_back(from_inst);
-			to_insts.push_back(to_inst);
-		}
-	}
+    PLCInstance *to_inst = site_to._occ_insts[pos_to.z];
 
-	/************************************************************************/
-	/*	¹¦ÄÜ£ºÕÒµ½Ò»¸ö¿É½»»»µÄµ¥Ôª
-	*	²ÎÊý£º
-			from_obj:	Òª½»»»µÄµ¥Ôª
-			pos_to:		Ä¿µÄµØÖ·
-			rlim:		¾àÀëÔ¼Êø
-	*	·µ»ØÖµ£ºSwapableType£¬ËµÃ÷ÊÇÄÄÒ»ÖÖ¿É½»»»ÀàÐÍ
-	*	ËµÃ÷£º
-	*		Ã¿¸ösite×î³õÔÚ_available_pos±äÁ¿ÀïÃæ´æ´¢ÁËÕû¸öÐ¾Æ¬·¶Î§¿É½»»»µÄÎ»ÖÃ£¬
-	*		Ëæ×ÅSAµÄ¹ý³Ì£¬rlimÖð½¥±äÐ¡£¬Æä¿É½»»»·¶Î§Öð²½ËõÐ¡
-	*		µ±Ö´ÐÐfind_to¹ý³ÌÖÐµ÷ÓÃsatisfy_cst_rules_for_XXXXÊ±£¬
-	*		Ëæ»ú´Ó_available_posÖÐÕÒµ½Ò»¸ö¿É½»»»µÄÎ»ÖÃ£¬Èç¹û²»Âú×ãrlim£¬ÄÇÃ´¾Í½«Æä
-	*		´Ó_available_posÀïÃæÌÞ³ý£¬ÕâÑù_available_posÒ²¾ÍÖð²½±äÐ¡
-	*/
-	/************************************************************************/
-	FLOORPLAN::SwapableType Floorplan::find_to(SwapObject* from_obj, Point& pos_to, double rlim)
-	{
-		Site& site_from = from_obj->base_loc_site();
-		do {
-			//Èç¹ûÃ»ÓÐ¿É½»»»Î»ÖÃ£¬·µ»Ø
-			if(site_from._available_pos.size() == 0)
-				return FLOORPLAN::IGNORE;
-			//Ñ°ÕÒÒ»¸ö¿É½»»»Î»ÖÃ
-			bool					has_found = false;
-			FLOORPLAN::SwapableType	to_type   = FLOORPLAN::IGNORE;
-			switch(from_obj->type())
-			{
-				case FLOORPLAN::SITE:
-					boost::tie(has_found, to_type) 
-						= satisfy_cst_rules_for_site(from_obj, pos_to, rlim);
-					break;
-				case FLOORPLAN::LUT6:
-					boost::tie(has_found, to_type)
-						= satisfy_cst_rules_for_lut6(from_obj, pos_to, rlim);
-					break;
-				case FLOORPLAN::CARRY_CHAIN:
-					boost::tie(has_found, to_type)
-						= satisfy_cst_rules_for_carrychain(from_obj, pos_to, rlim);
-					break;
-				default:
-					ASSERT(0, (CONSOLE::PLC_ERROR % "unknown swap object."));
-			}
-			//ÕÒµ½£¬·µ»Ø
-			if(has_found)
-				return to_type;
+    from_inst->set_curr_logic_pos(pos_to);
+    from_inst->set_curr_loc_site(&site_to);
+    if (to_inst) {
+      to_inst->set_curr_logic_pos(pos_from);
+      to_inst->set_curr_loc_site(&site_from);
+    }
+    from_insts.push_back(from_inst);
+    to_insts.push_back(to_inst);
+  }
+}
 
-		} while(true);
-	}
-	/************************************************************************/
-	/*	¹¦ÄÜ£º½»»»Á½¸öµ¥Ôªinstance
-	*	²ÎÊý£º
-			from_insts:	Ô´½»»»µ¥Ôª
-			to_insts:	Ä¿µÄ½»»»µ¥Ôª
-			pos_from:	Ô´Î»ÖÃ
-			pos_to:		Ä¿µÄµØÖ·
-			rlim:		¾àÀëÔ¼Êø
-	*	·µ»ØÖµ£ºSwapableType£¬ËµÃ÷ÊÇÄÇÒ»ÖÖ¿É½»»»ÀàÐÍ
-	*	ËµÃ÷£ºËæ»úÌôÑ¡Ò»¸öFrom obj£¬È»ºóÑ°ÕÒÒ»¸öto obj£¬×îºó½øÐÐ½»»»
-	*/
-	/************************************************************************/
-	void Floorplan::swap_insts(SwapInsts& from_insts, SwapInsts& to_insts, 
-							   Point&	  pos_from,	  Point&	 pos_to, 
-							   double	  rlim)
-	{
-		FLOORPLAN::SwapableType to_type;
-		SwapObject* from_obj = NULL;
-		//Èç¹ûÕâÀï_nl_info.num_swap_objects()Îª0£¬ÄÇÃ´¾Í²»»áÌø³öÑ­»·£¬ÕâÀïÒÔºóÐèÒªÐÞ¸Ä
-		do{
-			//Ëæ»úÕÒµ½Ò»¸ö¿ÉÒÔ½»»»µÄfrom obj£¬Õâ¸öÊÇ´ÓÍø±íÐÅÏ¢ÀïÃæÑ°ÕÒ
-			int rand_from_idx  = rand() % _nl_info.num_swap_objects();
-			from_obj = _nl_info.swap_object(rand_from_idx);
-			//ÕÒµ½Ò»¸ö¿É½»»»to obj
-			to_type = find_to(from_obj, pos_to, rlim);
-			//Èç¹ûÃ»ÓÐÕÒµ½Ò»¸ö¿É½»»» to obj£¬ÄÇÃ´´Óswap_objÀïÃæÌÞ³ýÕâ¸öfrom obj
-			if(to_type == FLOORPLAN::IGNORE)
-				_nl_info.pop_swap_object(rand_from_idx);
+/************************************************************************/
+/*	ï¿½ï¿½ï¿½Ü£ï¿½ï¿½Òµï¿½Ò»ï¿½ï¿½ï¿½É½ï¿½ï¿½ï¿½ï¿½Äµï¿½Ôª
+*	ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+                from_obj:	Òªï¿½ï¿½ï¿½ï¿½ï¿½Äµï¿½Ôª
+                pos_to:		Ä¿ï¿½Äµï¿½Ö·
+                rlim:		ï¿½ï¿½ï¿½ï¿½Ô¼ï¿½ï¿½
+*	ï¿½ï¿½ï¿½ï¿½Öµï¿½ï¿½SwapableTypeï¿½ï¿½Ëµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ò»ï¿½Ö¿É½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+*	Ëµï¿½ï¿½ï¿½ï¿½
+*		Ã¿ï¿½ï¿½siteï¿½ï¿½ï¿½ï¿½ï¿½_available_posï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½æ´¢ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ð¾Æ¬ï¿½ï¿½Î§ï¿½É½ï¿½ï¿½ï¿½ï¿½ï¿½Î»ï¿½Ã£ï¿½
+*
+ï¿½ï¿½ï¿½ï¿½SAï¿½Ä¹ï¿½ï¿½Ì£ï¿½rlimï¿½ð½¥±ï¿½Ð¡ï¿½ï¿½ï¿½ï¿½É½ï¿½ï¿½ï¿½ï¿½ï¿½Î§ï¿½ï¿½ï¿½ï¿½Ð¡
+*		ï¿½ï¿½Ö´ï¿½ï¿½find_toï¿½ï¿½ï¿½ï¿½ï¿½Ðµï¿½ï¿½ï¿½satisfy_cst_rules_for_XXXXÊ±ï¿½ï¿½
+*		ï¿½ï¿½ï¿½ï¿½ï¿½_available_posï¿½ï¿½ï¿½Òµï¿½Ò»ï¿½ï¿½ï¿½É½ï¿½ï¿½ï¿½ï¿½ï¿½Î»ï¿½Ã£ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½rlimï¿½ï¿½ï¿½ï¿½Ã´ï¿½Í½ï¿½ï¿½ï¿½
+*
+ï¿½ï¿½_available_posï¿½ï¿½ï¿½ï¿½ï¿½Þ³ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½_available_posÒ²ï¿½ï¿½ï¿½ð²½±ï¿½Ð¡
+*/
+/************************************************************************/
+FLOORPLAN::SwapableType Floorplan::find_to(SwapObject *from_obj, Point &pos_to,
+                                           double rlim) {
+  Site &site_from = from_obj->base_loc_site();
+  do {
+    // ï¿½ï¿½ï¿½Ã»ï¿½Ð¿É½ï¿½ï¿½ï¿½Î»ï¿½Ã£ï¿½ï¿½ï¿½ï¿½ï¿½
+    if (site_from._available_pos.size() == 0)
+      return FLOORPLAN::IGNORE;
+    // Ñ°ï¿½ï¿½Ò»ï¿½ï¿½ï¿½É½ï¿½ï¿½ï¿½Î»ï¿½ï¿½
+    bool has_found = false;
+    FLOORPLAN::SwapableType to_type = FLOORPLAN::IGNORE;
+    switch (from_obj->type()) {
+    case FLOORPLAN::SITE:
+      boost::tie(has_found, to_type) =
+          satisfy_cst_rules_for_site(from_obj, pos_to, rlim);
+      break;
+    case FLOORPLAN::LUT6:
+      boost::tie(has_found, to_type) =
+          satisfy_cst_rules_for_lut6(from_obj, pos_to, rlim);
+      break;
+    case FLOORPLAN::CARRY_CHAIN:
+      boost::tie(has_found, to_type) =
+          satisfy_cst_rules_for_carrychain(from_obj, pos_to, rlim);
+      break;
+    default:
+      ASSERT(0, (CONSOLE::PLC_ERROR % "unknown swap object."));
+    }
+    // ï¿½Òµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+    if (has_found)
+      return to_type;
 
-		} while(to_type == FLOORPLAN::IGNORE);
-		//½»»»ÏàÓ¦µÄisntance
-		switch(from_obj->type())
-		{
-			case FLOORPLAN::SITE:
-				swap_insts_for_site(from_obj, pos_to, from_insts, to_insts, to_type);
-				break;
-			case FLOORPLAN::LUT6:
-				swap_insts_for_lut6(from_obj, pos_to, from_insts, to_insts, to_type);
-				break;
-			case FLOORPLAN::CARRY_CHAIN:
-				swap_insts_for_carrychain(from_obj, pos_to, from_insts, to_insts, to_type);
-				break;
-		}
-	}
-	/************************************************************************/
-	/*	¹¦ÄÜ£ºtry swapÒÔºó¸ù¾ÝÊÇ·ñÄÜ½»»»À´¾ö¶¨ÊÇ½»»»»¹ÊÇ»ØÍË²Ù×÷
-	 *	²ÎÊý£º
-	 *		keey_swap: bool,ÅÐ¶Ï½»»»ÊÇ·ñ±»½ÓÊÜ
-	 *		from_insts:SwapInsts,from obj
-	 *		to_insts:SwapInsts,to obj
-	 *	·µ»ØÖµ£ºvoid
-	 *	ËµÃ÷£º
-	 */
-	/************************************************************************/	
-	void Floorplan::maintain(bool		 keey_swap, 
-							 SwapInsts&  from_insts,  SwapInsts& to_insts)
-	{
-		//ÅÐ¶ÏÁ½¸ö½»»»¶ÔÏóÊÇ·ñÊÇÏàÍ¬´óÐ¡
-		ASSERT(from_insts.size() == to_insts.size(),
-			   (CONSOLE::PLC_ERROR % "swap instances' size not equal."));
-		
-		int size = from_insts.size();
-		//¶ÔÓÚÃ¿Ò»½»»»µÄinst
-		for(int i = 0; i < size; ++i){
-			PLCInstance* from_inst = from_insts[i];
-			PLCInstance* to_inst   = to_insts[i];
-				   
-			Point			pos_from, pos_to;
-			Site::SiteType	site_type;
-			//ÒÑ¾­½»»»¹ýÁË
-			if(from_inst){
-				pos_from  = from_inst->past_logic_pos();
-				pos_to	  = from_inst->curr_logic_pos();
-				site_type = from_inst->curr_loc_site()->_type;
-			}
-			else if(to_inst){
-				pos_from  = to_inst->curr_logic_pos();
-				pos_to    = to_inst->past_logic_pos();
-				site_type = to_inst->curr_loc_site()->_type;
-			}
-			else
-				throw (CONSOLE::PLC_ERROR % "both from_inst & to_inst are NULL.");
-			//µÃµ½site fromºÍsite to
-			Site& site_from = _fpga.at(pos_from).site(site_type);
-			Site& site_to   = _fpga.at(pos_to).site(site_type);
-			//Èç¹û½»»»±»½ÓÊÜ
-			if(keey_swap){
-				//
-				if(_mode == PLACER::TIMING_DRIVEN){
-					update_tcost(from_inst, to_inst);
-					update_tcost(to_inst, from_inst);
-				}
-				//ÉèÖÃsite_fromºÍsite_to
-				site_from._occ_insts[pos_from.z] = to_inst;
-				site_to._occ_insts[pos_to.z]	 = from_inst;
-				//Èç¹ûfromÓÐµ¥ÊÇtoÃ»ÓÐ£¬ÄÇÃ´¸üÐÂ
-				if(from_inst && !to_inst){
-					--site_from._occ;
-					++site_to._occ;
-				} 
-				//Èç¹ûfromÃ»ÓÐ£¬µ«ÊÇtoÓÐ,¸üÐÂ
-				else if(!from_inst && to_inst){
-					++site_from._occ;
-					--site_to._occ;
-				}
-//				else if(from_inst && to_inst) { /* need to do nothing */ }
-			}
-			// swap was rejected,reset all information
-			else{
-				//»Ö¸´from obj
-				if(from_inst){
-					from_inst->reset_logic_pos();
-					from_inst->reset_loc_site();
-				}
-				//»Ö¸´to obj
-				if(to_inst){
-					to_inst->reset_logic_pos();
-					to_inst->reset_loc_site();
-				}
-			}
-		} // end of "for"
-		//¶ÔÏßÍøµÄ´¦Àí
-		typedef pair<PLCInstance*, PLCNet*> AffectedNet;
-		if(keey_swap){
-			//Èç¹û½»»»½ÓÊÜ£¬Çå³ýÏßÍøµÄpre_bb_costºÍaffected type
-			for (AffectedNet& affected_net: _nl_info.affected_nets()) {
-				affected_net.second->reset_pre_bb_cost();
-				affected_net.second->reset_affected_type();
-			}
-		} else {
-			//Èç¹û½»»»Ã»ÓÐ±»½ÓÊÜ
-			for (AffectedNet& affected_net: _nl_info.affected_nets()) {
-				affected_net.second->restore_bounding_box();
-				affected_net.second->reset_affected_type();
-			}
-		}
-		//Èç¹û±»½»»»£¬ÖØÐÂ¼ÆËãÊÜÓ°ÏìµÄÁÐµÄ_qualified_pos
-		if(keey_swap)
-			update_qualified_pos_for_carrychain(from_insts, to_insts);
-	}
-	/************************************************************************/
-	/*	¹¦ÄÜ£º¸üÐÂÒ»¸öisntsµÄÊÜÓ°ÏìÏßÍø
-	 *	²ÎÊý£º
-	 *		insts:SwapInsts,ÊÜÓ°ÏìµÄswap insts
-	 *		t:AffectedType,Ó°ÏìÏßÍøµÄÀàÐÍ
-	 *	·µ»ØÖµ£ºvoid
-	 *	ËµÃ÷£º
-	 */
-	/************************************************************************/	
-	void Floorplan::find_affected_nets(SwapInsts& insts, PLCNet::AffectedType t)
-	{
-		for (PLCInstance* inst: insts) {
-			if(inst){
-				for (Pin* pin: inst->pins()) {
-					PLCNet* p_net = static_cast<PLCNet*>(pin->net());
-					if (p_net && !p_net->is_ignored()){
-						//ÕâÀïÒÔÇ°ÊÇ´íµÄ£¬ËùÒÔ×¢ÊÍ
-						//p_net->set_affected_type(PLCNet::FROM);
-						p_net->set_affected_type(t);
-						//·ÀÖ¹ÖØ¸´Ôö¼Ó£¬Èç¹û<0£¬ËµÃ÷Ã»ÓÐ¼ÓÈë¹ýÀïÃæ
-						if (p_net->pre_bb_cost() < 0.){
-							_nl_info.add_affected_net(inst, p_net);
-							p_net->set_pre_bb_cost(1.0);
-						}
-					}
-				}
-			}
-		}
-	}
+  } while (true);
+}
+/************************************************************************/
+/*	ï¿½ï¿½ï¿½Ü£ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ôªinstance
+*	ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+                from_insts:	Ô´ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ôª
+                to_insts:	Ä¿ï¿½Ä½ï¿½ï¿½ï¿½ï¿½ï¿½Ôª
+                pos_from:	Ô´Î»ï¿½ï¿½
+                pos_to:		Ä¿ï¿½Äµï¿½Ö·
+                rlim:		ï¿½ï¿½ï¿½ï¿½Ô¼ï¿½ï¿½
+*	ï¿½ï¿½ï¿½ï¿½Öµï¿½ï¿½SwapableTypeï¿½ï¿½Ëµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ò»ï¿½Ö¿É½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+*	Ëµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ñ¡Ò»ï¿½ï¿½From objï¿½ï¿½È»ï¿½ï¿½Ñ°ï¿½ï¿½Ò»ï¿½ï¿½to objï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ð½ï¿½ï¿½ï¿½
+*/
+/************************************************************************/
+void Floorplan::swap_insts(SwapInsts &from_insts, SwapInsts &to_insts,
+                           Point &pos_from, Point &pos_to, double rlim) {
+  FLOORPLAN::SwapableType to_type;
+  SwapObject *from_obj = NULL;
+  // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½_nl_info.num_swap_objects()Îª0ï¿½ï¿½ï¿½ï¿½Ã´ï¿½Í²ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ñ­ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ôºï¿½ï¿½ï¿½Òªï¿½Þ¸ï¿½
+  do {
+    // ï¿½ï¿½ï¿½ï¿½Òµï¿½Ò»ï¿½ï¿½ï¿½ï¿½ï¿½Ô½ï¿½ï¿½ï¿½ï¿½ï¿½from objï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ç´ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ï¢ï¿½ï¿½ï¿½ï¿½Ñ°ï¿½ï¿½
+    int rand_from_idx = rand() % _nl_info.num_swap_objects();
+    from_obj = _nl_info.swap_object(rand_from_idx);
+    // ï¿½Òµï¿½Ò»ï¿½ï¿½ï¿½É½ï¿½ï¿½ï¿½to obj
+    to_type = find_to(from_obj, pos_to, rlim);
+    // ï¿½ï¿½ï¿½Ã»ï¿½ï¿½ï¿½Òµï¿½Ò»ï¿½ï¿½ï¿½É½ï¿½ï¿½ï¿½ to
+    // objï¿½ï¿½ï¿½ï¿½Ã´ï¿½ï¿½swap_objï¿½ï¿½ï¿½ï¿½ï¿½Þ³ï¿½ï¿½ï¿½ï¿½from obj
+    if (to_type == FLOORPLAN::IGNORE)
+      _nl_info.pop_swap_object(rand_from_idx);
 
-	/************************************************************************/
-	/*	¹¦ÄÜ£º¸üÐÂÒ»´Î½»»»ºóÁ½¸öinstsµÄÊÜÓ°ÏìÏßÍø
-	 *	²ÎÊý£º
-	 *		from_insts:SwapInsts,ÊÜÓ°ÏìµÄswap insts
-	 *		to_insts:SwapInsts,ÊÜÓ°ÏìµÄswap insts
-	 *	·µ»ØÖµ£ºvoid
-	 *	ËµÃ÷£º
-	 */
-	/************************************************************************/	
-	void Floorplan::find_affected_nets(SwapInsts& from_insts, SwapInsts& to_insts)
-	{
-		//ÏÈ½«ÊÜÓ°ÏìÏßÍøÇå³ý
-		_nl_info.clr_affected_nets();
-		//·Ö±ð¼ÆËãFROMºÍTOµÄÊÜÓ°ÏìÏßÍø
-		find_affected_nets(from_insts, PLCNet::FROM);
-		find_affected_nets(to_insts,   PLCNet::TO);
-	}
+  } while (to_type == FLOORPLAN::IGNORE);
+  // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ó¦ï¿½ï¿½isntance
+  switch (from_obj->type()) {
+  case FLOORPLAN::SITE:
+    swap_insts_for_site(from_obj, pos_to, from_insts, to_insts, to_type);
+    break;
+  case FLOORPLAN::LUT6:
+    swap_insts_for_lut6(from_obj, pos_to, from_insts, to_insts, to_type);
+    break;
+  case FLOORPLAN::CARRY_CHAIN:
+    swap_insts_for_carrychain(from_obj, pos_to, from_insts, to_insts, to_type);
+    break;
+  default:
+    throw "Not handled switch case";
+  }
+}
+/************************************************************************/
+/*	ï¿½ï¿½ï¿½Ü£ï¿½try swapï¿½Ôºï¿½ï¿½ï¿½ï¿½ï¿½Ç·ï¿½ï¿½Ü½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ç½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ç»ï¿½ï¿½Ë²ï¿½ï¿½ï¿½
+ *	ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+ *		keey_swap: bool,ï¿½Ð¶Ï½ï¿½ï¿½ï¿½ï¿½Ç·ñ±»½ï¿½ï¿½ï¿½
+ *		from_insts:SwapInsts,from obj
+ *		to_insts:SwapInsts,to obj
+ *	ï¿½ï¿½ï¿½ï¿½Öµï¿½ï¿½void
+ *	Ëµï¿½ï¿½ï¿½ï¿½
+ */
+/************************************************************************/
+void Floorplan::maintain(bool keey_swap, SwapInsts &from_insts,
+                         SwapInsts &to_insts) {
+  // ï¿½Ð¶ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ç·ï¿½ï¿½ï¿½ï¿½ï¿½Í¬ï¿½ï¿½Ð¡
+  ASSERT(from_insts.size() == to_insts.size(),
+         (CONSOLE::PLC_ERROR % "swap instances' size not equal."));
 
-	double Floorplan::compute_bb_cost()
-	{
-		double cost = 0.;
-		for (PLCNet* net: static_cast<PLCModule*>(_nl_info.design()->top_module())->nets()){
-			if (net->is_ignored())
-				continue;
+  int size = from_insts.size();
+  // ï¿½ï¿½ï¿½ï¿½Ã¿Ò»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½inst
+  for (int i = 0; i < size; ++i) {
+    PLCInstance *from_inst = from_insts[i];
+    PLCInstance *to_inst = to_insts[i];
 
-			net->compute_bounding_box(_dev_info.device_scale()); 
-			cost += net->compute_bb_cost(_dev_info.inv_of_chan_width());
-		}
+    Point pos_from, pos_to;
+    Site::SiteType site_type;
+    // ï¿½Ñ¾ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+    if (from_inst) {
+      pos_from = from_inst->past_logic_pos();
+      pos_to = from_inst->curr_logic_pos();
+      site_type = from_inst->curr_loc_site()->_type;
+    } else if (to_inst) {
+      pos_from = to_inst->curr_logic_pos();
+      pos_to = to_inst->past_logic_pos();
+      site_type = to_inst->curr_loc_site()->_type;
+    } else
+      throw(CONSOLE::PLC_ERROR % "both from_inst & to_inst are NULL.");
+    // ï¿½Ãµï¿½site fromï¿½ï¿½site to
+    Site &site_from = _fpga.at(pos_from).site(site_type);
+    Site &site_to = _fpga.at(pos_to).site(site_type);
+    // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+    if (keey_swap) {
+      //
+      if (_mode == PLACER::TIMING_DRIVEN) {
+        update_tcost(from_inst, to_inst);
+        update_tcost(to_inst, from_inst);
+      }
+      // ï¿½ï¿½ï¿½ï¿½site_fromï¿½ï¿½site_to
+      site_from._occ_insts[pos_from.z] = to_inst;
+      site_to._occ_insts[pos_to.z] = from_inst;
+      // ï¿½ï¿½ï¿½fromï¿½Ðµï¿½ï¿½ï¿½toÃ»ï¿½Ð£ï¿½ï¿½ï¿½Ã´ï¿½ï¿½ï¿½ï¿½
+      if (from_inst && !to_inst) {
+        --site_from._occ;
+        ++site_to._occ;
+      }
+      // ï¿½ï¿½ï¿½fromÃ»ï¿½Ð£ï¿½ï¿½ï¿½ï¿½ï¿½toï¿½ï¿½,ï¿½ï¿½ï¿½ï¿½
+      else if (!from_inst && to_inst) {
+        ++site_from._occ;
+        --site_to._occ;
+      }
+      //				else if(from_inst && to_inst) { /* need
+      // to do nothing */ }
+    }
+    // swap was rejected,reset all information
+    else {
+      // ï¿½Ö¸ï¿½from obj
+      if (from_inst) {
+        from_inst->reset_logic_pos();
+        from_inst->reset_loc_site();
+      }
+      // ï¿½Ö¸ï¿½to obj
+      if (to_inst) {
+        to_inst->reset_logic_pos();
+        to_inst->reset_loc_site();
+      }
+    }
+  } // end of "for"
+  // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä´ï¿½ï¿½ï¿½
+  typedef pair<PLCInstance *, PLCNet *> AffectedNet;
+  if (keey_swap) {
+    // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ü£ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½pre_bb_costï¿½ï¿½affected type
+    for (AffectedNet &affected_net : _nl_info.affected_nets()) {
+      affected_net.second->reset_pre_bb_cost();
+      affected_net.second->reset_affected_type();
+    }
+  } else {
+    // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ã»ï¿½Ð±ï¿½ï¿½ï¿½ï¿½ï¿½
+    for (AffectedNet &affected_net : _nl_info.affected_nets()) {
+      affected_net.second->restore_bounding_box();
+      affected_net.second->reset_affected_type();
+    }
+  }
+  // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Â¼ï¿½ï¿½ï¿½ï¿½ï¿½Ó°ï¿½ï¿½ï¿½ï¿½Ðµï¿½_qualified_pos
+  if (keey_swap)
+    update_qualified_pos_for_carrychain(from_insts, to_insts);
+}
+/************************************************************************/
+/*	ï¿½ï¿½ï¿½Ü£ï¿½ï¿½ï¿½ï¿½ï¿½Ò»ï¿½ï¿½isntsï¿½ï¿½ï¿½ï¿½Ó°ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+ *	ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+ *		insts:SwapInsts,ï¿½ï¿½Ó°ï¿½ï¿½ï¿½swap insts
+ *		t:AffectedType,Ó°ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+ *	ï¿½ï¿½ï¿½ï¿½Öµï¿½ï¿½void
+ *	Ëµï¿½ï¿½ï¿½ï¿½
+ */
+/************************************************************************/
+void Floorplan::find_affected_nets(SwapInsts &insts, PLCNet::AffectedType t) {
+  for (PLCInstance *inst : insts) {
+    if (inst) {
+      for (Pin *pin : inst->pins()) {
+        PLCNet *p_net = static_cast<PLCNet *>(pin->net());
+        if (p_net && !p_net->is_ignored()) {
+          // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ç°ï¿½Ç´ï¿½ï¿½Ä£ï¿½ï¿½ï¿½ï¿½ï¿½×¢ï¿½ï¿½
+          // p_net->set_affected_type(PLCNet::FROM);
+          p_net->set_affected_type(t);
+          // ï¿½ï¿½Ö¹ï¿½Ø¸ï¿½ï¿½ï¿½ï¿½Ó£ï¿½ï¿½ï¿½ï¿½<0ï¿½ï¿½Ëµï¿½ï¿½Ã»ï¿½Ð¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+          if (p_net->pre_bb_cost() < 0.) {
+            _nl_info.add_affected_net(inst, p_net);
+            p_net->set_pre_bb_cost(1.0);
+          }
+        }
+      }
+    }
+  }
+}
 
-		return cost;
-	}
+/************************************************************************/
+/*	ï¿½ï¿½ï¿½Ü£ï¿½ï¿½ï¿½ï¿½ï¿½Ò»ï¿½Î½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½instsï¿½ï¿½ï¿½ï¿½Ó°ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+ *	ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+ *		from_insts:SwapInsts,ï¿½ï¿½Ó°ï¿½ï¿½ï¿½swap insts
+ *		to_insts:SwapInsts,ï¿½ï¿½Ó°ï¿½ï¿½ï¿½swap insts
+ *	ï¿½ï¿½ï¿½ï¿½Öµï¿½ï¿½void
+ *	Ëµï¿½ï¿½ï¿½ï¿½
+ */
+/************************************************************************/
+void Floorplan::find_affected_nets(SwapInsts &from_insts, SwapInsts &to_insts) {
+  // ï¿½È½ï¿½ï¿½ï¿½Ó°ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+  _nl_info.clr_affected_nets();
+  // ï¿½Ö±ï¿½ï¿½ï¿½ï¿½FROMï¿½ï¿½TOï¿½ï¿½ï¿½ï¿½Ó°ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+  find_affected_nets(from_insts, PLCNet::FROM);
+  find_affected_nets(to_insts, PLCNet::TO);
+}
 
-	double Floorplan::compute_tcost(TEngine::WORK_MODE emode, double crit_exp)
-	{
-		double dmax;
-		double tcost = 0.;
-		PLCInstance *source_inst, *sink_inst;
-		Property<COS::TData>& delays = 
-			create_temp_property<COS::TData>(COS::PIN, PIN::DELAY);
-		//if(dynamic_cast<TDesign*>(_nl_info.design()) != NULL )
-			dmax = _nl_info.design()->timing_analyse(emode);
+double Floorplan::compute_bb_cost() {
+  double cost = 0.;
+  for (PLCNet *net :
+       static_cast<PLCModule *>(_nl_info.design()->top_module())->nets()) {
+    if (net->is_ignored())
+      continue;
 
-		for (PLCNet* net: static_cast<PLCModule*>(_nl_info.design()->top_module())->nets()){
-			if (net->is_ignored())
-				continue;
+    net->compute_bounding_box(_dev_info.device_scale());
+    cost += net->compute_bb_cost(_dev_info.inv_of_chan_width());
+  }
 
-			source_inst = static_cast<PLCInstance*>(net->source_pins().begin()->owner());
-			for (Pin* pin: net->sink_pins()){
-				sink_inst = static_cast<PLCInstance*>(pin->owner());
+  return cost;
+}
 
-				double delay = _dev_info.get_p2p_delay(source_inst, sink_inst);
-				pin->set_property(delays, TData(delay, delay));
-			}
+double Floorplan::compute_tcost(TEngine::WORK_MODE emode, double crit_exp) {
+  double dmax;
+  double tcost = 0.;
+  PLCInstance *source_inst, *sink_inst;
+  Property<COS::TData> &delays =
+      create_temp_property<COS::TData>(COS::PIN, PIN::DELAY);
+  // if(dynamic_cast<TDesign*>(_nl_info.design()) != NULL )
+  dmax = _nl_info.design()->timing_analyse(emode);
 
-			tcost += net->compute_tcost(dmax, crit_exp);
-		}
+  for (PLCNet *net :
+       static_cast<PLCModule *>(_nl_info.design()->top_module())->nets()) {
+    if (net->is_ignored())
+      continue;
 
-		return tcost;
-	}
+    source_inst =
+        static_cast<PLCInstance *>(net->source_pins().begin()->owner());
+    for (Pin *pin : net->sink_pins()) {
+      sink_inst = static_cast<PLCInstance *>(pin->owner());
 
-	double Floorplan::compute_delta_bb_cost(SwapInsts& from_insts, SwapInsts& to_insts)
-	{
-		find_affected_nets(from_insts, to_insts);
+      double delay = _dev_info.get_p2p_delay(source_inst, sink_inst);
+      pin->set_property(delays, TData(delay, delay));
+    }
 
-		double delta_bb_cost = 0.;
-		typedef pair<PLCInstance*, PLCNet*> AffectNet;
-		for (const AffectNet& net: _nl_info.affected_nets()) {
-			PLCInstance* cause_inst   = net.first;
-			PLCNet*		 affected_net = net.second;
+    tcost += net->compute_tcost(dmax, crit_exp);
+  }
 
-			affected_net->save_bounding_box();
+  return tcost;
+}
 
-			if((affected_net->affected_type() & PLCNet::FROM) && 
-			   (affected_net->affected_type() & PLCNet::TO))
-				continue;
+double Floorplan::compute_delta_bb_cost(SwapInsts &from_insts,
+                                        SwapInsts &to_insts) {
+  find_affected_nets(from_insts, to_insts);
 
-			if(affected_net->affected_type() & PLCNet::FROM)
-				affected_net->update_bounding_box(cause_inst->past_logic_pos(), 
-												  cause_inst->curr_logic_pos(), 
-												  _dev_info.device_scale());
-			else if(affected_net->affected_type() & PLCNet::TO)
-				affected_net->update_bounding_box(cause_inst->past_logic_pos(),
-												  cause_inst->curr_logic_pos(),
-												  _dev_info.device_scale());
+  double delta_bb_cost = 0.;
+  typedef pair<PLCInstance *, PLCNet *> AffectNet;
+  for (const AffectNet &net : _nl_info.affected_nets()) {
+    PLCInstance *cause_inst = net.first;
+    PLCNet *affected_net = net.second;
 
-			affected_net->compute_bb_cost(_dev_info.inv_of_chan_width());
+    affected_net->save_bounding_box();
 
-			delta_bb_cost += affected_net->bb_cost() - affected_net->pre_bb_cost();
-		}
+    if ((affected_net->affected_type() & PLCNet::FROM) &&
+        (affected_net->affected_type() & PLCNet::TO))
+      continue;
 
-		return delta_bb_cost;
-	}
+    if (affected_net->affected_type() & PLCNet::FROM)
+      affected_net->update_bounding_box(cause_inst->past_logic_pos(),
+                                        cause_inst->curr_logic_pos(),
+                                        _dev_info.device_scale());
+    else if (affected_net->affected_type() & PLCNet::TO)
+      affected_net->update_bounding_box(cause_inst->past_logic_pos(),
+                                        cause_inst->curr_logic_pos(),
+                                        _dev_info.device_scale());
 
-	double Floorplan::compute_delta_tcost(PLCInstance* target, PLCInstance* reference)
-	{
-		double delta_delay = 0., delta_tcost = 0.;
-		Property<COS::TData>& delays = 
-			create_temp_property<COS::TData>(COS::PIN, PIN::DELAY);
-		Property<double>& tcosts = 
-			create_temp_property<double>(COS::PIN, PIN::TCOST);
-		Property<double>& temp_delays = 
-			create_temp_property<double>(COS::PIN, PIN::TEMP_DELAY);
-		Property<double>& temp_tcost = 
-			create_temp_property<double>(COS::PIN, PIN::TEMP_TCOST);
-		Property<double>& crits = 
-			create_temp_property<double>(COS::PIN, PIN::CRIT);
+    affected_net->compute_bb_cost(_dev_info.inv_of_chan_width());
 
-		if(!target)	return delta_tcost;
+    delta_bb_cost += affected_net->bb_cost() - affected_net->pre_bb_cost();
+  }
 
-		for (Pin* pin: target->pins()) {
-			PLCNet* p_net = static_cast<PLCNet*>(pin->net());
-			if (!p_net || p_net->is_ignored())
-				continue;
+  return delta_bb_cost;
+}
 
-			if (pin->is_sink()){
-				PLCInstance* p_inst = static_cast<PLCInstance*>(p_net->source_pins().begin()->owner());
-				if (p_inst != target && p_inst != reference){
-					double delay = _dev_info.get_p2p_delay(p_inst, target);
-					double tcost = pin->property_value(crits) * delay;
-					pin->set_property(temp_delays, delay);
-					pin->set_property(temp_tcost, tcost);
+double Floorplan::compute_delta_tcost(PLCInstance *target,
+                                      PLCInstance *reference) {
+  double delta_delay = 0., delta_tcost = 0.;
+  Property<COS::TData> &delays =
+      create_temp_property<COS::TData>(COS::PIN, PIN::DELAY);
+  Property<double> &tcosts = create_temp_property<double>(COS::PIN, PIN::TCOST);
+  Property<double> &temp_delays =
+      create_temp_property<double>(COS::PIN, PIN::TEMP_DELAY);
+  Property<double> &temp_tcost =
+      create_temp_property<double>(COS::PIN, PIN::TEMP_TCOST);
+  Property<double> &crits = create_temp_property<double>(COS::PIN, PIN::CRIT);
 
-					delta_delay += delay - pin->property_value(delays)._rising;
-					delta_tcost += tcost - pin->property_value(tcosts);
-				}
-			} else { // pin is source
-				for (Pin* sink_pin: p_net->sink_pins()) {
-					PLCInstance* p_inst = static_cast<PLCInstance*>(sink_pin->owner());
-					double delay = _dev_info.get_p2p_delay(target, p_inst);
-					double tcost = sink_pin->property_value(crits) * delay;
-					sink_pin->set_property(temp_delays, delay);
-					sink_pin->set_property(temp_tcost, tcost);
+  if (!target)
+    return delta_tcost;
 
-					delta_delay += delay - sink_pin->property_value(delays)._rising;
-					delta_tcost += tcost - sink_pin->property_value(tcosts);
-				}
-			}	
-		}
+  for (Pin *pin : target->pins()) {
+    PLCNet *p_net = static_cast<PLCNet *>(pin->net());
+    if (!p_net || p_net->is_ignored())
+      continue;
 
-		return delta_tcost;
-	}
+    if (pin->is_sink()) {
+      PLCInstance *p_inst =
+          static_cast<PLCInstance *>(p_net->source_pins().begin()->owner());
+      if (p_inst != target && p_inst != reference) {
+        double delay = _dev_info.get_p2p_delay(p_inst, target);
+        double tcost = pin->property_value(crits) * delay;
+        pin->set_property(temp_delays, delay);
+        pin->set_property(temp_tcost, tcost);
 
-	double Floorplan::compute_delta_tcost(SwapInsts& from_insts, SwapInsts& to_insts)
-	{
-		double delta_tcost = 0.;
+        delta_delay += delay - pin->property_value(delays)._rising;
+        delta_tcost += tcost - pin->property_value(tcosts);
+      }
+    } else { // pin is source
+      for (Pin *sink_pin : p_net->sink_pins()) {
+        PLCInstance *p_inst = static_cast<PLCInstance *>(sink_pin->owner());
+        double delay = _dev_info.get_p2p_delay(target, p_inst);
+        double tcost = sink_pin->property_value(crits) * delay;
+        sink_pin->set_property(temp_delays, delay);
+        sink_pin->set_property(temp_tcost, tcost);
 
-		for(int i = 0; i < from_insts.size(); ++i){
-			delta_tcost += compute_delta_tcost(from_insts[i], to_insts[i]);
-			delta_tcost += compute_delta_tcost(to_insts[i], from_insts[i]);
-		}
+        delta_delay += delay - sink_pin->property_value(delays)._rising;
+        delta_tcost += tcost - sink_pin->property_value(tcosts);
+      }
+    }
+  }
 
-		return delta_tcost;
-	}
+  return delta_tcost;
+}
 
-	pair<double, double> Floorplan::recompute_cost()
-	{
-		double new_bb_cost = 0., new_tcost = 0.;
-		for (PLCNet* net: static_cast<PLCModule*>(_nl_info.design()->top_module())->nets()) {
-			if (net->is_ignored())
-				continue;
+double Floorplan::compute_delta_tcost(SwapInsts &from_insts,
+                                      SwapInsts &to_insts) {
+  double delta_tcost = 0.;
 
-			new_bb_cost += net->bb_cost();
-			if (_mode == PLACER::TIMING_DRIVEN)
-				new_tcost += net->get_total_tcost();
-		}
+  for (int i = 0; i < from_insts.size(); ++i) {
+    delta_tcost += compute_delta_tcost(from_insts[i], to_insts[i]);
+    delta_tcost += compute_delta_tcost(to_insts[i], from_insts[i]);
+  }
 
-		return make_pair(new_bb_cost, new_tcost);
-	}
+  return delta_tcost;
+}
 
-	void Floorplan::update_tcost(PLCInstance* target, PLCInstance* reference)
-	{
-		Property<COS::TData>& delays = 
-			create_temp_property<COS::TData>(COS::PIN, PIN::DELAY);
-		Property<double>& tcosts = 
-			create_temp_property<double>(COS::PIN, PIN::TCOST);
-		Property<double>& temp_delays = 
-			create_temp_property<double>(COS::PIN, PIN::TEMP_DELAY);
-		Property<double>& temp_tcost = 
-			create_temp_property<double>(COS::PIN, PIN::TEMP_TCOST);
+pair<double, double> Floorplan::recompute_cost() {
+  double new_bb_cost = 0., new_tcost = 0.;
+  for (PLCNet *net :
+       static_cast<PLCModule *>(_nl_info.design()->top_module())->nets()) {
+    if (net->is_ignored())
+      continue;
 
-		if(!target) return;
+    new_bb_cost += net->bb_cost();
+    if (_mode == PLACER::TIMING_DRIVEN)
+      new_tcost += net->get_total_tcost();
+  }
 
-		for (Pin* pin: target->pins()) {
-			PLCNet* p_net = static_cast<PLCNet*>(pin->net());
-			if (!p_net || p_net->is_ignored())
-				continue;
+  return make_pair(new_bb_cost, new_tcost);
+}
 
-			if (pin->is_sink()){
-				PLCInstance* p_inst = static_cast<PLCInstance*>(p_net->source_pins().begin()->owner());
-				if (p_inst != target && p_inst != reference) {
-					double temp_value = pin->property_value(temp_delays);
-					pin->set_property(delays, TData(temp_value, temp_value));
+void Floorplan::update_tcost(PLCInstance *target, PLCInstance *reference) {
+  Property<COS::TData> &delays =
+      create_temp_property<COS::TData>(COS::PIN, PIN::DELAY);
+  Property<double> &tcosts = create_temp_property<double>(COS::PIN, PIN::TCOST);
+  Property<double> &temp_delays =
+      create_temp_property<double>(COS::PIN, PIN::TEMP_DELAY);
+  Property<double> &temp_tcost =
+      create_temp_property<double>(COS::PIN, PIN::TEMP_TCOST);
 
-					temp_value = pin->property_value(temp_tcost);
-					pin->set_property(tcosts,temp_value);
-				}
-			} else {
-				for (Pin* sink_pin: p_net->sink_pins()) {
-					double temp_value = sink_pin->property_value(temp_delays);
-					sink_pin->set_property(delays, TData(temp_value, temp_value));
+  if (!target)
+    return;
 
-					temp_value = sink_pin->property_value(temp_tcost);
-					sink_pin->set_property(tcosts, temp_value);
-				}
-			}			
-		}	
-	}
+  for (Pin *pin : target->pins()) {
+    PLCNet *p_net = static_cast<PLCNet *>(pin->net());
+    if (!p_net || p_net->is_ignored())
+      continue;
 
-	/************************************************************************/
-	/*	¹¦ÄÜ£ºÉè¶¨Íø±íÉè¼ÆÖÐµÄÒ»Ð©netsÎªignored
-	 *	²ÎÊý£ºvoid
-	 *	·µ»ØÖµ£º void
-	 *	ËµÃ÷£º1. carry chainÀïÃæµÄÏßÍøÉèÖÃÎªignored
-	 *		  2. netÖ»ÓÐÃû×ÖÃ»ÓÐpins(ISEÏÂÀ´ºó»á³öÏÖÕâ¸öÇé¿ö)
-	 *		  3. CONST_GENERATEÀïÃæµÄÓÃµ½£¬Ä¿Ç°°æ±¾²»´¦Àí
-	 *		  4. GCLKIOBµÄnetÉèÎªignored
-	 *		  5. PortµÄCELL_pinÒ²ÉèÖÃÎªignored£¨Í¬Ê±¼ì²écell_pinÊÇ·ñÁ¬½Ó£©
-	 */
-	/************************************************************************/
-	void Floorplan::set_ignored_nets()
-	{
-		for (PLCNet* net: static_cast<PLCModule*>(_nl_info.design()->top_module())->nets()) {
-			if( net->type() == COS::CARRY ||
-				net->type() == COS::CLOCK ||
-				net->type() == COS::VCC	 ||
-			   !net->num_pins()				 
+    if (pin->is_sink()) {
+      PLCInstance *p_inst =
+          static_cast<PLCInstance *>(p_net->source_pins().begin()->owner());
+      if (p_inst != target && p_inst != reference) {
+        double temp_value = pin->property_value(temp_delays);
+        pin->set_property(delays, TData(temp_value, temp_value));
+
+        temp_value = pin->property_value(temp_tcost);
+        pin->set_property(tcosts, temp_value);
+      }
+    } else {
+      for (Pin *sink_pin : p_net->sink_pins()) {
+        double temp_value = sink_pin->property_value(temp_delays);
+        sink_pin->set_property(delays, TData(temp_value, temp_value));
+
+        temp_value = sink_pin->property_value(temp_tcost);
+        sink_pin->set_property(tcosts, temp_value);
+      }
+    }
+  }
+}
+
+/************************************************************************/
+/*	ï¿½ï¿½ï¿½Ü£ï¿½ï¿½è¶¨ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ðµï¿½Ò»Ð©netsÎªignored
+ *	ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½void
+ *	ï¿½ï¿½ï¿½ï¿½Öµï¿½ï¿½ void
+ *	Ëµï¿½ï¿½ï¿½ï¿½1. carry chainï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Îªignored
+ *		  2. netÖ»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ã»ï¿½ï¿½pins(ISEï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½)
+ *		  3. CONST_GENERATEï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ãµï¿½ï¿½ï¿½Ä¿Ç°ï¿½æ±¾ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+ *		  4. GCLKIOBï¿½ï¿½netï¿½ï¿½Îªignored
+ *		  5. Portï¿½ï¿½CELL_pinÒ²ï¿½ï¿½ï¿½ï¿½Îªignoredï¿½ï¿½Í¬Ê±ï¿½ï¿½ï¿½cell_pinï¿½Ç·ï¿½ï¿½ï¿½ï¿½Ó£ï¿½
+ */
+/************************************************************************/
+void Floorplan::set_ignored_nets() {
+  for (PLCNet *net :
+       static_cast<PLCModule *>(_nl_info.design()->top_module())->nets()) {
+    if (net->type() == COS::CARRY || net->type() == COS::CLOCK ||
+        net->type() == COS::VCC || !net->num_pins()
 #ifndef CONST_GENERATE
-			   || !count_if(net->pins(), [](const Pin* pin) { return pin->is_source(); })
+        ||
+        !count_if(net->pins(), [](const Pin *pin) { return pin->is_source(); })
 #endif
-			  )
-			   net->set_ignored();
-		}
+    )
+      net->set_ignored();
+  }
 
-		for (PLCInstance* inst: static_cast<PLCModule*>(_nl_info.design()->top_module())->instances()) {
-			Site::SiteType site_type = lexical_cast<Site::SiteType>(inst->module_type());
-			if (site_type == Site::GCLKIOB){
-				for (Pin* pin: inst->pins())
-					if (pin->net())
-						static_cast<PLCNet*>(pin->net())->set_ignored();
-			}
-		}
+  for (PLCInstance *inst :
+       static_cast<PLCModule *>(_nl_info.design()->top_module())->instances()) {
+    Site::SiteType site_type =
+        lexical_cast<Site::SiteType>(inst->module_type());
+    if (site_type == Site::GCLKIOB) {
+      for (Pin *pin : inst->pins())
+        if (pin->net())
+          static_cast<PLCNet *>(pin->net())->set_ignored();
+    }
+  }
 
-		for (Pin* pin: static_cast<PLCModule*>(_nl_info.design()->top_module())->pins()) {
-//			ASSERT(port.cell_pin().net(), 
-//				   place_error(CONSOLE::PLC_ERROR % (port.name() + ": cell pin unconnect.")));
-			// allow cell pin of top cell unconnect 
-			//if(pin->name()=="out[2]")
-			//	int a=2;
-			if (pin->net())
-				static_cast<PLCNet*>(pin->net())->set_ignored();
-		}
-	}
+  for (Pin *pin :
+       static_cast<PLCModule *>(_nl_info.design()->top_module())->pins()) {
+    //			ASSERT(port.cell_pin().net(),
+    //				   place_error(CONSOLE::PLC_ERROR % (port.name()
+    //+ ": cell pin unconnect.")));
+    // allow cell pin of top cell unconnect
+    // if(pin->name()=="out[2]")
+    //	int a=2;
+    if (pin->net())
+      static_cast<PLCNet *>(pin->net())->set_ignored();
+  }
+}
 
-	/************************************************************************/
-	/*	¹¦ÄÜ£º¼ì²éÔ¼ÊøÎÄ¼þµÄÕýÈ·ÐÔ
-	*	²ÎÊý£ºvoid
-	*	·µ»ØÖµ£º void
-	*	ËµÃ÷£º1. carry chainÀïÃæµÄÏßÍøÉèÖÃÎªignored
-	*		  2. 
-	*		  3. 
-	*		  4. GCLKIOBµÄnetÉèÎªignored
-	*		  5. PortµÄCELL_pinÒ²ÉèÖÃÎªignored£¨Í¬Ê±¼ì²écell_pinÊÇ·ñÁ¬½Ó£©
-	*/
-	/************************************************************************/
-	void Floorplan::check_and_save_cst()
-	{
-		const int nx = _dev_info.device_scale().x;
-		const int ny = _dev_info.device_scale().y;
-		Property<string>& pads = create_temp_property<string>(COS::INSTANCE, "pad");
-		Property<Point>& positions = create_property<Point>(COS::INSTANCE, INSTANCE::POSITION);
-		Property<string>& SET_TYPE = create_property<string>(COS::INSTANCE, INSTANCE::SET_TYPE);
+/************************************************************************/
+/*	ï¿½ï¿½ï¿½Ü£ï¿½ï¿½ï¿½ï¿½Ô¼ï¿½ï¿½ï¿½Ä¼ï¿½ï¿½ï¿½ï¿½ï¿½È·ï¿½ï¿½
+ *	ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½void
+ *	ï¿½ï¿½ï¿½ï¿½Öµï¿½ï¿½ void
+ *	Ëµï¿½ï¿½ï¿½ï¿½1. carry chainï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Îªignored
+ *		  2.
+ *		  3.
+ *		  4. GCLKIOBï¿½ï¿½netï¿½ï¿½Îªignored
+ *		  5. Portï¿½ï¿½CELL_pinÒ²ï¿½ï¿½ï¿½ï¿½Îªignoredï¿½ï¿½Í¬Ê±ï¿½ï¿½ï¿½cell_pinï¿½Ç·ï¿½ï¿½ï¿½ï¿½Ó£ï¿½
+ */
+/************************************************************************/
+void Floorplan::check_and_save_cst() {
+  const int nx = _dev_info.device_scale().x;
+  const int ny = _dev_info.device_scale().y;
+  Property<string> &pads = create_temp_property<string>(COS::INSTANCE, "pad");
+  Property<Point> &positions =
+      create_property<Point>(COS::INSTANCE, INSTANCE::POSITION);
+  Property<string> &SET_TYPE =
+      create_property<string>(COS::INSTANCE, INSTANCE::SET_TYPE);
 
-		Point invalid_pos;
-		for (PLCInstance* inst: static_cast<PLCModule*>(_nl_info.design()->top_module())->instances()) {
-			//Èç¹ûÔ¼ÊøÎ»ÖÃ²»ÕýÈ·£¬·µ»Ø
-			string position = inst->property_value(pads);
-			//instÃ»ÓÐ±»Ô¼Êø
-			if(position == "")
-				continue;
-			
-			Point pos;
-			try
-			{ pos = lexical_cast<Point>(position); }
-			catch (boost::bad_lexical_cast& e)
-			{ pos = FPGADesign::instance()->find_pad_by_name(position); }
-			ASSERT(pos != Point(), ("parse failed. constraint: illegal position for " + inst->name()));
+  Point invalid_pos;
+  for (PLCInstance *inst :
+       static_cast<PLCModule *>(_nl_info.design()->top_module())->instances()) {
+    // ï¿½ï¿½ï¿½Ô¼ï¿½ï¿½Î»ï¿½Ã²ï¿½ï¿½ï¿½È·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+    string position = inst->property_value(pads);
+    // instÃ»ï¿½Ð±ï¿½Ô¼ï¿½ï¿½
+    if (position == "")
+      continue;
 
-			
-			inst->set_property(positions,pos);
-			Point logic_pos = inst->property_value(positions);
-			//Èç¹ûÔ¼ÊøÎ»ÖÃ²»ÔÚÂß¼­·¶Î§Ö®ÄÚ
-			ASSERT(logic_pos.x >= 0 && logic_pos.x <= nx &&
-				   logic_pos.y >= 0 && logic_pos.y <= ny &&
-				   logic_pos.z >= 0,
-				   (CONSOLE::PLC_ERROR % (inst->name() + ": illegal constraint.")));
-			//Ô¼ÊøµÄÀàÐÍ²»ÊÇFPGA½ÓÊÜÀàÐÍ
-			Site::SiteType site_type = lexical_cast<Site::SiteType>(inst->module_type());
+    Point pos;
+    try {
+      pos = lexical_cast<Point>(position);
+    } catch (boost::bad_lexical_cast &e) {
+      pos = FPGADesign::instance()->find_pad_by_name(position);
+    }
+    ASSERT(pos != Point(),
+           ("parse failed. constraint: illegal position for " + inst->name()));
 
-			ASSERT(site_type != Site::IGNORE, 
-				   (CONSOLE::PLC_ERROR % (inst->name() + ": illegal cell type.")));
-			//ÔÚ¸ÃÎ»ÖÃÉÏÊÇ·ñ´æÔÚÔ¼ÊøµÄsiteÀàÐÍ
-			ASSERT(_fpga.at(logic_pos).exist_site(site_type),
-				   (CONSOLE::PLC_ERROR % (inst->name() + ": illgal constraint.")));
-			//Èç¹ûÊÇIOB»òÊÇGCLKIOB£¬ÄÇÃ´ÅÐ¶ÏÊÇ·ñ·â×°³öÀ´
-			if(site_type == Site::IOB || site_type == Site::GCLKIOB){
-				//is_io_bound£¬ÅÐ¶ÏÊÇ·ñ±»·â×°³öÀ´
-				ASSERT(FPGADesign::instance()->is_io_bound(logic_pos),
-					   (CONSOLE::PLC_ERROR % (inst->name() + ": illegal constraint.")));
-			}
-			//»ñµÃFPGAÎ»ÖÃÎªlogic_posÀàÐÍÎªsite_typeµÄsite
-			Site& site = _fpga.at(logic_pos).site(site_type);
-			//ÅÐ¶Ïz×ø±êÊÇ·ñÂú×ã
-			ASSERT(logic_pos.z < site._occ_insts.size(), 
-				   (CONSOLE::PLC_ERROR % (inst->name() + ": illegal constraint.")));
-			//ÅÐ¶ÏÊÇ·ñÓÐÖØ¸´Ô¼Êøµ½Í¬Ò»Î»ÖÃ
-			ASSERT(!site._occ_insts[logic_pos.z],
-				   (CONSOLE::PLC_ERROR % (inst->name() + ": illegal constraint.")));
-			//²»ÄÜÔ¼Êøcarry chain
-			//ASSERT(inst->property_value(SET_TYPE) != DEVICE::CARRY,
-			//	   place_error(CONSOLE::PLC_ERROR % (inst->name() + ": illegal constraint.")));
-			//²»ÄÜÔ¼ÊøLUT6
-			ASSERT(inst->property_value(SET_TYPE) != DEVICE::LUT_6,
-				   (CONSOLE::PLC_ERROR % (inst->name() + ": illegal constraint.")));
-			//½«instance·ÅÈëÔ¼ÊøµÄsiteÀïÃæ
-			site._occ_insts[logic_pos.z] = inst;
-			++site._occ;
-			//ÉèÖÃinstµÄÊôÐÔ
-			inst->set_curr_logic_pos(logic_pos);
-			inst->set_curr_loc_site(&site);
-			inst->set_swapable_type(FLOORPLAN::SITE);
-			inst->fix_inst();
+    inst->set_property(positions, pos);
+    Point logic_pos = inst->property_value(positions);
+    // ï¿½ï¿½ï¿½Ô¼ï¿½ï¿½Î»ï¿½Ã²ï¿½ï¿½ï¿½ï¿½ß¼ï¿½ï¿½ï¿½Î§Ö®ï¿½ï¿½
+    ASSERT(logic_pos.x >= 0 && logic_pos.x <= nx && logic_pos.y >= 0 &&
+               logic_pos.y <= ny && logic_pos.z >= 0,
+           (CONSOLE::PLC_ERROR % (inst->name() + ": illegal constraint.")));
+    // Ô¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Í²ï¿½ï¿½ï¿½FPGAï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+    Site::SiteType site_type =
+        lexical_cast<Site::SiteType>(inst->module_type());
 
-			// ugly hard code, need optimization
-			//GCLKIOBµÄÔ¼ÊøÅÐ¶Ï£ºGCLK°üÀ¨£º GCLK_pin £¬ GCLK buffer
-			if (site_type == Site::GCLKIOB){
-				Pin* gclkout_pin = inst->pins().find(DEVICE::GCLKOUT);
-				ASSERT(gclkout_pin && gclkout_pin->net(),
-					   (CONSOLE::PLC_ERROR % (inst->name() + ": NOT connect to GCLK.")));
-				PLCInstance* gclkbuf = 
-					static_cast<PLCInstance*>(gclkout_pin->net()->sink_pins().begin()->owner());
+    ASSERT(site_type != Site::IGNORE,
+           (CONSOLE::PLC_ERROR % (inst->name() + ": illegal cell type.")));
+    // ï¿½Ú¸ï¿½Î»ï¿½ï¿½ï¿½ï¿½ï¿½Ç·ï¿½ï¿½ï¿½ï¿½Ô¼ï¿½ï¿½ï¿½ï¿½siteï¿½ï¿½ï¿½ï¿½
+    ASSERT(_fpga.at(logic_pos).exist_site(site_type),
+           (CONSOLE::PLC_ERROR % (inst->name() + ": illgal constraint.")));
+    // ï¿½ï¿½ï¿½ï¿½ï¿½IOBï¿½ï¿½ï¿½ï¿½GCLKIOBï¿½ï¿½ï¿½ï¿½Ã´ï¿½Ð¶ï¿½ï¿½Ç·ï¿½ï¿½×°ï¿½ï¿½ï¿½ï¿½
+    if (site_type == Site::IOB || site_type == Site::GCLKIOB) {
+      // is_io_boundï¿½ï¿½ï¿½Ð¶ï¿½ï¿½Ç·ñ±»·ï¿½×°ï¿½ï¿½ï¿½ï¿½
+      ASSERT(FPGADesign::instance()->is_io_bound(logic_pos),
+             (CONSOLE::PLC_ERROR % (inst->name() + ": illegal constraint.")));
+    }
+    // ï¿½ï¿½ï¿½FPGAÎ»ï¿½ï¿½Îªlogic_posï¿½ï¿½ï¿½ï¿½Îªsite_typeï¿½ï¿½site
+    Site &site = _fpga.at(logic_pos).site(site_type);
+    // ï¿½Ð¶ï¿½zï¿½ï¿½ï¿½ï¿½ï¿½Ç·ï¿½ï¿½ï¿½ï¿½ï¿½
+    ASSERT(logic_pos.z < site._occ_insts.size(),
+           (CONSOLE::PLC_ERROR % (inst->name() + ": illegal constraint.")));
+    // ï¿½Ð¶ï¿½ï¿½Ç·ï¿½ï¿½ï¿½ï¿½Ø¸ï¿½Ô¼ï¿½ï¿½ï¿½ï¿½Í¬Ò»Î»ï¿½ï¿½
+    ASSERT(!site._occ_insts[logic_pos.z],
+           (CONSOLE::PLC_ERROR % (inst->name() + ": illegal constraint.")));
+    // ï¿½ï¿½ï¿½ï¿½Ô¼ï¿½ï¿½carry chain
+    // ASSERT(inst->property_value(SET_TYPE) != DEVICE::CARRY,
+    //	   place_error(CONSOLE::PLC_ERROR % (inst->name() + ": illegal
+    // constraint."))); ï¿½ï¿½ï¿½ï¿½Ô¼ï¿½ï¿½LUT6
+    ASSERT(inst->property_value(SET_TYPE) != DEVICE::LUT_6,
+           (CONSOLE::PLC_ERROR % (inst->name() + ": illegal constraint.")));
+    // ï¿½ï¿½instanceï¿½ï¿½ï¿½ï¿½Ô¼ï¿½ï¿½ï¿½ï¿½siteï¿½ï¿½ï¿½ï¿½
+    site._occ_insts[logic_pos.z] = inst;
+    ++site._occ;
+    // ï¿½ï¿½ï¿½ï¿½instï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+    inst->set_curr_logic_pos(logic_pos);
+    inst->set_curr_loc_site(&site);
+    inst->set_swapable_type(FLOORPLAN::SITE);
+    inst->fix_inst();
 
-				Point gclkbuf_pos = gclkbuf->property_value(positions);
-				if (gclkbuf_pos == invalid_pos){
-					Site& gclk_site = _fpga.at(logic_pos).site(Site::GCLK);
+    // ugly hard code, need optimization
+    // GCLKIOBï¿½ï¿½Ô¼ï¿½ï¿½ï¿½Ð¶Ï£ï¿½GCLKï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ GCLK_pin ï¿½ï¿½ GCLK buffer
+    if (site_type == Site::GCLKIOB) {
+      Pin *gclkout_pin = inst->pins().find(DEVICE::GCLKOUT);
+      ASSERT(gclkout_pin && gclkout_pin->net(),
+             (CONSOLE::PLC_ERROR % (inst->name() + ": NOT connect to GCLK.")));
+      PLCInstance *gclkbuf = static_cast<PLCInstance *>(
+          gclkout_pin->net()->sink_pins().begin()->owner());
 
-					gclk_site._occ_insts[logic_pos.z] = gclkbuf;
-					++gclk_site._occ;
+      Point gclkbuf_pos = gclkbuf->property_value(positions);
+      if (gclkbuf_pos == invalid_pos) {
+        Site &gclk_site = _fpga.at(logic_pos).site(Site::GCLK);
 
-					gclkbuf->set_curr_logic_pos(logic_pos);
-					gclkbuf->set_curr_loc_site(&gclk_site);
-					gclkbuf->set_swapable_type(FLOORPLAN::SITE);
-					gclkbuf->fix_inst();
-				} else {
-					ASSERT(gclkbuf_pos == logic_pos, 
-						   (CONSOLE::PLC_ERROR % (gclkbuf->name() + ": pos not equal to GCLKIOB " + inst->name())));
-				}
-			}		
-		}
-	}
+        gclk_site._occ_insts[logic_pos.z] = gclkbuf;
+        ++gclk_site._occ;
 
-}}
+        gclkbuf->set_curr_logic_pos(logic_pos);
+        gclkbuf->set_curr_loc_site(&gclk_site);
+        gclkbuf->set_swapable_type(FLOORPLAN::SITE);
+        gclkbuf->fix_inst();
+      } else {
+        ASSERT(
+            gclkbuf_pos == logic_pos,
+            (CONSOLE::PLC_ERROR %
+             (gclkbuf->name() + ": pos not equal to GCLKIOB " + inst->name())));
+      }
+    }
+  }
+}
+
+} // namespace Place
+} // namespace FDU

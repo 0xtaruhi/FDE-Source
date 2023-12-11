@@ -3,54 +3,59 @@
 
 #include "cil/elementLib/element/sramInElem.h"
 
-namespace FDU { namespace cil_lib {
+namespace FDU {
+namespace cil_lib {
 
-	class pathElem : public CilBase {
-	private:
-		std::string		_in;
-		std::string		_out;
-		bool			_segregated;
-		contSramsElem	_cfgInfo;
-		
-	public:
-		using cstString = const std::string;
-		pathElem(cstString& pathName, cstString& in, cstString& out, bool seg = false)
-			: CilBase(pathName), _in(in), _out(out), _segregated(seg)
-		{}
+class pathElem : public CilBase {
+private:
+  std::string _in;
+  std::string _out;
+  bool _segregated;
+  contSramsElem _cfgInfo;
 
-		void setSegregated(bool Segregated) { _segregated = Segregated; }
-		bool isSegregated() const { return _segregated; }
-		bool searchMe(const std::string& in, const std::string& out) const;
+public:
+  using cstString = const std::string;
+  pathElem(cstString &pathName, cstString &in, cstString &out, bool seg = false)
+      : CilBase(pathName), _in(in), _out(out), _segregated(seg) {}
 
-		sramElem* addCfgSram(sramElem* sram) { return _cfgInfo.addSram(sram); }
-		sramElem& getCfgSram(const std::string& sramName) const { return _cfgInfo.getSram(sramName); }
+  void setSegregated(bool Segregated) { _segregated = Segregated; }
+  bool isSegregated() const { return _segregated; }
+  bool searchMe(const std::string &in, const std::string &out) const;
 
-		contSramsElem& getCfgInfo() { return _cfgInfo; }
+  sramElem *addCfgSram(sramElem *sram) { return _cfgInfo.addSram(sram); }
+  sramElem &getCfgSram(const std::string &sramName) const {
+    return _cfgInfo.getSram(sramName);
+  }
 
-		void listSrams(vecBits& bits);
-	};
+  contSramsElem &getCfgInfo() { return _cfgInfo; }
 
-	class contPathsElem {
-	public:
-		using pathsElemType		  = cilContainer<pathElem>::range_type;
-		using const_pathsElemType = cilContainer<pathElem>::const_range_type;
-		using pathElemIter		  = cilContainer<pathElem>::iterator;
-		using const_pathElemIter  = cilContainer<pathElem>::const_iterator;
+  void listSrams(vecBits &bits);
+};
 
-	private:
-		cilContainer<pathElem> _paths;
+class contPathsElem {
+public:
+  using pathsElemType = cilContainer<pathElem>::range_type;
+  using const_pathsElemType = cilContainer<pathElem>::const_range_type;
+  using pathElemIter = cilContainer<pathElem>::iterator;
+  using const_pathElemIter = cilContainer<pathElem>::const_iterator;
 
-	public:
-		pathsElemType		paths()		  { return _paths.range(); }
-		const_pathsElemType paths() const { return _paths.range(); } 
+private:
+  cilContainer<pathElem> _paths;
 
-		pathElem* addPath(pathElem* path) { return _paths.add(path); }
-		pathElem& getPath(const std::string& pathName) { return *paths().find(pathName); }
+public:
+  pathsElemType paths() { return _paths.range(); }
+  const_pathsElemType paths() const { return _paths.range(); }
 
-		void listPathSrams(const pathInfo& path, vecBits& bits);
-		bool hasRequiredPath(const std::string& in, const std::string& out);
-	};
+  pathElem *addPath(pathElem *path) { return _paths.add(path); }
+  pathElem &getPath(const std::string &pathName) {
+    return *paths().find(pathName);
+  }
 
-}}
+  void listPathSrams(const pathInfo &path, vecBits &bits);
+  bool hasRequiredPath(const std::string &in, const std::string &out);
+};
+
+} // namespace cil_lib
+} // namespace FDU
 
 #endif

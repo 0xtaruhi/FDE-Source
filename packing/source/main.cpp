@@ -2,12 +2,11 @@
 
 using namespace PACK;
 
-int main(int argc, char* argv[])
-{
-	PKApp& app = PKApp::instance();
+int main(int argc, char *argv[]) {
+  PKApp &app = PKApp::instance();
 
-	app.parse_command(argc, argv);
-	app.try_process();
+  app.parse_command(argc, argv);
+  app.try_process();
 
-	return 0;
+  return 0;
 }

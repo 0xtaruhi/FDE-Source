@@ -2,127 +2,121 @@
 #include "plc_factory.h"
 #include "plc_utils.h"
 
-namespace FDU { namespace Place {
+namespace FDU {
+namespace Place {
 
-	using namespace std;
-	using namespace boost;
+using namespace std;
+using namespace boost;
 
-#undef EXPORT_NETLIST 
+#undef EXPORT_NETLIST
 
-	/************************************************************************/
-	/*	¹¦ÄÜ£ºÕÒµ½Íø±íÖÐµÄcarry chain,²¢´æ´¢
-	 *	²ÎÊý£ºdesign:Éè¼ÆÍø±í£¬ chains: ÕÒµ½µÄcarry chain
-	 *·µ»ØÖµ£ºvoid
-	 *	ËµÃ÷£ºchainsÎªÒ»¸ömap,ÆäkeyÎªstring,carry chainµÄÃû×Ö£¬contentÎªvector£¬Îª
-	 *			ÆäÄÚ²¿instance½á¹¹µÄÖ¸Õë¼¯ºÏ
-	 */
-	/************************************************************************/
-	void CarryChainInference::inference(TDesign* design, CarryChains& chains)
-	{
-		find_chains(static_cast<PLCModule*>(design->top_module()));
-		store_chains(chains);
+/*	ï¿½ï¿½ï¿½Ü£ï¿½ï¿½Òµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ðµï¿½carry chain,ï¿½ï¿½ï¿½æ´¢
+ *	ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½design:ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ chains: ï¿½Òµï¿½ï¿½ï¿½carry chain
+ *ï¿½ï¿½ï¿½ï¿½Öµï¿½ï¿½void
+ *	Ëµï¿½ï¿½ï¿½ï¿½chainsÎªÒ»ï¿½ï¿½map,ï¿½ï¿½keyÎªstring,carry chainï¿½ï¿½ï¿½ï¿½ï¿½Ö£ï¿½contentÎªvectorï¿½ï¿½Îª
+ *			ï¿½ï¿½ï¿½Ú²ï¿½instanceï¿½á¹¹ï¿½ï¿½Ö¸ï¿½ë¼¯ï¿½ï¿½
+ */
+void CarryChainInference::inference(TDesign *design, CarryChains &chains) {
+  find_chains(static_cast<PLCModule *>(design->top_module()));
+  store_chains(chains);
 #ifdef EXPORT_NETLIST
-		design->save(fileio::xml, design->name() + "_carrychain.xml");
+  design->save(fileio::xml, design->name() + "_carrychain.xml");
 #endif
-	}
-	/************************************************************************/
-	/*	¹¦ÄÜ£º´´½¨Ò»¸öcarry chainÖÐµÄ½Úµã£¬²¢´æ´¢ÔÚ_nodesÀïÃæ
-	 *	²ÎÊý£ºowner: Ò»¸öcarry chain ÖÐµÄ½Úµã
-	 *·µ»ØÖµ£ºChainNode* £º´´½¨½ÚµãµÄÖ¸Õë
-	 *	ËµÃ÷£º
-	 *			
-	 */
-	/************************************************************************/
-	ChainNode* CarryChainInference::create_node(PLCInstance* owner)
-	{
-		ChainNode* node = NULL;
-		//Èç¹û´æÔÚÔÚ_nodesÀïÃæ£¬ÄÇÃ´·µ»Ø¸Ã½Úµã
-		//Èç¹û²»´æÔÚ£¬´´½¨Ò»¸ö²¢²åÈëµ½_nodesºó
-		if(_nodes.count(owner))
-			node = _nodes[owner];
-		else {
-			node = new ChainNode(owner);
-			_nodes.insert(make_pair(owner, node));
-		}
-		return node;	
-	}
-	/************************************************************************/
-	/*	¹¦ÄÜ£ºÕÒµ½Íø±íÖÐ¸÷¸öcarry chainµÄ½Úµã
-	 *	²ÎÊý£ºtop_cell: designµÄ¶¥²ãµ¥Ôª
-	 *·µ»ØÖµ£ºvoid
-	 *	ËµÃ÷£ºÍø±íÖÐÃ¿¸önetµÄpin nameÊôÐÔÎªcin,coutµÄÎªcarry chain,
-	 *			Õâ¸öº¯ÊýÖ»ÊÇÕÒµ½ËùÓÐ¾ßÓÐÕâÐ©ÊôÐÔµÄµã£¬²¢½«ÕâÐ©µã¼°Æä±ß´´½¨ºÃ
-	/************************************************************************/
-	void CarryChainInference::find_chains(PLCModule* top_cell)
-	{
-		//ÕÒµ½ÏßÍøÖÐpinµÄÃû×ÖÊÇCIN£¬COUTµÄÏßÍø
-        PLCInstance * cin_instance;
-        PLCInstance * cout_instance;
-		for (PLCNet* net: top_cell->nets()) {
-			PLCNet::pin_iter cin_pin  = find_if(net->pins(), [](const Pin* pin) { return pin->name() == DEVICE::CIN;  });
-			PLCNet::pin_iter cout_pin = find_if(net->pins(), [](const Pin* pin) { return pin->name() == DEVICE::COUT; });
-			//ÕÒµ½ÁËÒ»¸önet
-            if(cin_pin != net->pins().end() && cout_pin != net->pins().end()){
+}
+/*	ï¿½ï¿½ï¿½Ü£ï¿½ï¿½ï¿½ï¿½ï¿½Ò»ï¿½ï¿½carry chainï¿½ÐµÄ½Úµã£¬ï¿½ï¿½ï¿½æ´¢ï¿½ï¿½_nodesï¿½ï¿½ï¿½ï¿½
+ *	ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½owner: Ò»ï¿½ï¿½carry chain ï¿½ÐµÄ½Úµï¿½
+ *ï¿½ï¿½ï¿½ï¿½Öµï¿½ï¿½ChainNode* ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Úµï¿½ï¿½Ö¸ï¿½ï¿½
+ *	Ëµï¿½ï¿½ï¿½ï¿½
+ *
+ */
+ChainNode *CarryChainInference::create_node(PLCInstance *owner) {
+  ChainNode *node = NULL;
+  // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½_nodesï¿½ï¿½ï¿½æ£¬ï¿½ï¿½Ã´ï¿½ï¿½ï¿½Ø¸Ã½Úµï¿½
+  // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ú£ï¿½ï¿½ï¿½ï¿½ï¿½Ò»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ëµ½_nodesï¿½ï¿½
+  if (_nodes.count(owner))
+    node = _nodes[owner];
+  else {
+    node = new ChainNode(owner);
+    _nodes.insert(make_pair(owner, node));
+  }
+  return node;
+}
+/*	ï¿½ï¿½ï¿½Ü£ï¿½ï¿½Òµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ð¸ï¿½ï¿½ï¿½carry chainï¿½Ä½Úµï¿½
+ *	ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½top_cell: designï¿½Ä¶ï¿½ï¿½ãµ¥Ôª
+ *ï¿½ï¿½ï¿½ï¿½Öµï¿½ï¿½void
+ *	Ëµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ã¿ï¿½ï¿½netï¿½ï¿½pin nameï¿½ï¿½ï¿½ï¿½Îªcin,coutï¿½ï¿½Îªcarry chain,
+ *			ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö»ï¿½ï¿½ï¿½Òµï¿½ï¿½ï¿½ï¿½Ð¾ï¿½ï¿½ï¿½ï¿½ï¿½Ð©ï¿½ï¿½ï¿½ÔµÄµã£¬ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ð©ï¿½ã¼°ï¿½ï¿½ß´ï¿½ï¿½ï¿½ï¿½ï¿½
+ */
+void CarryChainInference::find_chains(PLCModule *top_cell) {
+  // ï¿½Òµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½pinï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½CINï¿½ï¿½COUTï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+  PLCInstance *cin_instance;
+  PLCInstance *cout_instance;
+  for (PLCNet *net : top_cell->nets()) {
+    PLCNet::pin_iter cin_pin = find_if(
+        net->pins(), [](const Pin *pin) { return pin->name() == DEVICE::CIN; });
+    PLCNet::pin_iter cout_pin = find_if(net->pins(), [](const Pin *pin) {
+      return pin->name() == DEVICE::COUT;
+    });
+    // ï¿½Òµï¿½ï¿½ï¿½Ò»ï¿½ï¿½net
+    if (cin_pin != net->pins().end() && cout_pin != net->pins().end()) {
 
-                cin_instance = static_cast<PLCInstance*>(cin_pin->owner());
-                cout_instance = static_cast<PLCInstance*>(cout_pin->owner());
+      cin_instance = static_cast<PLCInstance *>(cin_pin->owner());
+      cout_instance = static_cast<PLCInstance *>(cout_pin->owner());
 
-				//ÉèÖÃÎªignord£¬ÔÚ¼ÆËãcostÖÐ²»ÓÃ¿¼ÂÇ
-				net->set_ignored();
-                if (cout_instance->is_fixed() && cin_instance->is_fixed())
-                {
-                    //printf("fixed carry chain");
-                }
-                else if (!cout_instance->is_fixed() && !cin_instance->is_fixed())
-                {
-                    ChainNode* cout_node = create_node(cout_instance);
-                    ChainNode* cin_node	 = create_node(cin_instance);
-                    cout_node->create_to_edge(cin_node);
-                }
-                else
-                    ASSERT(0,
-                    (CONSOLE::PLC_ERROR % ("illegal constraint for carry chain.")));
-				//ÎªnetÁ¬½ÓµÄÁ½¸öslice´´½¨Á½¸ö½Úµã£¬²¢´´½¨Ò»Ìõ±ß
-				
-			}
-		}
-	}
-	/************************************************************************/
-	/*	¹¦ÄÜ£º½«find_chainsÕÒµ½µÄcarry chainµÄ¸÷¸ö½Úµã´®³ÉÏàÓ¦µÄcarry chain£¬²¢ÐÞ¸ÄinstanceµÄÊôÐÔ
-	 *	²ÎÊý£ºchains£¬carry chainµÄ¼¯ºÏ
-	 *·µ»ØÖµ£ºvoid
-	 *	ËµÃ÷£º
-	/************************************************************************/
-	void CarryChainInference::store_chains(CarryChains& chains)
-	{
-		for (ChainNodes::value_type& node: _nodes) {
-			ChainNode* chain_node = node.second;
-			if(!chain_node->_from_edge){ // Èç¹ûÒ»¸öµãÃ»ÓÐfrom edge£¬ÄÇÃ´¾ÍÎªcarry chainµÄ¿ªÊ¼
-				PLCInstance* owner  = chain_node->_owner;
-				//hsetÎªÍø±íÐèÒªµÄÒ»¸öÃû×Ö£¬Íø±íÒªÇócarry chainµÄÃû×ÖÎªcarry chain¿ªÊ¼µÄinstanceµÄÃû×Ö
-				string		 hset   = owner->name();
-//				chains.insert(make_pair(hset, vector<PLCInstance*>()));
-				//µÃµ½´æ·ÅÕâÌõcarry chainµÄvector
-				vector<PLCInstance*>& chain = chains[hset];
-				//·ÅÈëcarry chain vector
-				chain.push_back(owner);
-				//ÒÀ´ÎÑ¹ÈëºóÐøinstance
-				while(chain_node->_to_edge){
-					chain.push_back(chain_node->_to_edge->_to_node->_owner);
-					chain_node = chain_node->_to_edge->_to_node;
-				}
-				//ÏÂÃæµÄÊôÐÔÉèÖÃÊÇ¸ù¾ÝÍø±íÐèÇó
-				int rloc = chain.size() - 1;
-				Property<string>& hsets = create_property<string>(COS::INSTANCE, INSTANCE::HSET);
-				Property<Point>& RLOCs = create_property<Point>(COS::INSTANCE, INSTANCE::RLOC);
-				Property<string>& SET_TYPE = create_property<string>(COS::INSTANCE, INSTANCE::SET_TYPE);
-				for (PLCInstance* inst: chain) {
-					inst->set_property(hsets, hset);
-					inst->set_property(RLOCs, Point(rloc--, 0, 0));
-					inst->set_property(SET_TYPE, DEVICE::CARRY);
-				}
-			}
-		}
-	}
+      // ï¿½ï¿½ï¿½ï¿½Îªignordï¿½ï¿½ï¿½Ú¼ï¿½ï¿½ï¿½costï¿½Ð²ï¿½ï¿½Ã¿ï¿½ï¿½ï¿½
+      net->set_ignored();
+      if (cout_instance->is_fixed() && cin_instance->is_fixed()) {
+        // printf("fixed carry chain");
+      } else if (!cout_instance->is_fixed() && !cin_instance->is_fixed()) {
+        ChainNode *cout_node = create_node(cout_instance);
+        ChainNode *cin_node = create_node(cin_instance);
+        cout_node->create_to_edge(cin_node);
+      } else
+        ASSERT(0,
+               (CONSOLE::PLC_ERROR % ("illegal constraint for carry chain.")));
+      // Îªnetï¿½ï¿½ï¿½Óµï¿½ï¿½ï¿½ï¿½ï¿½sliceï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Úµã£¬ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ò»ï¿½ï¿½ï¿½ï¿½
+    }
+  }
+}
+/*	ï¿½ï¿½ï¿½Ü£ï¿½ï¿½ï¿½find_chainsï¿½Òµï¿½ï¿½ï¿½carry chainï¿½Ä¸ï¿½ï¿½ï¿½ï¿½Úµã´®ï¿½ï¿½ï¿½ï¿½Ó¦ï¿½ï¿½carry
+ *chainï¿½ï¿½ï¿½ï¿½ï¿½Þ¸ï¿½instanceï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+ *ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½chainsï¿½ï¿½carry chainï¿½Ä¼ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½Öµï¿½ï¿½void Ëµï¿½ï¿½ï¿½ï¿½
+ */
+void CarryChainInference::store_chains(CarryChains &chains) {
+  for (ChainNodes::value_type &node : _nodes) {
+    ChainNode *chain_node = node.second;
+    if (!chain_node
+             ->_from_edge) { // ï¿½ï¿½ï¿½Ò»ï¿½ï¿½ï¿½ï¿½Ã»ï¿½ï¿½from edgeï¿½ï¿½ï¿½ï¿½Ã´ï¿½ï¿½Îªcarry chainï¿½Ä¿ï¿½Ê¼
+      PLCInstance *owner = chain_node->_owner;
+      // hsetÎªï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Òªï¿½ï¿½Ò»ï¿½ï¿½ï¿½ï¿½ï¿½Ö£ï¿½ï¿½ï¿½ï¿½ï¿½Òªï¿½ï¿½carry chainï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Îªcarry
+      // chainï¿½ï¿½Ê¼ï¿½ï¿½instanceï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+      string hset = owner->name();
+      //				chains.insert(make_pair(hset,
+      // vector<PLCInstance*>())); ï¿½Ãµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½carry chainï¿½ï¿½vector
+      vector<PLCInstance *> &chain = chains[hset];
+      // ï¿½ï¿½ï¿½ï¿½carry chain vector
+      chain.push_back(owner);
+      // ï¿½ï¿½ï¿½ï¿½Ñ¹ï¿½ï¿½ï¿½ï¿½ï¿½instance
+      while (chain_node->_to_edge) {
+        chain.push_back(chain_node->_to_edge->_to_node->_owner);
+        chain_node = chain_node->_to_edge->_to_node;
+      }
+      // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ç¸ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+      int rloc = chain.size() - 1;
+      Property<string> &hsets =
+          create_property<string>(COS::INSTANCE, INSTANCE::HSET);
+      Property<Point> &RLOCs =
+          create_property<Point>(COS::INSTANCE, INSTANCE::RLOC);
+      Property<string> &SET_TYPE =
+          create_property<string>(COS::INSTANCE, INSTANCE::SET_TYPE);
+      for (PLCInstance *inst : chain) {
+        inst->set_property(hsets, hset);
+        inst->set_property(RLOCs, Point(rloc--, 0, 0));
+        inst->set_property(SET_TYPE, DEVICE::CARRY);
+      }
+    }
+  }
+}
 
-}}
+} // namespace Place
+} // namespace FDU

@@ -8,13 +8,12 @@ using namespace FDU::Place;
  *	说明：入口函数
  */
 /************************************************************************/
-int main(int argc, char* argv[])
-{
-	PlaceApp app;
-	//分析参数
-	app.parse_command(argc, argv);
-	//开始布局
-	app.try_process();
+int main(int argc, char *argv[]) {
+  PlaceApp app;
+  // 分析参数
+  app.parse_command(argc, argv);
+  // 开始布局
+  app.try_process();
 
-	return EXIT_SUCCESS;
+  return EXIT_SUCCESS;
 }

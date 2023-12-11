@@ -1,34 +1,37 @@
 #ifndef PLCAPP_H
 #define PLCAPP_H
 
+#include "log.h"
 #include "plc_algorithm.h"
 #include "plc_args.h"
-#include "log.h"
 
-namespace FDU { namespace Place {
+namespace FDU {
+namespace Place {
 
-	using COS::TDesign;
+using COS::TDesign;
 
-	class PlaceApp
-	{
-	public:
-		PlaceApp() : _placer(&_design) { LOG::init_log_file("place.log", "place"); }//³õÊ¼»¯logÎÄ¼þ
+class PlaceApp {
+public:
+  PlaceApp() : _placer(&_design) {
+    LOG::init_log_file("place.log", "place");
+  } // ï¿½ï¿½Ê¼ï¿½ï¿½logï¿½Ä¼ï¿½
 
-		void parse_command(int argc, char* argv[]);
-		void try_process();
+  void parse_command(int argc, char *argv[]);
+  void try_process();
 
-	protected:
-		void load_files();
-		void export_jtag_csts();
+protected:
+  void load_files();
+  void export_jtag_csts();
 
-	private:
-		PlaceArgs		_args; //²¼¾ÖµÄ²ÎÊý
+private:
+  PlaceArgs _args; // ï¿½ï¿½ï¿½ÖµÄ²ï¿½ï¿½ï¿½
 
-		TDesign			_design; //ÓÃ»§Íø±í
-		SAPlacer		_placer; //²¼¾ÖÆ÷£¬Ä£ÄâÍË»ð¹ý³ÌËã·¨ÔÚÕâÀïÍê³É£¬¼ÆËãcostµÄÔÚFloorPlanÀïÃæÍê³É
-	};
+  TDesign _design; // ï¿½Ã»ï¿½ï¿½ï¿½ï¿½ï¿½
+  SAPlacer
+      _placer; // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä£ï¿½ï¿½ï¿½Ë»ï¿½ï¿½ï¿½ï¿½ï¿½ã·¨ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½É£ï¿½ï¿½ï¿½ï¿½ï¿½costï¿½ï¿½ï¿½ï¿½FloorPlanï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+};
 
-}}
-
+} // namespace Place
+} // namespace FDU
 
 #endif

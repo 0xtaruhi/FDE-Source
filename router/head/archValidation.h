@@ -4,33 +4,38 @@
 #include "arch/archlib.hpp"
 #include <iostream>
 
-namespace FDU{namespace RT{
-	using namespace ARCH;
-	using std::string;
-	using std::ostream;
+namespace FDU {
+namespace RT {
+using namespace ARCH;
+using std::ostream;
+using std::string;
 
-	class ArchValidationBase{
-	public:
-		ArchValidationBase();
-		virtual void validate() const = 0;
-		ostream& println(ostream& os, const string& str) const;
-	protected:
-		FPGADesign *_arch;
-	};
+class ArchValidationBase {
+public:
+  ArchValidationBase();
+  virtual void validate() const = 0;
+  ostream &println(ostream &os, const string &str) const;
 
-	class ArchValidation : public ArchValidationBase{
-	public:
-		virtual void validate() const;
-	};
+protected:
+  FPGADesign *_arch;
+};
 
-	class TilePortValidation : public ArchValidationBase{
-	public:
-		virtual void validate() const;
-	private:
-		void vldtInstance(const ArchInstance *inst, ostream &os) const;
-		void vldtInstanceSide(const ArchInstance *inst, SideType side, ostream &os) const;
-		bool portsFit(const Port *lhs, const Port *rhs) const;
-	};
-}}
+class ArchValidation : public ArchValidationBase {
+public:
+  virtual void validate() const;
+};
+
+class TilePortValidation : public ArchValidationBase {
+public:
+  virtual void validate() const;
+
+private:
+  void vldtInstance(const ArchInstance *inst, ostream &os) const;
+  void vldtInstanceSide(const ArchInstance *inst, SideType side,
+                        ostream &os) const;
+  bool portsFit(const Port *lhs, const Port *rhs) const;
+};
+} // namespace RT
+} // namespace FDU
 
 #endif

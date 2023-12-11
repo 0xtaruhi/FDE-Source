@@ -574,7 +574,7 @@ void yy_undefineMacro() {
         switch(tok) {
         case 0:
             // scan through whitespace
-            if (c != ' ' && c != '\t')
+            if (c != ' ' && c != '\t') {
                 if (pos == 0 || c == '\n') {
                     yyerror("Parsing macro undefinition failed");
                 } else {
@@ -583,6 +583,7 @@ void yy_undefineMacro() {
                     tok++;
                     continue;
                 }
+            }
             break;
         case 1:
             assert(pos < MAX_KEY_LENGTH);
@@ -646,7 +647,7 @@ void yy_defineMacro() {
         switch(tok) {
         case 0:
             // scan through whitespace
-            if (c != ' ' && c != '\t')
+            if (c != ' ' && c != '\t') {
                 if (pos == 0 || c == '\n') {
                     yyerror("Parsing macro undefinition failed");
                 } else {
@@ -655,6 +656,7 @@ void yy_defineMacro() {
                     tok++;
                     continue;
                 }
+            }
             break;
         case 1:
             assert(pos < MAX_KEY_LENGTH);
@@ -849,7 +851,7 @@ void yy_beginConditionalMacro() {
         switch(tok) {
         case 0:
             // scan through whitespace
-            if (c != ' ' && c != '\t')
+            if (c != ' ' && c != '\t') {
                 if (pos == 0 || c == '\n') {
                     yyerror("Parsing conditional directive failed");
                 } else {
@@ -858,6 +860,7 @@ void yy_beginConditionalMacro() {
                     tok++;
                     continue;
                 }
+            }
             break;
         case 1:
             assert(pos < MAX_KEY_LENGTH);

@@ -1,258 +1,264 @@
 #include "plc_netlist.h"
+#include "arch/archlib.hpp"
 #include "plc_factory.h"
 #include "plc_utils.h"
-#include "arch/archlib.hpp"
 #include <boost/lexical_cast.hpp>
 
-#include <string>  
-#include <iostream>
 #include <fstream>
+#include <iostream>
+#include <string>
 
 #include "report/report.h"
 
-namespace FDU { namespace Place {
+namespace FDU {
+namespace Place {
 
-	using boost::lexical_cast;
-	using namespace boost;
-	using namespace std;
-	using namespace ARCH;
-	using namespace rapidxml;
-	//////////////////////////////////////////////////////////////////////////
-	// SwapObject
-	/************************************************************************/
-	/* µÃµ½Ò»¸öswapobjµÄÂß¼­µØÖ·                                            */
-	/************************************************************************/
-	Point SwapObject::base_logic_pos() const 
-	{
-		switch(_type)
-		{
-		case FLOORPLAN::SITE: 
-			return _insts[0]->curr_logic_pos();
-		case FLOORPLAN::LUT6: 
-			return _insts[0]->curr_logic_pos();
-		case FLOORPLAN::CARRY_CHAIN:
-			return _insts[0]->curr_logic_pos();
-		default:
-			ASSERT(0, (CONSOLE::PLC_ERROR % "unknown swap object.")) ;
-		}
-	}
-	/************************************************************************/
-	/* µÃµ½¸Ãswap objµÄsite                                                 */
-	/************************************************************************/
-	Site& SwapObject::base_loc_site() const 
-	{
-		switch(_type)
-		{
-		case FLOORPLAN::SITE: 
-			return *_insts[0]->curr_loc_site();
-		case FLOORPLAN::LUT6: 
-			return *_insts[0]->curr_loc_site();
-		case FLOORPLAN::CARRY_CHAIN:
-			return *_insts[0]->curr_loc_site();
-		default:
-			ASSERT(0, (CONSOLE::PLC_ERROR % "unknown swap object."));
-		}
-	}
-	/************************************************************************/
-	/* ¹¦ÄÜ£º¸üÐÂÒ»¸öswapobjµÄÂß¼­Î»ÖÃºÍµ¥ÔªÀàÐÍ                                  
-	* ²ÎÊý£º
-	*		inst_idx£ºint£¬ÒªÐÞ¸ÄµÄinstanceµÄindex£»
-	*		pos:Point£¬Òª¸üÐÂµÄÄ¿±êÂß¼­Î»ÖÃ
-	*		loc_site:Site£¬Òª¸üÐÂµÄÄ¿±êsite
-	*/
-	/************************************************************************/
-	void SwapObject::update_place_info(int inst_idx, const Point& pos, Site& loc_site)
-	{
-		_insts[inst_idx]->set_curr_logic_pos(pos);
-		_insts[inst_idx]->set_curr_loc_site(&loc_site);
-	}
+using boost::lexical_cast;
+using namespace boost;
+using namespace std;
+using namespace ARCH;
+using namespace rapidxml;
+//////////////////////////////////////////////////////////////////////////
+// SwapObject
+/************************************************************************/
+/* ï¿½Ãµï¿½Ò»ï¿½ï¿½swapobjï¿½ï¿½ï¿½ß¼ï¿½ï¿½ï¿½Ö· */
+/************************************************************************/
+Point SwapObject::base_logic_pos() const {
+  switch (_type) {
+  case FLOORPLAN::SITE:
+    return _insts[0]->curr_logic_pos();
+  case FLOORPLAN::LUT6:
+    return _insts[0]->curr_logic_pos();
+  case FLOORPLAN::CARRY_CHAIN:
+    return _insts[0]->curr_logic_pos();
+  default:
+    ASSERT(0, (CONSOLE::PLC_ERROR % "unknown swap object."));
+  }
+}
+/************************************************************************/
+/* ï¿½Ãµï¿½ï¿½ï¿½swap objï¿½ï¿½site                                                 */
+/************************************************************************/
+Site &SwapObject::base_loc_site() const {
+  switch (_type) {
+  case FLOORPLAN::SITE:
+    return *_insts[0]->curr_loc_site();
+  case FLOORPLAN::LUT6:
+    return *_insts[0]->curr_loc_site();
+  case FLOORPLAN::CARRY_CHAIN:
+    return *_insts[0]->curr_loc_site();
+  default:
+    ASSERT(0, (CONSOLE::PLC_ERROR % "unknown swap object."));
+  }
+}
+/************************************************************************/
+/* ï¿½ï¿½ï¿½Ü£ï¿½ï¿½ï¿½ï¿½ï¿½Ò»ï¿½ï¿½swapobjï¿½ï¿½ï¿½ß¼ï¿½Î»ï¿½ÃºÍµï¿½Ôªï¿½ï¿½ï¿½ï¿½
+ * ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+ *		inst_idxï¿½ï¿½intï¿½ï¿½Òªï¿½Þ¸Äµï¿½instanceï¿½ï¿½indexï¿½ï¿½
+ *		pos:Pointï¿½ï¿½Òªï¿½ï¿½ï¿½Âµï¿½Ä¿ï¿½ï¿½ï¿½ß¼ï¿½Î»ï¿½ï¿½
+ *		loc_site:Siteï¿½ï¿½Òªï¿½ï¿½ï¿½Âµï¿½Ä¿ï¿½ï¿½site
+ */
+/************************************************************************/
+void SwapObject::update_place_info(int inst_idx, const Point &pos,
+                                   Site &loc_site) {
+  _insts[inst_idx]->set_curr_logic_pos(pos);
+  _insts[inst_idx]->set_curr_loc_site(&loc_site);
+}
 
-	//////////////////////////////////////////////////////////////////////////
-	// NLInfo
-	/************************************************************************/
-	/* ¹¦ÄÜ£º¼ì²éÊÇ·ñÍ¬Ò»¸öÎ»ÖÃÉÏÓÐÁ½¸öµ¥Ôª                                       
-	* ²ÎÊý£ºvoid
-	* ·µ»ØÖµ£ºvoid
-	* ËµÃ÷£ºGCLKIOBºöÂÔ
-	*/
-	/************************************************************************/
-	void NLInfo::check_place()
-	{
-		vector<map<Point, PLCInstance*> > pos_checker(Site::NUM_OF_SITE_TYPE);
-		//¶ÔÍø±íÖÐµÄÃ¿Ò»¸öinst¼ì²éÊÇ·ñÓÐÎ»ÖÃÖØºÏ
-		for (PLCInstance* inst: static_cast<PLCModule*>(_design->top_module())->instances()) {
-			Site::SiteType site_type = lexical_cast<Site::SiteType>(inst->module_type());
-			//ºöÂÔGCKIOB
-			if (site_type == Site::GCLKIOB||site_type == Site::VCC) 
-				continue;
-			//¼ì²éÊÇ·ñ´æÔÚ·Ç·¨inst£¬ÈçÃ»ÓÐpack³É¹¦µÄinst
-			ASSERT(site_type != Site::IGNORE, 
-				(CONSOLE::PLC_ERROR % (inst->name() + ": invalid instance type.")));
-			//¼ì²éÊÇ·ñÓÐÖØºÏ
-			ASSERT(!pos_checker[site_type].count(inst->curr_logic_pos()),
-				(CONSOLE::PLC_ERROR % (inst->name() + ": overlap position.")));
-			//Ã»ÓÐÖØºÏµÄ»°Ö±½ÓÉèÖÃºÃ¸Ãmap vector
-			pos_checker[site_type][inst->curr_logic_pos()] = inst;
-		}
-	}
-	/************************************************************************/
-	/* ¹¦ÄÜ£º±£´æ²¼¾ÖµÄÐÅÏ¢                                       
-	* ²ÎÊý£ºvoid
-	* ·µ»ØÖµ£ºvoid
-	* ËµÃ÷£ºGCLKIOBÌØÊâ´¦Àí
-	*/
-	/************************************************************************/	
-	void NLInfo::save_place()
-	{
-		Property<Point>& positions = create_property<Point>(COS::INSTANCE, INSTANCE::POSITION);
-		for (PLCInstance* inst: static_cast<PLCModule*>(_design->top_module())->instances()) {
-			Site::SiteType site_type = lexical_cast<Site::SiteType>(inst->module_type());
-			//´¦ÀíGCLK
-			if (site_type == Site::GCLKIOB){
-				Pin* gclkout_pin = inst->pins().find(DEVICE::GCLKOUT);
-				ASSERT(gclkout_pin, (CONSOLE::PLC_ERROR % (inst->name() + ": can NOT place GCLKIOB.")));
-				PLCInstance* gclkbuf = 
-					static_cast<PLCInstance*>(gclkout_pin->net()->sink_pins().begin()->owner());
-				inst->set_curr_logic_pos(gclkbuf->curr_logic_pos());
-			}
-			//±£´æÃ¿Ò»¸öinstanceµÄpositionÐÅÏ¢
+//////////////////////////////////////////////////////////////////////////
+// NLInfo
+/************************************************************************/
+/* ï¿½ï¿½ï¿½Ü£ï¿½ï¿½ï¿½ï¿½ï¿½Ç·ï¿½Í¬Ò»ï¿½ï¿½Î»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ôª
+ * ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½void
+ * ï¿½ï¿½ï¿½ï¿½Öµï¿½ï¿½void
+ * Ëµï¿½ï¿½ï¿½ï¿½GCLKIOBï¿½ï¿½ï¿½ï¿½
+ */
+/************************************************************************/
+void NLInfo::check_place() {
+  vector<map<Point, PLCInstance *>> pos_checker(Site::NUM_OF_SITE_TYPE);
+  // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ðµï¿½Ã¿Ò»ï¿½ï¿½instï¿½ï¿½ï¿½ï¿½Ç·ï¿½ï¿½ï¿½Î»ï¿½ï¿½ï¿½Øºï¿½
+  for (PLCInstance *inst :
+       static_cast<PLCModule *>(_design->top_module())->instances()) {
+    Site::SiteType site_type =
+        lexical_cast<Site::SiteType>(inst->module_type());
+    // ï¿½ï¿½ï¿½ï¿½GCKIOB
+    if (site_type == Site::GCLKIOB || site_type == Site::VCC)
+      continue;
+    // ï¿½ï¿½ï¿½ï¿½Ç·ï¿½ï¿½ï¿½Ú·Ç·ï¿½instï¿½ï¿½ï¿½ï¿½Ã»ï¿½ï¿½packï¿½É¹ï¿½ï¿½ï¿½inst
+    ASSERT(site_type != Site::IGNORE,
+           (CONSOLE::PLC_ERROR % (inst->name() + ": invalid instance type.")));
+    // ï¿½ï¿½ï¿½ï¿½Ç·ï¿½ï¿½ï¿½ï¿½Øºï¿½
+    ASSERT(!pos_checker[site_type].count(inst->curr_logic_pos()),
+           (CONSOLE::PLC_ERROR % (inst->name() + ": overlap position.")));
+    // Ã»ï¿½ï¿½ï¿½ØºÏµÄ»ï¿½Ö±ï¿½ï¿½ï¿½ï¿½ï¿½ÃºÃ¸ï¿½map vector
+    pos_checker[site_type][inst->curr_logic_pos()] = inst;
+  }
+}
+/************************************************************************/
+/* ï¿½ï¿½ï¿½Ü£ï¿½ï¿½ï¿½ï¿½æ²¼ï¿½Öµï¿½ï¿½ï¿½Ï¢
+ * ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½void
+ * ï¿½ï¿½ï¿½ï¿½Öµï¿½ï¿½void
+ * Ëµï¿½ï¿½ï¿½ï¿½GCLKIOBï¿½ï¿½ï¿½â´¦ï¿½ï¿½
+ */
+/************************************************************************/
+void NLInfo::save_place() {
+  Property<Point> &positions =
+      create_property<Point>(COS::INSTANCE, INSTANCE::POSITION);
+  for (PLCInstance *inst :
+       static_cast<PLCModule *>(_design->top_module())->instances()) {
+    Site::SiteType site_type =
+        lexical_cast<Site::SiteType>(inst->module_type());
+    // ï¿½ï¿½ï¿½ï¿½GCLK
+    if (site_type == Site::GCLKIOB) {
+      Pin *gclkout_pin = inst->pins().find(DEVICE::GCLKOUT);
+      ASSERT(gclkout_pin, (CONSOLE::PLC_ERROR %
+                           (inst->name() + ": can NOT place GCLKIOB.")));
+      PLCInstance *gclkbuf = static_cast<PLCInstance *>(
+          gclkout_pin->net()->sink_pins().begin()->owner());
+      inst->set_curr_logic_pos(gclkbuf->curr_logic_pos());
+    }
+    // ï¿½ï¿½ï¿½ï¿½Ã¿Ò»ï¿½ï¿½instanceï¿½ï¿½positionï¿½ï¿½Ï¢
 
-			inst->set_property(positions, inst->curr_logic_pos());
-		}
-		/************************************************************************/
-		/*´¦ÀíV2ÖÐµÄVCCÆ÷¼þ£¬ÅäºÏISEÁ÷³ÌÓÃ*/
-		/************************************************************************/	
-		for (PLCNet* net: static_cast<PLCModule*>(_design->top_module())->nets())
-		{
-			PLCNet::pin_iter vcc_pin  = find_if(net->pins(), [](const Pin* pin) { return pin->name() == DEVICE::VCCOUT; });
-			if (vcc_pin != net->pins().end())
-			{
-				PLCInstance* VCC = static_cast<PLCInstance*>(vcc_pin->owner());
-				ASSERT(lexical_cast<Site::SiteType>(VCC->module_type())==Site::VCC, (CONSOLE::PLC_ERROR % (VCC->name() + ": is not a VCC device")));
-				PLCInstance* inst = static_cast<PLCInstance*>(net->sink_pins().begin()->owner());
-				Point invalid_pos;
-				Point pos = inst->property_value(positions);
-				ASSERT(pos!=invalid_pos, (CONSOLE::PLC_ERROR % (inst->name() + ": is not placed")));
-				ArchCell* tile_cell = FPGADesign::instance()->get_inst_by_pos(pos)->down_module();
-				ASSERTD(find_if(tile_cell->instances(), [](const ArchInstance* inst) { return inst->module_type() == lexical_cast<string>(Site::VCC) })
-						!= tile_cell->instances().end(),
-					(CONSOLE::PLC_ERROR % ("VCC site does not exist at:" + lexical_cast<string>(pos))));
-				VCC->set_property(positions, pos);
-			}
-		}
-		// 		for (PLCNet& net: static_cast<PLCModule&>(_design->top_cell()).nets())
-		// 			net.clear_pips();
-	}
-	/************************************************************************/
-	/* ¹¦ÄÜ£ºÍ³¼ÆÓÃµÄ×ÊÔ´                                      
-	* ²ÎÊý£ºvoid
-	* ·µ»ØÖµ£ºvoid
-	* ËµÃ÷£º
-	*/
-	/************************************************************************/	
-	void NLInfo::classify_used_resource()
-	{
-		for (PLCInstance* inst: static_cast<PLCModule*>(_design->top_module())->instances()){
-			//Èç¹ûÒÑ¾­ÓÐÒ»¸ö£¬ÄÇÃ´¸ÃÀàÐÍ+1
-			if(_rsc_stat.count(inst->module_type()))
-				_rsc_stat[inst->module_type()] += 1;
-			//ÒÔÇ°Ã»ÓÐ£¬ÄÇÃ´Îª1
-			else
-				_rsc_stat[inst->module_type()]  = 1;
-		}
+    inst->set_property(positions, inst->curr_logic_pos());
+  }
+  /************************************************************************/
+  /*ï¿½ï¿½ï¿½ï¿½V2ï¿½Ðµï¿½VCCï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ISEï¿½ï¿½ï¿½ï¿½ï¿½ï¿½*/
+  /************************************************************************/
+  for (PLCNet *net : static_cast<PLCModule *>(_design->top_module())->nets()) {
+    PLCNet::pin_iter vcc_pin = find_if(net->pins(), [](const Pin *pin) {
+      return pin->name() == DEVICE::VCCOUT;
+    });
+    if (vcc_pin != net->pins().end()) {
+      PLCInstance *VCC = static_cast<PLCInstance *>(vcc_pin->owner());
+      ASSERT(lexical_cast<Site::SiteType>(VCC->module_type()) == Site::VCC,
+             (CONSOLE::PLC_ERROR % (VCC->name() + ": is not a VCC device")));
+      PLCInstance *inst =
+          static_cast<PLCInstance *>(net->sink_pins().begin()->owner());
+      Point invalid_pos;
+      Point pos = inst->property_value(positions);
+      ASSERT(pos != invalid_pos,
+             (CONSOLE::PLC_ERROR % (inst->name() + ": is not placed")));
+      ArchCell *tile_cell =
+          FPGADesign::instance()->get_inst_by_pos(pos)->down_module();
+      ASSERTD(find_if(tile_cell->instances(),
+                      [](const ArchInstance *inst) {
+                        return inst->module_type() ==
+                               lexical_cast<string>(Site::VCC)
+                      }) != tile_cell->instances().end(),
+              (CONSOLE::PLC_ERROR %
+               ("VCC site does not exist at:" + lexical_cast<string>(pos))));
+      VCC->set_property(positions, pos);
+    }
+  }
+  // 		for (PLCNet& net:
+  // static_cast<PLCModule&>(_design->top_cell()).nets())
+  // net.clear_pips();
+}
+/************************************************************************/
+/* ï¿½ï¿½ï¿½Ü£ï¿½Í³ï¿½ï¿½ï¿½Ãµï¿½ï¿½ï¿½Ô´
+ * ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½void
+ * ï¿½ï¿½ï¿½ï¿½Öµï¿½ï¿½void
+ * Ëµï¿½ï¿½ï¿½ï¿½
+ */
+/************************************************************************/
+void NLInfo::classify_used_resource() {
+  for (PLCInstance *inst :
+       static_cast<PLCModule *>(_design->top_module())->instances()) {
+    // ï¿½ï¿½ï¿½ï¿½Ñ¾ï¿½ï¿½ï¿½Ò»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ã´ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½+1
+    if (_rsc_stat.count(inst->module_type()))
+      _rsc_stat[inst->module_type()] += 1;
+    // ï¿½ï¿½Ç°Ã»ï¿½Ð£ï¿½ï¿½ï¿½Ã´Îª1
+    else
+      _rsc_stat[inst->module_type()] = 1;
+  }
 
 #ifdef UNUSED
-		int carrychain_count = 0;
-		for (MacroInfo::CarryChains::value_type& chains: _macro_info._carrychains)
-			carrychain_count += chains.second.size();
+  int carrychain_count = 0;
+  for (MacroInfo::CarryChains::value_type &chains : _macro_info._carrychains)
+    carrychain_count += chains.second.size();
 
-		if(carrychain_count)
-			_rsc_stat[Module::CARRY_CHAIN] = carrychain_count;
+  if (carrychain_count)
+    _rsc_stat[Module::CARRY_CHAIN] = carrychain_count;
 #endif
-	}
-	/************************************************************************/
-	/* ¹¦ÄÜ£ºÍ³¼ÆÍø±íÖÐµÄ×ÊÔ´ÐÅÏ¢                                       
-	* ²ÎÊý£ºvoid
-	* ·µ»ØÖµ£ºvoid
-	* ËµÃ÷£º
-	*/
-	/************************************************************************/	
-	void NLInfo::echo_netlist_resource()
-	{
-		//design name
-		INFO(CONSOLE::DESIGN % _design->name());
-		//Êä³öÃ¿Ò»¸öÀàÐÍµÄÊ÷Ä¾
-		for (RscStat::value_type& rsc: _rsc_stat)
-			INFO(CONSOLE::RSC_IN_DESIGN % rsc.first % rsc.second);
-		//Êä³öÏßÍøÊýÄ¿
-		INFO(CONSOLE::RSC_IN_DESIGN % "Net" % _design->top_module()->num_nets());
-	}
-	/************************************************************************/
-	/* ¹¦ÄÜ£ºÊä³ö×ÊÔ´ÀûÓÃÂÊ                                      
-	* ²ÎÊý£ºvoid
-	* ·µ»ØÖµ£ºvoid
-	* ËµÃ÷£º
-	*/
-	/************************************************************************/	
-	void NLInfo::echo_resource_usage(DeviceInfo::RscStat& dev_rsc)
-	{
-		//Æ÷¼þÀàÐÍ
-		INFO(CONSOLE::DEVICE_TYPE % ARCH::FPGADesign::instance()->name());
-		//Êä³öÃ¿Ò»ÀàÐÍµÄ¶«Î÷ËùÓÃµÄpercent
-		for (const RscStat::value_type& rsc: _rsc_stat) {
-			Site::SiteType type = lexical_cast<Site::SiteType>(rsc.first);
+}
+/************************************************************************/
+/* ï¿½ï¿½ï¿½Ü£ï¿½Í³ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ðµï¿½ï¿½ï¿½Ô´ï¿½ï¿½Ï¢
+ * ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½void
+ * ï¿½ï¿½ï¿½ï¿½Öµï¿½ï¿½void
+ * Ëµï¿½ï¿½ï¿½ï¿½
+ */
+/************************************************************************/
+void NLInfo::echo_netlist_resource() {
+  // design name
+  INFO(CONSOLE::DESIGN % _design->name());
+  // ï¿½ï¿½ï¿½Ã¿Ò»ï¿½ï¿½ï¿½ï¿½ï¿½Íµï¿½ï¿½ï¿½Ä¾
+  for (RscStat::value_type &rsc : _rsc_stat)
+    INFO(CONSOLE::RSC_IN_DESIGN % rsc.first % rsc.second);
+  // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä¿
+  INFO(CONSOLE::RSC_IN_DESIGN % "Net" % _design->top_module()->num_nets());
+}
+/************************************************************************/
+/* ï¿½ï¿½ï¿½Ü£ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ô´ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+ * ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½void
+ * ï¿½ï¿½ï¿½ï¿½Öµï¿½ï¿½void
+ * Ëµï¿½ï¿½ï¿½ï¿½
+ */
+/************************************************************************/
+void NLInfo::echo_resource_usage(DeviceInfo::RscStat &dev_rsc) {
+  // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+  INFO(CONSOLE::DEVICE_TYPE % ARCH::FPGADesign::instance()->name());
+  // ï¿½ï¿½ï¿½Ã¿Ò»ï¿½ï¿½ï¿½ÍµÄ¶ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ãµï¿½percent
+  for (const RscStat::value_type &rsc : _rsc_stat) {
+    Site::SiteType type = lexical_cast<Site::SiteType>(rsc.first);
 
-			if(dev_rsc.count(type)){
-				double percent = (double)rsc.second / dev_rsc[type] *100.;
-				if(type == Site::SLICE)
-					INFO(CONSOLE::RSC_SLICE % rsc.first % DEVICE::NUM_LUT_INPUTS % percent);
-				else			
-					INFO(CONSOLE::RSC_USAGE % rsc.first % percent);				
-			}
-		}
-	}
-	/************************************************************************/
-	/* ¹¦ÄÜ£ºÍ³¼ÆÍø±íÖÐµÄ×ÊÔ´ÐÅÏ¢                                       
-	* ²ÎÊý£ºvoid
-	* ·µ»ØÖµ£ºvoid
-	* ËµÃ÷£º
-	*/
-	/************************************************************************/	
-	
-	void NLInfo::writeReport(DeviceInfo::RscStat& dev_rsc, string output_file)
-	{
-		using namespace FDU::RPT;
-		char val_string[25];
-		char percent_string[25];
-		double percent;
+    if (dev_rsc.count(type)) {
+      double percent = (double)rsc.second / dev_rsc[type] * 100.;
+      if (type == Site::SLICE)
+        INFO(CONSOLE::RSC_SLICE % rsc.first % DEVICE::NUM_LUT_INPUTS % percent);
+      else
+        INFO(CONSOLE::RSC_USAGE % rsc.first % percent);
+    }
+  }
+}
+/************************************************************************/
+/* ï¿½ï¿½ï¿½Ü£ï¿½Í³ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ðµï¿½ï¿½ï¿½Ô´ï¿½ï¿½Ï¢
+ * ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½void
+ * ï¿½ï¿½ï¿½ï¿½Öµï¿½ï¿½void
+ * Ëµï¿½ï¿½ï¿½ï¿½
+ */
+/************************************************************************/
 
-		string design_name = output_file;
-		int str_len = design_name.length();
-		design_name = design_name.replace(str_len - 8, 8, "");
-		Report* rpt = new Report();
-		rpt->set_design(design_name);
-		
-		Section* sec_type = rpt->create_section("Type_Count", "Type Count");
-		Table* table_type = sec_type->create_table("General_Table");
-		table_type->create_column("Type_Name", "Type Name");
-		table_type->create_column("Count", "Count");
+void NLInfo::writeReport(DeviceInfo::RscStat &dev_rsc, string output_file) {
+  using namespace FDU::RPT;
+  char val_string[25];
+  char percent_string[25];
+  double percent;
 
-		for (RscStat::value_type& rsc: _rsc_stat)
-		{
-			Site::SiteType type = lexical_cast<Site::SiteType>(rsc.first);
-			if(dev_rsc.count(type)){
-				percent = (double)rsc.second / dev_rsc[type] *100.;
-				sprintf(percent_string, "%.2f%%", percent);
-				sprintf(val_string, "%d", rsc.second);
+  string design_name = output_file;
+  int str_len = design_name.length();
+  design_name = design_name.replace(str_len - 8, 8, "");
+  Report *rpt = new Report();
+  rpt->set_design(design_name);
 
-				Row* row = table_type->create_row();
-				row->set_item("Type_Name", rsc.first);
-				row->set_item("Count", rsc.second);
-			}
-		}
+  Section *sec_type = rpt->create_section("Type_Count", "Type Count");
+  Table *table_type = sec_type->create_table("General_Table");
+  table_type->create_column("Type_Name", "Type Name");
+  table_type->create_column("Count", "Count");
 
-		rpt->write(design_name+"_plc_rpt.xml");
-		
-	}
+  for (RscStat::value_type &rsc : _rsc_stat) {
+    Site::SiteType type = lexical_cast<Site::SiteType>(rsc.first);
+    if (dev_rsc.count(type)) {
+      percent = (double)rsc.second / dev_rsc[type] * 100.;
+      snprintf(percent_string, 25, "%.2f%%", percent);
+      snprintf(val_string, 25, "%d", rsc.second);
 
-}}
+      Row *row = table_type->create_row();
+      row->set_item("Type_Name", rsc.first);
+      row->set_item("Count", rsc.second);
+    }
+  }
+
+  rpt->write(design_name + "_plc_rpt.xml");
+}
+
+} // namespace Place
+} // namespace FDU

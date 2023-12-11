@@ -3,31 +3,33 @@
 
 #include "circuit/netLib/net/net.h"
 
-namespace BitGen { namespace circuit {
-	
-	class netLib{
-	public:
-		using netsType       = cktContainer<Net>::range_type;
-		using const_netsType = cktContainer<Net>::const_range_type;
-		using netIter		 = cktContainer<Net>::iterator;
-		using const_netIter  = cktContainer<Net>::const_iterator;
+namespace BitGen {
+namespace circuit {
 
-	private:
-		cktContainer<Net> _nets;
-		instLib* _refInstLib;
+class netLib {
+public:
+  using netsType = cktContainer<Net>::range_type;
+  using const_netsType = cktContainer<Net>::const_range_type;
+  using netIter = cktContainer<Net>::iterator;
+  using const_netIter = cktContainer<Net>::const_iterator;
 
-	public:
-		explicit netLib(instLib* refInstLib = 0) : _refInstLib(refInstLib) {}
+private:
+  cktContainer<Net> _nets;
+  instLib *_refInstLib;
 
-		netsType	   nets()		{ return _nets.range(); }
-		const_netsType nets() const { return _nets.range(); }
+public:
+  explicit netLib(instLib *refInstLib = 0) : _refInstLib(refInstLib) {}
 
-		Net* addNet(Net* net) { return _nets.add(net); }
-		Net& getNet(const std::string& netName) { return *nets().find(netName); }
+  netsType nets() { return _nets.range(); }
+  const_netsType nets() const { return _nets.range(); }
 
-		void listNetPips(vecPips& pips);
-	};
+  Net *addNet(Net *net) { return _nets.add(net); }
+  Net &getNet(const std::string &netName) { return *nets().find(netName); }
 
-}}
+  void listNetPips(vecPips &pips);
+};
+
+} // namespace circuit
+} // namespace BitGen
 
 #endif

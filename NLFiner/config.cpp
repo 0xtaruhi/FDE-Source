@@ -35,11 +35,9 @@ void Config::debug_info() const {
 }
 
 void ConfigRepo::debug_info() const {
-  pair<string, map<string, Config *>> block;
-  pair<string, Config *> pm;
-  for (block : _config) {
+  for (const auto& block : _config) {
     cout << "Block: " << block.first << endl;
-    for (pm : block.second) {
+    for (const auto& pm : block.second) {
       cout << "Primitive: " << pm.first << endl;
       pm.second->debug_info();
     }

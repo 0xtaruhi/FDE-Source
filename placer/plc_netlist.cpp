@@ -142,7 +142,7 @@ void NLInfo::save_place() {
       ASSERTD(find_if(tile_cell->instances(),
                       [](const ArchInstance *inst) {
                         return inst->module_type() ==
-                               lexical_cast<string>(Site::VCC)
+                               lexical_cast<string>(Site::VCC);
                       }) != tile_cell->instances().end(),
               (CONSOLE::PLC_ERROR %
                ("VCC site does not exist at:" + lexical_cast<string>(pos))));

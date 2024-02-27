@@ -55,7 +55,7 @@ struct Warning {
 struct Info {
   std::string _msg;
 
-  explicit Info(const std::string &msg) : _msg("|>> " + msg) {}
+  explicit Info(const std::string &msg) : _msg(msg) {}
   operator ccstr() const { return _msg.c_str(); }
 };
 

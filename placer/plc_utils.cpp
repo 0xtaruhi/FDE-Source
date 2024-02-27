@@ -7,7 +7,7 @@ using namespace std;
 
 namespace DEVICE {
 /************************************************************************/
-/* ³õÊ¼»¯µÄÖµ¶¼ÊÇÕë¶Ô3000kµÄ£¬Èç¹ûÊÇv2µÄ»°³ÌÐò»á´¦Àí¸üÐÂÕâÐ©Öµ */
+/* ï¿½ï¿½Ê¼ï¿½ï¿½ï¿½ï¿½Öµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½3000kï¿½Ä£ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½v2ï¿½Ä»ï¿½ï¿½ï¿½ï¿½ï¿½á´¦ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ð©Öµ */
 int NUM_SLICE_PER_TILE = 2;
 int NUM_CARRY_PER_TILE = 2;
 int NUM_LUT_INPUTS = 4;
@@ -28,7 +28,7 @@ ostream &operator<<(ostream &s, DelayTableType type) {
 } // namespace DEVICE
 
 /************************************************************************/
-/* ³ÌÐòÖ´ÐÐ¹ý³ÌÖÐµÄÊä³ö¸ñÊ½                                             */
+/* ï¿½ï¿½ï¿½ï¿½Ö´ï¿½Ð¹ï¿½ï¿½ï¿½ï¿½Ðµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê½                                             */
 /************************************************************************/
 namespace CONSOLE {
 // ERROR
@@ -45,7 +45,7 @@ format COPY_RIGHT("Release 1.0 - Place\n"
 format EFFORT_LEVEL("Effort Level  : %1%");
 format PLC_MODE("Mode          : %1%");
 format PROGRESS("Progress  %1$3d%%: %2% ...");
-format FINISH("Successfully finish placement. Elapsed Time: %1%s");
+format FINISH("Successfully finish the placement. Elapsed Time: %1%s");
 format DESIGN("Design        : \"%1%\", resource statistic:");
 format RSC_IN_DESIGN("  * Amount of %1%: %2%");
 format DEVICE_TYPE("Device        : \"%1%\", resource usage:");

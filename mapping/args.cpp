@@ -21,7 +21,8 @@ Args::Args(int argc, char **argv) {
     po::store(po::parse_command_line(argc, argv, desc), vm);
     po::notify(vm);
 
-    cout << fde_copyright("Mapping");
+    // cout << fde_copyright("Mapping");
+    // FDU_LOG(INFO) << Info("Successfullly map the logical netlist!");
 
     if (vm.count("help")) {
       cout << desc << endl;

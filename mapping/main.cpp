@@ -13,6 +13,7 @@
 #include "log.h"
 #include "mapping.hpp"
 #include <chrono>
+#include <iomanip>
 
 using namespace std;
 using namespace std::chrono;
@@ -54,8 +55,8 @@ int main(int argc, char **argv) {
   FDU_LOG(INFO) << "write report";
   mm.doReport();
 
-  dur = duration_cast<duration<double>>(steady_clock::now() - t0).count();
-  FDU_LOG(INFO) << "mapping success! Cost time " << dur << " s.";
+  dur = duration_cast<duration<double>>(steady_clock::now() - t0).count(); 
+  FDU_LOG(INFO) << "Successfully map the netlist. Elapsed Time: " << setprecision(0) << dur << "s";
 
   return 0;
 }

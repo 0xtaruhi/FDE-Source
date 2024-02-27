@@ -129,7 +129,7 @@ const char *const info_msg[] = {
     "  * After %1% iterations %2% net(s) unrouted",   // INFO_ECHO_NUM_URT_NET
     "Successfully route the design after %1% iterations. Pips Usage: %2%%%. "
     "Number of ignored nets: %3%",       // INFO_SUCES_RT
-    "Route complete. Elapsed Time: %1%s" // INFO_FNL_RT
+    "Successfully route the design. Elapsed Time: %1%s" // INFO_FNL_RT
 };
 
 class InfoMsg : public MsgFormat {

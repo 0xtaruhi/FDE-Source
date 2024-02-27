@@ -17,8 +17,8 @@ int main(int argc, char *argv[]) {
   bitgen.tryBGen();
 
   time(&end);
-  FDU_LOG(INFO) << Info("Successfully bitgen in ") << difftime(end, start)
-                << "s!";
+  FDU_LOG(INFO) << Info("Successfully generate the bitstream. Elapsed Time: ") << difftime(end, start)
+                << "s";
 
   return 0;
 }

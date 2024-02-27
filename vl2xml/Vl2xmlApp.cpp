@@ -360,13 +360,15 @@ int Vl2xmlApp::saveXML() {
 #endif
     // save the xml
     _XMLDesign->save("xml", _XMLFileName, _needEncrypt);
-    std::cout << "Save XML Successfully!" << std::endl;
+    // FDU_LOG(INFO) << "Save XML Successfully!";
+    std::cout << "INFO : Successfully save XML file." << std::endl;
   } catch (std::exception &e) {
     std::cout
         << "An error happened in saving xml! The reasong is listed below :"
         << std::endl;
     std::cout << e.what() << std::endl;
     return 1;
+    
   }
   POP_STEP;
   return 0;

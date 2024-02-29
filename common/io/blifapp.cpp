@@ -56,7 +56,7 @@ int BLIFApp::process_args(int argc, char *argv[]) {
     }
   } catch (std::exception &e) {
     std::cout << e.what() << std::endl;
-    return -1;
+    return 1;
   }
   return 0;
 }

@@ -60,7 +60,6 @@ static string TrimEscapedStr(Module &cell, string escaped, int type) {
 }
 
 void Vl2xmlApp::initialize() {
-
   /*do some initialization job*/
   _verilogDesign = new VerilogDesign;
 }
@@ -118,11 +117,21 @@ int Vl2xmlApp::ProcessArgs(int argc, char *argv[]) {
 
     if (vm.count("input")) {
       s = vm["input"].as<vector<string>>();
-      for (vector<string>::const_iterator it = s.begin(); it != s.end(); ++it)
-        _SrcFileList.push_back(*it);
-    } else {
-      _SrcFileList.push_back(_prjName.append(".v"));
+      for (vector<string>::const_iterator it = s.begin(); it != s.end(); ++it) {
+        if (it->length() > 0) {
+          _SrcFileList.push_back(*it);
+
+        } else {
+          std::cout << "ERROR : No source file to parse!" << std::endl;
+          exit(1);
+        }
+      }
     }
+    //  else {
+    //   // _SrcFileList.push_back(_prjName.append(".v"));
+    //   std::cout << "ERROR : No source file to parse!" << std::endl;
+    //   return 1;
+    // }
 
     if (vm.count("check"))
       _needClarify = true;
@@ -155,17 +164,17 @@ int Vl2xmlApp::ProcessArgs(int argc, char *argv[]) {
 
   } catch (std::exception &e) {
     std::cout << e.what() << std::endl;
-    return -1;
+    return 1;
   }
   return 0;
 }
 
 int Vl2xmlApp::parseDesign() {
+  std::cout << "Parse Design Start" << std::endl;
   /* 1 pass the design to yacc*/
   yydesign = _verilogDesign;
 
   /* 2 create a new design in data structure */
-
   _XMLDesign = new Design("XMLDesign");
 
   /* 3 read the library*/
@@ -173,13 +182,13 @@ int Vl2xmlApp::parseDesign() {
     std::cout << "An error happened in reading cell library!" << std::endl;
     return 1;
   }
-
   /* 4 read the source files*/
   for (vector<string>::iterator it = _SrcFileList.begin();
        it != _SrcFileList.end(); ++it) {
     parseSourceFile((*it).c_str());
+    std::cout << "Parse " << *it << " Done" << std::endl;
   }
-
+  std::cout << "Parse Design Done" << std::endl;
   return 0;
 }
 
@@ -213,7 +222,7 @@ int Vl2xmlApp::parseSourceFile(std::string name) {
   } catch (std::exception &e) {
     /*leave for future improvement*/
     std::cout << e.what() << std::endl;
-    return -1;
+    return 1;
   }
   return 0;
 }
@@ -368,7 +377,6 @@ int Vl2xmlApp::saveXML() {
         << std::endl;
     std::cout << e.what() << std::endl;
     return 1;
-    
   }
   POP_STEP;
   return 0;

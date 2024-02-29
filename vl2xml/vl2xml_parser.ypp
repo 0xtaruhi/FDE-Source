@@ -1392,5 +1392,5 @@ void yyerror(const char *str)
         cerr << "ERROR: " << str << endl << " at " << yyfilename << " : " << "Line " <<  yylineno << endl;
     }
     assert(false);
-    exit(0);
+    exit(1);
 }

@@ -1,5 +1,6 @@
 #include "DebugHelper.hpp"
 #include "Vl2xmlApp.h"
+#include <iostream>
 
 using namespace VL2XML_PARSER;
 

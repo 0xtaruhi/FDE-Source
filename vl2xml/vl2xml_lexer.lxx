@@ -285,7 +285,7 @@ of									return VLOG_OF_IN_COMMENT;
                             ; // ignore
                         else {
                             yyerror("Parsing octal constant failed");
-                            exit(0);
+                            exit(1);
                         }
                     }
                         
@@ -390,7 +390,7 @@ of									return VLOG_OF_IN_COMMENT;
                         yylval.Num.number.bits = atoi(buf);
                         if(yylval.Num.number.bits == 0) {
                             yyerror("Invalid zero-length constant");
-                            exit(0);
+                            exit(1);
                         }
                     } else
                         yylval.Num.number.bits = -1;

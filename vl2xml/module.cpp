@@ -142,6 +142,7 @@ int VerilogModule::clarifyInstanceType(list<VerilogModule *> &modulelist,
         /*need more care*/
         std::cout << "Can't find " << (*itI)->type
                   << " in neither CellLibrary and Module list" << std::endl;
+        return 1;
       }
     }
   }
@@ -254,7 +255,7 @@ int VerilogModule::ConvertParameters(Module &cell, Library &cell_lib,
     } else {
       std::cout << "Parameter type not supported\n";
       std::cout << "Parameter name: " << (*it)->name << "\n";
-      exit(0);
+      exit(1);
     }
     lineno = (*it)->lineno;
     // std::cout<< "parameter" << (*it)->lineno<<std::endl;

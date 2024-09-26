@@ -35,7 +35,7 @@ else()
 		${PROJECT_SOURCE_DIR}/utils/zfstream.h)
 endif()
 
-add_library(${PROJECT_NAME}
+add_library(${PROJECT_NAME} SHARED
 		netlist/netlist.cpp
 
 		io/fileio.cpp

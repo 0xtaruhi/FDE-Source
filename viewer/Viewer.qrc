@@ -1,0 +1,25 @@
+<RCC>
+    <qresource prefix="/">
+        <file>images/about.png</file>
+        <file>images/bit_gen.png</file>
+        <file>images/CPUz_dtu.ico</file>
+        <file>images/draw_net.png</file>
+        <file>images/find.png</file>
+        <file>images/full_scale.png</file>
+        <file>images/hide_all.png</file>
+        <file>images/hide_unhighlighted.png</file>
+        <file>images/hide_unselected.png</file>
+        <file>images/open_arch.png</file>
+        <file>images/open_design.png</file>
+        <file>images/quit.png</file>
+        <file>images/route_save.png</file>
+        <file>images/save.png</file>
+        <file>images/save_as.png</file>
+        <file>images/show_place_info.png</file>
+        <file>images/show_timing_info.png</file>
+        <file>images/viewer.bmp</file>
+        <file>images/zoom_in.png</file>
+        <file>images/zoom_out.png</file>
+        <file>images/zoom_selection.png</file>
+    </qresource>
+</RCC>
